@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, ViewTransition } from "react";
 import type { Metadata } from "next";
 import Form from "next/form";
 import Link from "next/link";
@@ -21,6 +21,7 @@ import {
   runToolQuery,
   toolQueryHref,
 } from "@/lib/content/tool-query";
+import { reveal } from "@/lib/motion";
 
 export const metadata: Metadata = {
   title: "Explore AI tools",
@@ -123,13 +124,16 @@ async function ToolsDirectory({
 
         {result.items.length > 0 ? (
           <>
-            <ul className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {result.items.map((tool) => (
-                <li key={tool.slug}>
-                  <ToolCard tool={tool} categoryName={categoryName(tool.categorySlugs[0])} />
-                </li>
-              ))}
-            </ul>
+            {/* Crossfades in place whenever the filters change. */}
+            <ViewTransition key={formKey} enter="results" exit="results" default="none">
+              <ul className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {result.items.map((tool, i) => (
+                  <li key={tool.slug} {...reveal(i)}>
+                    <ToolCard tool={tool} categoryName={categoryName(tool.categorySlugs[0])} />
+                  </li>
+                ))}
+              </ul>
+            </ViewTransition>
             <div className="mt-10">
               <Pagination
                 page={result.page}

@@ -32,6 +32,7 @@ Updated after each milestone. Mirrors section 18 of the master brief.
 - [x] Search results (tools, guides, workflows, prompts, settings, troubleshooting; type tabs; empty state)
 - [x] Related content (guides, workflows and similar tools on tool pages)
 - [x] Loading skeletons, empty states and a friendly error page
+- [x] Motion system (page transitions, logo morph, scroll reveal, hero effects; reduced-motion safe)
 - [ ] Owner review of the prototype
 
 ## Backend and admin (Phases 3–4)

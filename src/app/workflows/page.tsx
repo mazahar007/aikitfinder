@@ -5,6 +5,7 @@ import { SampleNotice } from "@/components/content/sample-notice";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { Container } from "@/components/layout/container";
 import { getWorkflows } from "@/lib/content/repository";
+import { reveal } from "@/lib/motion";
 
 export const metadata: Metadata = {
   title: "Workflows",
@@ -24,8 +25,8 @@ export default async function WorkflowsPage() {
       </p>
       <SampleNotice className="mt-6" />
       <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {workflows.map((w) => (
-          <li key={w.slug}>
+        {workflows.map((w, i) => (
+          <li key={w.slug} {...reveal(i)}>
             <WorkflowCard workflow={w} />
           </li>
         ))}

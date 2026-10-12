@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
  * covers the card so the whole card is clickable without nesting links.
  */
 const cardBase =
-  "group relative flex h-full flex-col rounded-md border bg-card p-5 transition-[box-shadow,border-color] duration-150 hover:border-input hover:shadow-card-hover focus-within:border-primary";
+  "group relative flex h-full flex-col card-motion rounded-md border bg-card p-5 hover:border-input hover:shadow-card-hover focus-within:border-primary";
 const stretchedLink =
   "after:absolute after:inset-0 after:rounded-md after:content-[''] focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-ring";
 
@@ -36,7 +36,7 @@ export function ToolCard({
   return (
     <article className={cardBase}>
       <div className="flex items-start gap-3">
-        <ToolLogo name={tool.name} />
+        <ToolLogo name={tool.name} morphId={tool.slug} />
         <div className="min-w-0">
           <Heading className="text-base leading-snug font-semibold text-foreground">
             <Link href={`/tools/${tool.slug}`} className={stretchedLink}>
@@ -124,7 +124,7 @@ export function CategoryCard({
 }) {
   return (
     <article className={cn(cardBase, compact ? "p-4" : "p-5")}>
-      <span className="inline-flex size-10 items-center justify-center rounded-md bg-primary-tint text-primary-hover">
+      <span className="card-icon inline-flex size-10 items-center justify-center rounded-md bg-primary-tint text-primary-hover">
         <CategoryIcon icon={category.icon} className="size-5" />
       </span>
       <h3 className="mt-3 text-sm leading-snug font-semibold text-foreground sm:text-base">

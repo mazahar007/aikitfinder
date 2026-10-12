@@ -15,6 +15,7 @@ import {
   getGuidesInCategory,
   getToolsInCategory,
 } from "@/lib/content/repository";
+import { reveal } from "@/lib/motion";
 
 export async function generateStaticParams() {
   const categories = await getCategories();
@@ -73,8 +74,8 @@ export default async function CategoryPage({ params }: PageProps<"/categories/[s
         />
         {tools.length ? (
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {tools.map((t) => (
-              <li key={t.slug}>
+            {tools.map((t, i) => (
+              <li key={t.slug} {...reveal(i)}>
                 <ToolCard tool={t} />
               </li>
             ))}
@@ -98,8 +99,8 @@ export default async function CategoryPage({ params }: PageProps<"/categories/[s
             linkLabel="All guides"
           />
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {guides.map((g) => (
-              <li key={g.slug}>
+            {guides.map((g, i) => (
+              <li key={g.slug} {...reveal(i)}>
                 <GuideCard guide={g} />
               </li>
             ))}

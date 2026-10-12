@@ -1,0 +1,372 @@
+/*
+ * AIKitFinder motion system
+ * -------------------------
+ * Motion explains what is happening; it never decorates for its own sake:
+ *   - arrival:     content rises gently into place (page enter, scroll reveal)
+ *   - continuity:  the same tool logo travels from a card to its page (morph)
+ *   - response:    hover, focus and copy feedback within 150–250ms
+ *   - progress:    reading progress bar on long pages
+ *
+ * Everything animates only transform and opacity (cheap for phones), and all
+ * of it is switched off when the device asks for reduced motion. Scroll-driven
+ * effects are progressive enhancement: browsers without support show the
+ * final, static state.
+ */
+
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+  --dur-slow: 450ms;
+}
+
+@property --search-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* ---------------------------------------------------------------- keyframes */
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes aurora-drift-a {
+  from {
+    transform: translate3d(-8%, -6%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(10%, 8%, 0) scale(1.15);
+  }
+}
+
+@keyframes aurora-drift-b {
+  from {
+    transform: translate3d(8%, 4%, 0) scale(1.1);
+  }
+  to {
+    transform: translate3d(-10%, -6%, 0) scale(0.95);
+  }
+}
+
+@keyframes gradient-pan {
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes spin-angle {
+  to {
+    --search-angle: 360deg;
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.6);
+  }
+  60% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes grow-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes header-raise {
+  to {
+    box-shadow: 0 6px 24px -12px rgb(15 23 42 / 25%);
+  }
+}
+
+/* ------------------------------------------------------------- hero effects */
+
+/* Soft, slowly drifting colour light behind the hero (no blur filter: the
+   gradients are already soft, which keeps it cheap on phones). */
+.aurora {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.aurora::before,
+.aurora::after {
+  content: "";
+  position: absolute;
+  width: 70vmax;
+  height: 70vmax;
+  border-radius: 50%;
+  opacity: 0.9;
+}
+.aurora::before {
+  top: -45vmax;
+  left: -15vmax;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--primary) 34%, transparent),
+    transparent
+  );
+}
+.aurora::after {
+  top: -35vmax;
+  right: -25vmax;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--learn) 30%, transparent),
+    transparent
+  );
+}
+/* Faint grid that fades out towards the edges. */
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--border) 70%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--border) 70%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black, transparent);
+}
+
+/* Gradient wording, e.g. "Use it." in the headline. */
+.text-gradient {
+  background: linear-gradient(90deg, var(--primary), var(--learn), var(--primary));
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Animated light ring around the hero search while it has focus: the border
+   is painted with a rotating conic gradient behind the solid card fill. */
+.search-glow:focus-within {
+  border-color: transparent;
+  background:
+    linear-gradient(var(--card), var(--card)) padding-box,
+    conic-gradient(from var(--search-angle), var(--primary), var(--learn), var(--primary))
+      border-box;
+}
+
+/* ------------------------------------------------------------- interaction */
+
+/* Cards lift slightly and a soft light follows the pointer. --mx/--my are
+   set by <PointerSpotlight />. */
+.card-motion {
+  isolation: isolate;
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+}
+.card-motion::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    320px circle at var(--mx, 50%) var(--my, 0%),
+    color-mix(in srgb, var(--primary) 9%, transparent),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+.card-motion:hover::before {
+  opacity: 1;
+}
+.card-motion .card-icon {
+  transition: transform var(--dur-base) var(--ease-out);
+}
+.card-motion:hover .card-icon {
+  transform: translateY(-2px) rotate(-6deg) scale(1.06);
+}
+
+.pop-in {
+  animation: pop var(--dur-base) var(--ease-out);
+}
+
+/* ------------------------------------------------------- reading progress */
+
+.reading-progress {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 60;
+  height: 3px;
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  background: linear-gradient(90deg, var(--primary), var(--learn));
+}
+
+/* ---------------------------------------------- motion only when welcomed */
+
+@media (prefers-reduced-motion: no-preference) {
+  .aurora::before {
+    animation: aurora-drift-a 22s var(--ease-in-out) infinite alternate;
+  }
+  .aurora::after {
+    animation: aurora-drift-b 26s var(--ease-in-out) infinite alternate;
+  }
+  .text-gradient {
+    animation: gradient-pan 6s linear infinite alternate;
+  }
+  .search-glow:focus-within {
+    animation: spin-angle 4s linear infinite;
+  }
+
+  /* Staggered entrance for hero content on first paint. */
+  .enter {
+    animation: rise-in 700ms var(--ease-out) both;
+    animation-delay: calc(var(--enter-delay, 0) * 90ms + 60ms);
+  }
+  .enter-fade {
+    animation: fade-in 900ms var(--ease-out) both;
+    animation-delay: calc(var(--enter-delay, 0) * 90ms + 60ms);
+  }
+
+  .card-motion:hover {
+    transform: translateY(-3px);
+  }
+
+  /* Scroll reveal: items rise into place as they enter the viewport. Items
+     already on screen at load are shown in their final state. */
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry calc(var(--reveal-i, 0) * 6%) entry calc(55% + var(--reveal-i, 0) * 6%);
+    }
+  }
+
+  /* Reading progress and the header shadow follow the page scroll. */
+  @supports (animation-timeline: scroll()) {
+    .reading-progress {
+      animation: grow-x linear both;
+      animation-timeline: scroll(root);
+    }
+    .header-scroll {
+      animation: header-raise linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 120px;
+    }
+  }
+}
+
+/* ----------------------------------------------------- view transitions */
+
+/* Keep the header still while page content changes underneath it. */
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
+}
+/* Clicks pass through to the live page during transitions. */
+::view-transition {
+  pointer-events: none;
+}
+
+/* Page change: old content fades out quickly, new content rises in. */
+::view-transition-old(.page) {
+  animation: 140ms ease-in both fade-in reverse;
+}
+::view-transition-new(.page) {
+  animation:
+    260ms var(--ease-out) 100ms both fade-in,
+    420ms var(--ease-out) both rise-in;
+}
+
+/* A tool's logo travels from its card to the tool page header. */
+::view-transition-group(.morph) {
+  animation-duration: 420ms;
+  animation-timing-function: var(--ease-out);
+}
+
+/* Filter results crossfade in place. */
+::view-transition-old(.results) {
+  animation: 120ms ease-in both fade-in reverse;
+}
+::view-transition-new(.results) {
+  animation: 240ms var(--ease-out) 60ms both fade-in;
+}
+
+/* Theme switch reveals the new theme in a circle from the toggle button. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html.theme-switching::view-transition-new(root) {
+  animation: theme-circle 520ms var(--ease-in-out) both;
+}
+@keyframes theme-circle {
+  from {
+    clip-path: circle(0 at var(--theme-x, 50%) var(--theme-y, 0%));
+  }
+  to {
+    clip-path: circle(150vmax at var(--theme-x, 50%) var(--theme-y, 0%));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}

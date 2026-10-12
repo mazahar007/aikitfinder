@@ -6,6 +6,7 @@ import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { Container } from "@/components/layout/container";
 import { skillLevelLabel, skillLevels } from "@/lib/content/labels";
 import { getGuides, getTools } from "@/lib/content/repository";
+import { reveal } from "@/lib/motion";
 
 export const metadata: Metadata = {
   title: "Guides",
@@ -38,8 +39,8 @@ export default async function GuidesPage() {
               {skillLevelLabel[level]}
             </h2>
             <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {items.map((g) => (
-                <li key={g.slug}>
+              {items.map((g, i) => (
+                <li key={g.slug} {...reveal(i)}>
                   <GuideCard guide={g} toolNames={toolNames(g.toolSlugs)} />
                 </li>
               ))}

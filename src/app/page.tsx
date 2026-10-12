@@ -12,6 +12,7 @@ import { Container } from "@/components/layout/container";
 import { SearchForm } from "@/components/search/search-form";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/content/labels";
+import { enterDelay, reveal } from "@/lib/motion";
 import {
   getCategories,
   getCategoryToolCounts,
@@ -21,6 +22,14 @@ import {
   getRecentlyUpdated,
   getTools,
 } from "@/lib/content/repository";
+
+const typingExamples = [
+  "make a video from a blog post",
+  "remove an image background",
+  "summarise a long PDF",
+  "explain this code",
+  "write a cover letter",
+];
 
 const suggestions = [
   "Write a blog post",
@@ -50,30 +59,46 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className="border-b bg-card">
-        <Container className="py-14 text-center sm:py-20">
-          <Badge variant="info" className="mb-5">
+      <section className="relative overflow-hidden border-b bg-card">
+        <div className="aurora" aria-hidden="true" />
+        <div className="hero-grid" aria-hidden="true" />
+        <Container className="relative py-16 text-center sm:py-24">
+          <Badge variant="info" className="enter mb-5" style={enterDelay(0)}>
             Free to use · No sign-up
           </Badge>
           <h1 className="mx-auto max-w-3xl text-[2.25rem] leading-tight font-extrabold tracking-tight text-balance text-heading sm:text-display">
-            Find the right AI tool. Learn it. Use it.
+            <span className="enter inline-block" style={enterDelay(1)}>
+              Find the right AI tool.
+            </span>{" "}
+            <span className="enter inline-block" style={enterDelay(2)}>
+              Learn it.
+            </span>{" "}
+            <span className="enter inline-block" style={enterDelay(3)}>
+              <span className="text-gradient">Use it.</span>
+            </span>
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lead text-muted-foreground">
+          <p
+            className="enter mx-auto mt-4 max-w-2xl text-lead text-muted-foreground"
+            style={enterDelay(4)}
+          >
             Explore AI tools, understand their settings, follow practical tutorials, and discover
             workflows that help you get better results.
           </p>
-          <SearchForm variant="hero" id="hero-search" className="mx-auto mt-8 max-w-2xl" />
-          <div className="mt-4 flex flex-wrap justify-center gap-2" aria-label="Popular searches">
-            {suggestions.map((q) => (
-              <Link
-                key={q}
-                href={`/search?q=${encodeURIComponent(q)}`}
-                className="inline-flex min-h-9 items-center rounded-full border bg-card px-3.5 text-sm text-foreground transition-colors hover:border-primary hover:bg-primary-tint hover:text-primary-hover"
-              >
-                {q}
-              </Link>
-            ))}
+          <div className="enter mx-auto mt-8 max-w-2xl" style={enterDelay(5)}>
+            <SearchForm variant="hero" id="hero-search" typingExamples={typingExamples} />
           </div>
+          <ul className="mt-4 flex flex-wrap justify-center gap-2" aria-label="Popular searches">
+            {suggestions.map((q, i) => (
+              <li key={q} className="enter-fade" style={enterDelay(6 + i)}>
+                <Link
+                  href={`/search?q=${encodeURIComponent(q)}`}
+                  className="inline-flex min-h-9 items-center rounded-full border bg-card/80 px-3.5 text-sm text-foreground backdrop-blur transition-[color,background-color,border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-primary hover:bg-primary-tint hover:text-primary-hover"
+                >
+                  {q}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </Container>
       </section>
 
@@ -91,8 +116,8 @@ export default async function HomePage() {
             linkLabel="All categories"
           />
           <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {categories.slice(0, 8).map((c) => (
-              <li key={c.slug}>
+            {categories.slice(0, 8).map((c, i) => (
+              <li key={c.slug} {...reveal(i, 4)}>
                 <CategoryCard category={c} toolCount={counts[c.slug] ?? 0} compact />
               </li>
             ))}
@@ -110,8 +135,8 @@ export default async function HomePage() {
             linkLabel="Explore all tools"
           />
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredTools.map((t) => (
-              <li key={t.slug}>
+            {featuredTools.map((t, i) => (
+              <li key={t.slug} {...reveal(i)}>
                 <ToolCard tool={t} categoryName={categoryName(t.categorySlugs[0])} />
               </li>
             ))}
@@ -129,8 +154,8 @@ export default async function HomePage() {
             linkLabel="All guides"
           />
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {guides.map((g) => (
-              <li key={g.slug}>
+            {guides.map((g, i) => (
+              <li key={g.slug} {...reveal(i)}>
                 <GuideCard guide={g} toolNames={toolNames(g.toolSlugs)} />
               </li>
             ))}
@@ -148,8 +173,8 @@ export default async function HomePage() {
             linkLabel="All workflows"
           />
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {workflows.map((w) => (
-              <li key={w.slug}>
+            {workflows.map((w, i) => (
+              <li key={w.slug} {...reveal(i)}>
                 <WorkflowCard workflow={w} />
               </li>
             ))}
@@ -161,8 +186,8 @@ export default async function HomePage() {
         <Container className="py-12">
           <SectionHeader id="recent-heading" title="Recently updated" />
           <ul className="divide-y rounded-md border bg-card">
-            {recent.map((r) => (
-              <li key={`${r.type}-${r.item.slug}`}>
+            {recent.map((r, i) => (
+              <li key={`${r.type}-${r.item.slug}`} {...reveal(i, 1)}>
                 <Link
                   href={recentHref(r)}
                   className="flex min-h-14 flex-wrap items-center gap-x-3 gap-y-1 px-4 py-3 hover:bg-surface-subtle"

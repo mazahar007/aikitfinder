@@ -34,6 +34,7 @@ import {
   getTools,
   getWorkflowsForTool,
 } from "@/lib/content/repository";
+import { reveal } from "@/lib/motion";
 
 export async function generateStaticParams() {
   const tools = await getTools();
@@ -120,6 +121,7 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
 
   return (
     <Container className="py-8 sm:py-12">
+      <div className="reading-progress" aria-hidden="true" />
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },
@@ -139,7 +141,7 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
       {/* Header */}
       <header className="mt-6 flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
         <div className="flex gap-4">
-          <ToolLogo name={tool.name} size="lg" />
+          <ToolLogo name={tool.name} size="lg" morphId={tool.slug} />
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-3xl font-bold tracking-tight text-heading sm:text-h1">
@@ -505,8 +507,8 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
               <>
                 <h3 className="mt-8 font-semibold text-heading">Similar tools</h3>
                 <ul className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                  {similar.map((t) => (
-                    <li key={t.slug}>
+                  {similar.map((t, i) => (
+                    <li key={t.slug} {...reveal(i)}>
                       <ToolCard tool={t} categoryName={categoryName(t.categorySlugs[0])} />
                     </li>
                   ))}

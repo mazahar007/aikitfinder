@@ -71,7 +71,7 @@ export default async function WorkflowPage({ params }: PageProps<"/workflows/[sl
             const tool = tools.find((t) => t.slug === step.toolSlug);
             const guide = guides.find((g) => g.slug === step.guideSlug);
             return (
-              <li key={step.title}>
+              <li key={step.title} className="reveal">
                 {i > 0 ? (
                   <ArrowDownIcon
                     className="mx-auto mb-3 size-5 text-muted-foreground"

@@ -43,6 +43,7 @@ export default async function GuidePage({ params }: PageProps<"/guides/[slug]">)
 
   return (
     <Container className="max-w-4xl py-8 sm:py-12">
+      <div className="reading-progress" aria-hidden="true" />
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },
@@ -112,7 +113,11 @@ export default async function GuidePage({ params }: PageProps<"/guides/[slug]">)
         </h2>
         <ol className="mt-6 space-y-8">
           {guide.steps.map((step, i) => (
-            <li key={step.title} id={`step-${i + 1}`} className="relative flex scroll-mt-24 gap-4">
+            <li
+              key={step.title}
+              id={`step-${i + 1}`}
+              className="reveal relative flex scroll-mt-24 gap-4"
+            >
               <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-learn text-base font-bold text-learn-foreground">
                 {i + 1}
               </span>

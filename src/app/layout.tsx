@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { PointerSpotlight } from "@/components/motion/pointer-spotlight";
 import { themeInitScript } from "@/components/theme/theme-script";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
@@ -74,6 +75,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {children}
         </main>
         <SiteFooter />
+        <PointerSpotlight />
       </body>
     </html>
   );

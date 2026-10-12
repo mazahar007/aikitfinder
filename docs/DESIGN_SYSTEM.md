@@ -84,6 +84,39 @@ filled buttons switch to dark text.
 | small     | 14px    | 14px   | 1.5         | 500    | Meta, badges, buttons   |
 | caption   | 12px    | 12px   | 1.4         | 500    | Timestamps (never body) |
 
+## Motion
+
+Implemented in `src/app/motion.css` with CSS, scroll-driven animations and React's
+`<ViewTransition>`, with no animation library. Motion always explains something; it is never
+decoration for its own sake.
+
+| Effect                             | Where                                    | What it communicates                  |
+| ---------------------------------- | ---------------------------------------- | ------------------------------------- |
+| Staggered rise-in                  | Homepage hero on load                    | The page is ready; read top to bottom |
+| Drifting colour light + faint grid | Homepage hero background                 | A modern, "alive" first impression    |
+| Animated gradient on "Use it."     | Hero headline                            | The promise of the product            |
+| Typing example searches            | Hero search placeholder (stops on focus) | What you can type here                |
+| Rotating light ring                | Hero search while focused                | Where your input goes                 |
+| Scroll reveal                      | Card grids, guide steps, workflow steps  | New content arriving                  |
+| Card lift + pointer light          | All cards on hover                       | This card is clickable                |
+| Logo morph                         | Tool card → tool page                    | Same tool, more detail                |
+| Page enter / exit                  | Every navigation (header stays still)    | You moved to a new page               |
+| Results crossfade                  | Tool filters                             | Same place, different results         |
+| Reading progress bar               | Tool and guide pages                     | How far through the page you are      |
+| Header shadow on scroll            | Site header                              | Content is scrolling beneath          |
+| Circular theme reveal              | Light/dark switch                        | The theme changed from this button    |
+| Check-mark pop                     | Copy buttons                             | Copied successfully                   |
+
+Rules:
+
+- Only `transform` and `opacity` animate, so motion stays smooth on low-end phones.
+- Durations: 150ms for feedback, 250ms for UI changes, about 450ms for page and morph transitions.
+  Easing is `cubic-bezier(0.22, 1, 0.36, 1)` (fast start, gentle stop).
+- Everything is switched off when the device asks for reduced motion. Content is always visible
+  without animation.
+- Scroll effects are progressive enhancement: browsers without scroll-driven animation support
+  show the final, static state.
+
 ## Spacing, shape and motion
 
 - **Spacing:** 4px grid (4, 8, 12, 16, 24, 32, 48, 64). 16px page gutters on phones.

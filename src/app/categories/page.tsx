@@ -4,6 +4,7 @@ import { CategoryCard } from "@/components/content/cards";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { Container } from "@/components/layout/container";
 import { getCategories, getCategoryToolCounts } from "@/lib/content/repository";
+import { reveal } from "@/lib/motion";
 
 export const metadata: Metadata = {
   title: "AI tool categories",
@@ -23,8 +24,8 @@ export default async function CategoriesPage() {
         Start from what you want to make or get done.
       </p>
       <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {categories.map((c) => (
-          <li key={c.slug}>
+        {categories.map((c, i) => (
+          <li key={c.slug} {...reveal(i)}>
             <CategoryCard category={c} toolCount={counts[c.slug] ?? 0} />
           </li>
         ))}

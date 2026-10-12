@@ -12,7 +12,11 @@ import { Button } from "@/components/ui/button";
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/85">
+    // Named so page transitions leave the header still (see motion.css).
+    <header
+      style={{ viewTransitionName: "site-header" }}
+      className="header-scroll sticky top-0 z-40 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/85"
+    >
       <Container className="flex h-16 items-center gap-4 lg:gap-6">
         <Logo />
         <nav aria-label="Main" className="hidden md:block">

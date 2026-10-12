@@ -1,3 +1,5 @@
+import { ViewTransition } from "react";
+
 import { cn } from "@/lib/utils";
 
 const tones = [
@@ -14,10 +16,16 @@ export function ToolLogo({
   name,
   size = "md",
   className,
+  morphId,
 }: {
   name: string;
   size?: "md" | "lg";
   className?: string;
+  /**
+   * Gives the logo a shared identity so it visibly travels from a tool card
+   * to the tool page header on navigation. Use only where a tool appears once.
+   */
+  morphId?: string;
 }) {
   const initials = name
     .split(/\s+/)
@@ -26,7 +34,7 @@ export function ToolLogo({
     .slice(0, 2)
     .toUpperCase();
   const tone = tones[[...name].reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % tones.length];
-  return (
+  const logo = (
     <span
       aria-hidden="true"
       className={cn(
@@ -38,5 +46,11 @@ export function ToolLogo({
     >
       {initials}
     </span>
+  );
+  if (!morphId) return logo;
+  return (
+    <ViewTransition name={`tool-logo-${morphId}`} share="morph" default="none">
+      {logo}
+    </ViewTransition>
   );
 }

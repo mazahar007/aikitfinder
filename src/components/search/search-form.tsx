@@ -15,7 +15,64 @@ type SearchFormProps = {
   shortcut?: boolean;
   className?: string;
   id?: string;
+  /** Hero only: type example searches into the placeholder to show what's possible. */
+  typingExamples?: string[];
 };
+
+const STATIC_HERO_PLACEHOLDER = "What do you want to do?";
+
+/**
+ * Types example searches into an input's placeholder, one character at a
+ * time, until the visitor focuses the field. Placeholder text is not
+ * announced repeatedly by screen readers, and the label stays constant.
+ */
+function useTypingPlaceholder(
+  inputRef: React.RefObject<HTMLInputElement | null>,
+  examples: string[] | undefined,
+) {
+  React.useEffect(() => {
+    const input = inputRef.current;
+    if (!input || !examples?.length) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let timer = 0;
+    let stopped = false;
+    let example = 0;
+    let chars = 0;
+    let deleting = false;
+
+    const tick = () => {
+      if (stopped) return;
+      const text = examples[example];
+      chars += deleting ? -1 : 1;
+      input.placeholder = `Try “${text.slice(0, chars)}”`;
+      let delay = deleting ? 28 : 55 + Math.random() * 45;
+      if (!deleting && chars === text.length) {
+        deleting = true;
+        delay = 1600;
+      } else if (deleting && chars === 0) {
+        deleting = false;
+        example = (example + 1) % examples.length;
+        delay = 350;
+      }
+      timer = window.setTimeout(tick, delay);
+    };
+
+    const stop = () => {
+      stopped = true;
+      window.clearTimeout(timer);
+      input.placeholder = STATIC_HERO_PLACEHOLDER;
+    };
+
+    timer = window.setTimeout(tick, 1200);
+    input.addEventListener("focus", stop, { once: true });
+    return () => {
+      stopped = true;
+      window.clearTimeout(timer);
+      input.removeEventListener("focus", stop);
+    };
+  }, [inputRef, examples]);
+}
 
 export function SearchForm({
   variant = "header",
@@ -23,8 +80,10 @@ export function SearchForm({
   shortcut = false,
   className,
   id = "site-search",
+  typingExamples,
 }: SearchFormProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
+  useTypingPlaceholder(inputRef, variant === "hero" ? typingExamples : undefined);
 
   React.useEffect(() => {
     if (!shortcut) return;
@@ -51,8 +110,12 @@ export function SearchForm({
       </label>
       <div
         className={cn(
-          "flex items-center gap-2 border border-input bg-card focus-within:border-primary focus-within:outline-2 focus-within:outline-offset-1 focus-within:outline-ring",
-          hero ? "rounded-lg p-1.5 pl-4 shadow-sm" : "h-11 rounded-md pl-3",
+          "flex items-center gap-2 border border-input bg-card focus-within:border-primary",
+          // The hero shows an animated light ring on focus (.search-glow);
+          // the compact field uses the standard focus outline.
+          hero
+            ? "search-glow rounded-lg border-2 p-1.5 pl-4 shadow-sm"
+            : "h-11 rounded-md pl-3 focus-within:outline-2 focus-within:outline-offset-1 focus-within:outline-ring",
         )}
       >
         <SearchIcon
@@ -70,7 +133,7 @@ export function SearchForm({
           defaultValue={defaultValue}
           autoComplete="off"
           enterKeyHint="search"
-          placeholder={hero ? "What do you want to do?" : "Search tools and guides"}
+          placeholder={hero ? STATIC_HERO_PLACEHOLDER : "Search tools and guides"}
           className={cn(
             "min-w-0 flex-1 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none",
             hero ? "h-12 text-base sm:text-lg" : "h-full text-sm",

@@ -25,7 +25,11 @@ export function CopyButton({ text, label = "Copy" }: { text: string; label?: str
 
   return (
     <Button type="button" variant="secondary" size="sm" onClick={copy}>
-      {state === "copied" ? <CheckIcon aria-hidden="true" /> : <CopyIcon aria-hidden="true" />}
+      {state === "copied" ? (
+        <CheckIcon className="pop-in" aria-hidden="true" />
+      ) : (
+        <CopyIcon aria-hidden="true" />
+      )}
       <span aria-live="polite">
         {state === "copied" ? "Copied" : state === "failed" ? "Select and copy" : label}
       </span>

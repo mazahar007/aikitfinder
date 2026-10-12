@@ -45,16 +45,28 @@ export function ThemeToggle() {
     return () => media.removeEventListener("change", onChange);
   }, []);
 
-  function toggle() {
-    const current =
-      document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+  function toggle(event: React.MouseEvent<HTMLButtonElement>) {
+    const root = document.documentElement;
+    const current = root.getAttribute("data-theme") === "dark" ? "dark" : "light";
     const next: Theme = current === "dark" ? "light" : "dark";
-    applyTheme(next);
     try {
       localStorage.setItem(THEME_STORAGE_KEY, next);
     } catch {
       // Storage can be unavailable (private mode); the switch still works for this visit.
     }
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!document.startViewTransition || reduceMotion) {
+      applyTheme(next);
+      return;
+    }
+    // Reveal the new theme in a circle growing from the button.
+    const rect = event.currentTarget.getBoundingClientRect();
+    root.style.setProperty("--theme-x", `${rect.left + rect.width / 2}px`);
+    root.style.setProperty("--theme-y", `${rect.top + rect.height / 2}px`);
+    root.classList.add("theme-switching");
+    const transition = document.startViewTransition(() => applyTheme(next));
+    transition.finished.finally(() => root.classList.remove("theme-switching"));
   }
 
   return (
