@@ -186,13 +186,28 @@ export type Guide = {
   isSample: boolean;
 };
 
+/**
+ * "manual": you do this yourself (by hand, or by using a tool and checking the
+ * result). "automatable": a tool could run this step for you, but AIKitFinder
+ * does not run it and nothing here is set up for you.
+ */
+export type StepMode = "manual" | "automatable";
+
 export type WorkflowStep = {
   title: string;
   instructions: string;
   input: string;
   output: string;
+  mode: StepMode;
+  /** The tool we suggest for this step. */
   toolSlug?: string;
+  /** Other tools that could do the same step. Only set from reliable knowledge. */
+  alternativeToolSlugs?: string[];
   guideSlug?: string;
+  /** Editorial estimate for a first run, in minutes. Leave out if it is a guess. */
+  estimatedMinutes?: number;
+  /** A caveat about this step, e.g. what to check or what can go wrong. */
+  note?: string;
 };
 
 export type Workflow = {
@@ -202,6 +217,8 @@ export type Workflow = {
   skillLevel: SkillLevel;
   estimatedMinutes: number;
   outcome: string;
+  /** What you need before you start (accounts, files, permissions). */
+  prerequisites?: string[];
   steps: WorkflowStep[];
   verification: VerificationStatus;
   status: ContentStatus;

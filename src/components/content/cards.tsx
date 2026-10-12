@@ -13,6 +13,7 @@ import { CategoryIcon } from "@/components/content/category-icon";
 import { Kicker } from "@/components/content/kicker";
 import { ToolLogo } from "@/components/content/tool-logo";
 import { Badge } from "@/components/ui/badge";
+import { modeCounts } from "@/lib/content/workflow-utils";
 import type { Category, Guide, Tool, Workflow } from "@/lib/content/types";
 import { cn } from "@/lib/utils";
 
@@ -113,6 +114,9 @@ export function WorkflowCard({ workflow }: { workflow: Workflow }) {
         <span className="inline-flex items-center gap-1">
           <ListOrderedIcon className="size-3.5" aria-hidden="true" />
           {workflow.steps.length} steps
+          {modeCounts(workflow.steps).automatable > 0
+            ? ` (${modeCounts(workflow.steps).automatable} can be automated)`
+            : ""}
         </span>
         <span className="inline-flex items-center gap-1">
           <ClockIcon className="size-3.5" aria-hidden="true" />

@@ -139,6 +139,12 @@ Followed in the file's own order. The roadmap file is not stored in the repo.
   - [ ] Accounts, saved prompts, private collections, user submissions (Phase 7)
   - [ ] Real prompts that someone has actually run and reviewed (Phase 1f)
 - [ ] Phase 6: workflow library
+  - [x] Step-by-step workflows with task, tool, input, output, guide link, alternatives and cautions per step
+  - [x] Manual vs "can be automated" labels (icon and words), with a note that nothing is run for you
+  - [x] Time shown as an editorial estimate; cost shown only from verified, recent pricing, never summed
+  - [x] `/workflows` search and filters; "Blog post -> YouTube video" example; SQL draft `0005_workflows_schema.sql`
+  - [ ] Interactive editor, user-saved and shareable workflows, execution and integrations (later, after security, permissions and cost planning)
+  - [ ] Real workflows with sources (Phase 1f)
 - [ ] Phase 7: accounts and personal workspace
 - [ ] Phase 8: AI assistant, automation, integrations
 - [ ] Phase 9: newsletter, partnerships, growth

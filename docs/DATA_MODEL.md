@@ -261,3 +261,56 @@ cannot have been tested, so they are now "Untested", matching the library rule.
   containing brackets. A public role sees only published prompts, only links to
   published tools, and cannot read `admin_notes`.
 - Not tested: screen readers, and browsers other than Chromium.
+
+## Workflow library (Phase 6)
+
+Types: `Workflow`, `WorkflowStep`, `StepMode` in `src/lib/content/types.ts`;
+helpers in `workflow-utils.ts` and `workflow-query.ts`; SQL draft in
+`supabase/migrations/0005_workflows_schema.sql` (not applied anywhere).
+This is the first iteration only: published, step-by-step recipes. There is no
+workflow editor and no engine that runs anything.
+
+- **Each step shows:** the task, the suggested tool, the input it needs, the
+  output it gives, a guide link, an optional per-step time estimate and an
+  optional caution. **Alternatives** ("Or instead: ...") are listed per step,
+  only where we know a real alternative.
+- **Manual or automatable, always with an icon and words:**
+  - _Manual_: you do it yourself, or use a tool and check the result.
+  - _Can be automated_: a tool could run it for you. AIKitFinder does not run it
+    or set it up, and the page says so. Nothing implies an integration exists.
+- **Time:** the header shows the sum of the step estimates when every step has
+  one (otherwise the workflow's own estimate), always labelled an editorial
+  estimate for a first run, never a measurement. A mismatch between the header
+  and the steps was found in testing and fixed.
+- **Cost:** no price or total is invented. For the suggested tools the page lists
+  which have a verified, recently checked free plan, which are verified without a
+  free plan, and which are "not verified or out of date" (this reuses the pricing
+  freshness rule from Phase 4). It states that costs are not added up.
+- **`/workflows` index:** search, skill level and "uses tool" filters (the tool
+  filter also matches alternatives), pagination, a legend for the two step labels.
+  Cards show how many steps can be automated.
+- **Sample workflows** now include the roadmap's "Blog post -> YouTube video"
+  example (six steps). Like all samples it uses fictional tools and says it does
+  not show that any real tool does a step, or does it for free.
+- **Not built (by design):** drag-and-drop editor, saved or shareable user
+  workflows, running or integrating anything, sources per workflow (a later
+  addition when real workflows replace the samples).
+
+## Checks run for Phase 6
+
+- `pnpm check` and `pnpm build` pass.
+- 9 cases for the helper logic (step counts, time sum only when every step has an
+  estimate, suggested tools distinct and in order with alternatives excluded,
+  stale / unverified / missing pricing never counted as free) passed in a
+  throwaway script. This repo has no test runner yet, so it is not committed.
+- Playwright at 1280px and 375px: index, legend, card counts, search, level and
+  tool filters (including alternative-only matches), invalid parameters, empty
+  state, the six-step detail page (labels, alternatives, notes, time, cost,
+  prerequisites, sample notice), the other three workflows, home page and tool
+  page still fine, no console errors, no overflow.
+- The five SQL migrations loaded into a temporary PostgreSQL 16, then deleted.
+  Rejected: zero minutes, "verified" without a date, duplicate step position,
+  zero-minute step, an invalid step mode. A public role sees steps only of
+  published workflows, alternatives only for published tools, and cannot read
+  `admin_notes`.
+- Not tested: screen readers, and browsers other than Chromium.
