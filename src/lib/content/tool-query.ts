@@ -1,4 +1,5 @@
 import { pricingModels, skillLevels } from "@/lib/content/labels";
+import { BUDGET_OPTIONS, fitsBudget, hasFreePlan, hasPayAsYouGo } from "@/lib/content/pricing";
 import { queryTerms, scoreDocument, type MatchMode } from "@/lib/content/text-match";
 import type { Category, PricingModel, SkillLevel, Tool } from "@/lib/content/types";
 
@@ -18,6 +19,12 @@ export type ToolQuery = {
   levels: SkillLevel[];
   pricing: PricingModel[];
   api: boolean;
+  /** Has a verified, recently checked free plan. */
+  freePlan: boolean;
+  /** Has a verified, recently checked pay-as-you-go plan. */
+  payg: boolean;
+  /** Highest monthly price in USD, from BUDGET_OPTIONS. */
+  budget?: number;
   sort: ToolSort;
   page: number;
 };
@@ -43,6 +50,9 @@ export function parseToolQuery(params: RawParams, validCategories: string[]): To
       pricingModels.includes(p as PricingModel),
     ),
     api: list(params.api)[0] === "yes",
+    freePlan: list(params.freeplan)[0] === "yes",
+    payg: list(params.payg)[0] === "yes",
+    budget: BUDGET_OPTIONS.find((b) => String(b) === list(params.budget)[0]),
     sort: sortParam && sortParam in toolSorts ? (sortParam as ToolSort) : "featured",
     page: Number.isFinite(page) && page > 0 ? page : 1,
   };
@@ -57,6 +67,9 @@ export function toolQueryHref(query: ToolQuery, overrides: Partial<ToolQuery> = 
   next.levels.forEach((l) => params.append("level", l));
   next.pricing.forEach((p) => params.append("pricing", p));
   if (next.api) params.set("api", "yes");
+  if (next.freePlan) params.set("freeplan", "yes");
+  if (next.payg) params.set("payg", "yes");
+  if (next.budget) params.set("budget", String(next.budget));
   if (next.sort !== "featured") params.set("sort", next.sort);
   if (next.page > 1) params.set("page", String(next.page));
   const qs = params.toString();
@@ -69,7 +82,10 @@ export function hasActiveFilters(query: ToolQuery) {
     query.categories.length > 0 ||
     query.levels.length > 0 ||
     query.pricing.length > 0 ||
-    query.api
+    query.api ||
+    query.freePlan ||
+    query.payg ||
+    query.budget !== undefined
   );
 }
 
@@ -92,9 +108,9 @@ function toolTextScore(tool: Tool, terms: string[], categories: Category[], mode
   );
 }
 
-type Facet = "categories" | "levels" | "pricing" | "api";
+type Facet = "categories" | "levels" | "pricing" | "api" | "freePlan" | "payg" | "budget";
 
-function matches(tool: Tool, query: ToolQuery, skip?: Facet) {
+function matches(tool: Tool, query: ToolQuery, today: string, skip?: Facet) {
   if (skip !== "categories" && query.categories.length > 0) {
     if (!tool.categorySlugs.some((c) => query.categories.includes(c))) return false;
   }
@@ -106,6 +122,12 @@ function matches(tool: Tool, query: ToolQuery, skip?: Facet) {
     if (!tool.pricingModel || !query.pricing.includes(tool.pricingModel)) return false;
   }
   if (skip !== "api" && query.api && tool.apiAvailable !== true) return false;
+  // Price filters only trust verified, recently checked plans.
+  if (skip !== "freePlan" && query.freePlan && !hasFreePlan(tool, today)) return false;
+  if (skip !== "payg" && query.payg && !hasPayAsYouGo(tool, today)) return false;
+  if (skip !== "budget" && query.budget !== undefined && !fitsBudget(tool, today, query.budget)) {
+    return false;
+  }
   return true;
 }
 
@@ -120,6 +142,9 @@ export type ToolQueryResult = {
     levels: Record<string, number>;
     pricing: Record<string, number>;
     api: number;
+    freePlan: number;
+    payg: number;
+    budgets: Record<string, number>;
   };
 };
 
@@ -127,6 +152,8 @@ export function runToolQuery(
   allTools: Tool[],
   query: ToolQuery,
   categories: Category[],
+  /** Today's ISO date, used to decide whether pricing is recent enough to filter on. */
+  today: string,
 ): ToolQueryResult {
   const terms = queryTerms(query.q);
   const scoreAll = (mode: MatchMode) =>
@@ -142,7 +169,7 @@ export function runToolQuery(
   const textMatched = scored.map((s) => s.tool);
 
   const count = (skip: Facet, test: (t: Tool) => boolean) =>
-    textMatched.filter((t) => matches(t, query, skip) && test(t)).length;
+    textMatched.filter((t) => matches(t, query, today, skip) && test(t)).length;
 
   const facets: ToolQueryResult["facets"] = {
     categories: Object.fromEntries(
@@ -155,9 +182,14 @@ export function runToolQuery(
       pricingModels.map((p) => [p, count("pricing", (t) => t.pricingModel === p)]),
     ),
     api: count("api", (t) => t.apiAvailable === true),
+    freePlan: count("freePlan", (t) => hasFreePlan(t, today)),
+    payg: count("payg", (t) => hasPayAsYouGo(t, today)),
+    budgets: Object.fromEntries(
+      BUDGET_OPTIONS.map((b) => [String(b), count("budget", (t) => fitsBudget(t, today, b))]),
+    ),
   };
 
-  const filtered = scored.filter((s) => matches(s.tool, query));
+  const filtered = scored.filter((s) => matches(s.tool, query, today));
   filtered.sort((a, b) => {
     if (query.sort === "name") return a.tool.name.localeCompare(b.tool.name);
     if (query.sort === "updated") return b.tool.updatedAt.localeCompare(a.tool.updatedAt);

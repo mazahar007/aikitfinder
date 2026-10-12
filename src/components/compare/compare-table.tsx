@@ -6,6 +6,7 @@ import { LevelBadge, SampleBadge, VerificationBadge } from "@/components/content
 import { ToolLogo } from "@/components/content/tool-logo";
 import { compareHref } from "@/lib/content/compare";
 import { formatDate, platformLabel, pricingLabel } from "@/lib/content/labels";
+import { currentPlans, formatPlanPrice, pricingFreshness } from "@/lib/content/pricing";
 import type { Category, Tool } from "@/lib/content/types";
 
 /**
@@ -64,7 +65,7 @@ function externalLink(href: string | undefined, label: string): Cell {
   };
 }
 
-function groups(categories: Category[]): Group[] {
+function groups(categories: Category[], today: string): Group[] {
   const categoryName = (slug?: string) =>
     categories.find((c) => c.slug === slug)?.name.replace(/^AI /, "");
   return [
@@ -89,6 +90,38 @@ function groups(categories: Category[]): Group[] {
         },
         { label: "Free plan", cell: (t) => text(t.freePlan) },
         { label: "Free trial", cell: (t) => text(t.freeTrial) },
+        {
+          label: "Plans and prices",
+          cell: (t) => {
+            const plans = currentPlans(t, today);
+            if (!plans.length) {
+              // Say why, so stale figures are never mistaken for current ones.
+              return pricingFreshness(t.pricing, today) === "stale"
+                ? {
+                    key: "stale",
+                    node: (
+                      <span className="text-muted-foreground italic">
+                        Last checked {t.pricing ? formatDate(t.pricing.checkedAt) : ""}, so not
+                        shown as current
+                      </span>
+                    ),
+                  }
+                : unknown;
+            }
+            return {
+              key: plans.map((p) => `${p.name}:${formatPlanPrice(p)}`).join("|"),
+              node: (
+                <ul className="space-y-1">
+                  {plans.map((p) => (
+                    <li key={p.name}>
+                      <span className="font-medium">{p.name}:</span> {formatPlanPrice(p)}
+                    </li>
+                  ))}
+                </ul>
+              ),
+            };
+          },
+        },
         {
           label: "Pricing note",
           cell: (t) =>
@@ -193,13 +226,15 @@ export function CompareTable({
   tools,
   categories,
   differencesOnly,
+  today,
 }: {
   tools: Tool[];
   categories: Category[];
   differencesOnly: boolean;
+  today: string;
 }) {
   const slugs = tools.map((t) => t.slug);
-  const tableGroups = groups(categories).map((group) => {
+  const tableGroups = groups(categories, today).map((group) => {
     const rows = group.rows
       .map((row) => {
         const cells = tools.map((t) => row.cell(t));

@@ -13,6 +13,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { pricingLabel, pricingModels, skillLevelLabel, skillLevels } from "@/lib/content/labels";
+import { BUDGET_OPTIONS } from "@/lib/content/pricing";
 import type { ToolQuery, ToolQueryResult } from "@/lib/content/tool-query";
 import type { Category } from "@/lib/content/types";
 import { cn } from "@/lib/utils";
@@ -64,6 +65,44 @@ function Option({
       />
       <span className="flex-1 text-foreground">{label}</span>
       <span className="text-xs text-muted-foreground tabular-nums">{count}</span>
+    </label>
+  );
+}
+
+function RadioOption({
+  name,
+  value,
+  label,
+  count,
+  checked,
+}: {
+  name: string;
+  value: string;
+  label: string;
+  /** Omit for "any" options, which always apply. */
+  count?: number;
+  checked: boolean;
+}) {
+  const disabled = count === 0 && !checked;
+  return (
+    <label
+      className={cn(
+        "flex min-h-10 cursor-pointer items-center gap-3 rounded-md px-2 text-sm hover:bg-surface-subtle",
+        disabled && "cursor-not-allowed opacity-60 hover:bg-transparent",
+      )}
+    >
+      <input
+        type="radio"
+        name={name}
+        value={value}
+        defaultChecked={checked}
+        disabled={disabled}
+        className="size-4 shrink-0 accent-primary"
+      />
+      <span className="flex-1 text-foreground">{label}</span>
+      {count === undefined ? null : (
+        <span className="text-xs text-muted-foreground tabular-nums">{count}</span>
+      )}
     </label>
   );
 }
@@ -139,7 +178,7 @@ function FilterForm({
         ))}
       </FilterGroup>
 
-      <FilterGroup legend="Pricing (verified only)">
+      <FilterGroup legend="Pricing model (verified only)">
         {pricingModels.map((p) => (
           <Option
             key={p}
@@ -148,6 +187,42 @@ function FilterForm({
             label={pricingLabel[p]}
             count={facets.pricing[p] ?? 0}
             checked={query.pricing.includes(p)}
+          />
+        ))}
+      </FilterGroup>
+
+      <FilterGroup legend="Plans (verified, recently checked)">
+        <Option
+          name="freeplan"
+          value="yes"
+          label="Has a free plan"
+          count={facets.freePlan}
+          checked={query.freePlan}
+        />
+        <Option
+          name="payg"
+          value="yes"
+          label="Pay as you go"
+          count={facets.payg}
+          checked={query.payg}
+        />
+      </FilterGroup>
+
+      <FilterGroup legend="Budget (USD per month)">
+        <RadioOption
+          name="budget"
+          value=""
+          label="Any budget"
+          checked={query.budget === undefined}
+        />
+        {BUDGET_OPTIONS.map((b) => (
+          <RadioOption
+            key={b}
+            name="budget"
+            value={String(b)}
+            label={`Up to $${b} a month`}
+            count={facets.budgets[String(b)] ?? 0}
+            checked={query.budget === b}
           />
         ))}
       </FilterGroup>

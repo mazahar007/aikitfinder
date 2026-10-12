@@ -11,7 +11,7 @@ import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { Container } from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
 import { COMPARE_MAX, COMPARE_MIN, compareHref, parseCompareParams } from "@/lib/content/compare";
-import { getAllCategories, getTools } from "@/lib/content/repository";
+import { getAllCategories, getToday, getTools } from "@/lib/content/repository";
 
 export const metadata: Metadata = {
   title: "Compare AI tools",
@@ -26,10 +26,11 @@ async function Comparison({
 }: {
   searchParams: PageProps<"/compare">["searchParams"];
 }) {
-  const [params, tools, categories] = await Promise.all([
+  const [params, tools, categories, today] = await Promise.all([
     searchParams,
     getTools(),
     getAllCategories(),
+    getToday(),
   ]);
   const { slugs, truncated, differencesOnly } = parseCompareParams(
     params,
@@ -116,6 +117,7 @@ async function Comparison({
             tools={selected}
             categories={categories}
             differencesOnly={differencesOnly}
+            today={today}
           />
         ) : (
           <div

@@ -1,4 +1,5 @@
 import type {
+  BillingInterval,
   DealEligibility,
   DealStatus,
   DealType,
@@ -83,4 +84,11 @@ export const dealStatusLabel: Record<DealStatus, string> = {
   upcoming: "Upcoming",
   expired: "Expired",
   "needs-verification": "Needs verification",
+};
+
+export const billingIntervalLabel: Record<BillingInterval, string> = {
+  month: "per month",
+  year: "per year",
+  "one-time": "one-time",
+  usage: "pay as you go",
 };

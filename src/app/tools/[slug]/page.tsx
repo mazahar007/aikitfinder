@@ -20,6 +20,7 @@ import {
 import { GuideCard, ToolCard, WorkflowCard } from "@/components/content/cards";
 import { CompareButton } from "@/components/compare/compare-button";
 import { DealCard } from "@/components/content/deal-card";
+import { PricingSection } from "@/components/content/pricing-section";
 import { PromptBlock } from "@/components/content/prompt-block";
 import { SourcesList } from "@/components/content/sources-list";
 import { ToolLogo } from "@/components/content/tool-logo";
@@ -35,6 +36,7 @@ import {
   getDealsForTool,
   getGuidesForTool,
   getSimilarTools,
+  getToday,
   getTool,
   getTools,
   getWorkflowsForTool,
@@ -61,6 +63,7 @@ const sections = [
   { id: "overview", label: "Overview" },
   { id: "quick-start", label: "Quick start" },
   { id: "features", label: "Features" },
+  { id: "pricing", label: "Pricing" },
   { id: "settings", label: "Settings explained" },
   { id: "prompts", label: "Prompts" },
   { id: "limitations", label: "Limitations" },
@@ -114,13 +117,14 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
   const tool = await getTool(slug);
   if (!tool) notFound();
 
-  const [categories, guides, workflows, similar, alternatives, deals] = await Promise.all([
+  const [categories, guides, workflows, similar, alternatives, deals, today] = await Promise.all([
     getAllCategories(),
     getGuidesForTool(tool.slug),
     getWorkflowsForTool(tool.slug),
     getSimilarTools(tool),
     getAlternatives(tool),
     getDealsForTool(tool.slug),
+    getToday(),
   ]);
   const primaryCategory = categories.find((c) => c.slug === tool.categorySlugs[0]);
   const categoryName = (s: string) =>
@@ -356,6 +360,10 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
 
           <Section id="features" title="Key features">
             {tool.features.length ? <BulletList items={tool.features} /> : <NotDocumented />}
+          </Section>
+
+          <Section id="pricing" title="Pricing">
+            <PricingSection tool={tool} today={today} />
           </Section>
 
           <Section id="settings" title="Settings explained">

@@ -14,7 +14,7 @@ import { ActiveFilters } from "@/components/tools/active-filters";
 import { SortSelect } from "@/components/tools/sort-select";
 import { ToolFiltersSheet, ToolFiltersSidebar } from "@/components/tools/tool-filters";
 import { Button } from "@/components/ui/button";
-import { getCategories, getTools } from "@/lib/content/repository";
+import { getCategories, getToday, getTools } from "@/lib/content/repository";
 import {
   hasActiveFilters,
   parseToolQuery,
@@ -34,19 +34,26 @@ async function ToolsDirectory({
 }: {
   searchParams: PageProps<"/tools">["searchParams"];
 }) {
-  const [params, tools, categories] = await Promise.all([
+  const [params, tools, categories, today] = await Promise.all([
     searchParams,
     getTools(),
     getCategories(),
+    getToday(),
   ]);
   const query = parseToolQuery(
     params,
     categories.map((c) => c.slug),
   );
-  const result = runToolQuery(tools, query, categories);
+  const result = runToolQuery(tools, query, categories, today);
   const formKey = toolQueryHref(query, { page: 1 });
   const activeCount =
-    query.categories.length + query.levels.length + query.pricing.length + (query.api ? 1 : 0);
+    query.categories.length +
+    query.levels.length +
+    query.pricing.length +
+    (query.api ? 1 : 0) +
+    (query.freePlan ? 1 : 0) +
+    (query.payg ? 1 : 0) +
+    (query.budget !== undefined ? 1 : 0);
   const categoryName = (slug: string) =>
     categories.find((c) => c.slug === slug)?.name.replace(/^AI /, "");
 
@@ -93,6 +100,11 @@ async function ToolsDirectory({
             <input key={p} type="hidden" name="pricing" value={p} />
           ))}
           {query.api ? <input type="hidden" name="api" value="yes" /> : null}
+          {query.freePlan ? <input type="hidden" name="freeplan" value="yes" /> : null}
+          {query.payg ? <input type="hidden" name="payg" value="yes" /> : null}
+          {query.budget !== undefined ? (
+            <input type="hidden" name="budget" value={query.budget} />
+          ) : null}
           <Button type="submit">Search</Button>
         </Form>
 

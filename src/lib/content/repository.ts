@@ -161,6 +161,19 @@ export async function getDealsForTool(toolSlug: string): Promise<DealView[]> {
   return (await getDeals()).filter((d) => d.toolSlug === toolSlug);
 }
 
+// Time ------------------------------------------------------------------------
+
+/**
+ * Today's date (UTC, YYYY-MM-DD) for freshness rules such as "pricing checked
+ * within 60 days". Cached for an hour, like the deals list, because reading the
+ * clock is not allowed during static prerendering.
+ */
+export async function getToday(): Promise<string> {
+  "use cache";
+  cacheLife("hours");
+  return new Date().toISOString().slice(0, 10);
+}
+
 // Mixed -----------------------------------------------------------------------
 
 export type RecentItem =

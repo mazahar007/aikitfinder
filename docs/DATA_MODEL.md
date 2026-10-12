@@ -152,3 +152,53 @@ new dependency), and plan-level prices (that is the pricing tracker phase).
   testing: the mobile page overflow above, and tray chips whose names collapsed
   on narrow screens.
 - Not tested: screen readers, and browsers other than Chromium.
+
+## Pricing tracker (Phase 4)
+
+Types: `ToolPricing`, `PricingPlan`, `BillingInterval` in
+`src/lib/content/types.ts`; rules in `src/lib/content/pricing.ts`; SQL draft in
+`supabase/migrations/0003_pricing_schema.sql` (not applied anywhere). The manual
+update steps are in `docs/PRICING_UPDATE_WORKFLOW.md`.
+
+- Each tool can have `pricing`: plans (name, price, currency, interval, notes,
+  usage limits, contact-sales), the official pricing URL, an optional API pricing
+  URL, `checkedAt` and a verification status. Prices are never guessed: a missing
+  price is "Price not stated" or "Contact sales".
+- **Freshness is derived from today's date**, not stored: unverified pricing is
+  hidden, verified pricing older than 60 days shows with an out-of-date warning,
+  and only current pricing feeds the filters and the Compare row. Reading the
+  clock goes through a cached `getToday()` (one-hour cache) because static
+  prerendering cannot read it directly.
+- **Tool page:** new "Pricing" section (plan cards, limits, last-checked badge,
+  official links, a "prices can change" note).
+- **Directory filters:** "Has a free plan", "Pay as you go", and a budget radio
+  (up to $10 / $25 / $50 a month, USD). Counts follow the existing facet logic;
+  active-filter chips and the mobile sheet include them. An invalid `budget`
+  value in the URL is ignored.
+- **Compare:** a "Plans and prices" row shows current plans, or says the figures
+  are not current because they were last checked on a given date.
+- The older `pricingModel`, `freePlan` and `pricingNote` fields stay as short
+  summaries; plan-level data is the detailed source.
+- Not built (by design): scraping or automated monitoring, price-change history
+  (left for later), currency conversion, and a "cheapest tool" ranking.
+
+## Checks run for Phase 4
+
+- `pnpm check` and `pnpm build` pass.
+- 29 pricing-rule cases passed in a throwaway script (freshness at 60 vs 61 days,
+  yearly price divided by 12, usage/one-time/other-currency/contact-sales
+  excluded from budget, stale and unverified pricing never matching a filter,
+  price formatting). This repo has no test runner yet, so the script is not
+  committed.
+- Playwright (desktop 1280px and mobile 375px): tool pages for fresh, stale,
+  unverified, missing, contact-sales and pay-as-you-go pricing; every new filter
+  by URL and through the sidebar / mobile sheet; filter chips and their count;
+  the Compare row; an invalid budget; no console errors, no horizontal overflow.
+- A visual check found a contradiction (a green "Verified" badge beside the
+  out-of-date warning); stale pricing now shows an amber badge. Two filter group
+  titles were also renamed because they read almost identically.
+- The three SQL migrations loaded into a temporary PostgreSQL 16 and were then
+  deleted. Rejected: paid plan without currency or interval, negative price,
+  lowercase currency code. A public role sees plans only for verified pricing of
+  published tools and cannot read `admin_notes`. The foreign key that forces a plan
+  to belong to a pricing record is declared but was not separately exercised.

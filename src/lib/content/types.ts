@@ -31,6 +31,40 @@ export type Source = {
 /** Where a tool can be used. Only set when verified from the official site. */
 export type Platform = "web" | "desktop" | "ios" | "android" | "browser-extension" | "api";
 
+/** How often a plan is billed. "usage" means pay as you go. */
+export type BillingInterval = "month" | "year" | "one-time" | "usage";
+
+export type PricingPlan = {
+  name: string;
+  /**
+   * Price in the plan's currency. 0 means free. Undefined means the provider
+   * does not state a price (for example "contact sales").
+   */
+  price?: number;
+  /** ISO 4217 code such as "USD". Required whenever `price` is above 0. */
+  currency?: string;
+  interval?: BillingInterval;
+  /** Qualifiers as the provider states them, e.g. "per user" or "billed annually". */
+  priceNote?: string;
+  /** Usage or credit limits, only if officially documented. */
+  usageLimits?: string;
+  contactSales?: boolean;
+};
+
+/**
+ * Plan-level pricing for one tool. Shown to visitors only while it is
+ * verified and recently checked (see lib/content/pricing.ts).
+ */
+export type ToolPricing = {
+  plans: PricingPlan[];
+  /** The provider's own pricing page: the source of every figure above. */
+  pricingUrl: string;
+  apiPricingUrl?: string;
+  /** ISO date the pricing page was last checked. */
+  checkedAt: string;
+  verification: VerificationStatus;
+};
+
 export type Category = {
   slug: string;
   name: string;
@@ -93,7 +127,9 @@ export type Tool = {
   freePlan?: string;
   /** Free trial details (length, card required) when the official site states them. */
   freeTrial?: string;
-  /** Short pricing summary with its own source and check date (details come in the pricing tracker). */
+  /** Plan-by-plan pricing with its own source and check date. */
+  pricing?: ToolPricing;
+  /** Short pricing summary with its own source and check date. */
   pricingNote?: { text: string; sourceUrl?: string; checkedAt?: string };
   /** Platforms the tool runs on, when verified. Undefined means unknown. */
   platforms?: Platform[];

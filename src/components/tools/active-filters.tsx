@@ -31,6 +31,16 @@ export function ActiveFilters({ query, categories }: { query: ToolQuery; categor
   if (query.api)
     chips.push({ label: "Has an API", href: toolQueryHref(query, { api: false, page: 1 }) });
 
+  if (query.freePlan)
+    chips.push({ label: "Free plan", href: toolQueryHref(query, { freePlan: false, page: 1 }) });
+  if (query.payg)
+    chips.push({ label: "Pay as you go", href: toolQueryHref(query, { payg: false, page: 1 }) });
+  if (query.budget !== undefined)
+    chips.push({
+      label: `Up to $${query.budget} a month`,
+      href: toolQueryHref(query, { budget: undefined, page: 1 }),
+    });
+
   if (chips.length === 0) return null;
 
   return (

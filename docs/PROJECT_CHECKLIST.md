@@ -125,6 +125,13 @@ Followed in the file's own order. The roadmap file is not stored in the repo.
   - [ ] Plan-level pricing and usage limits rows (needs the pricing tracker data, Phase 4)
   - [ ] Real, verified tool data to compare (Phase 1f)
 - [ ] Phase 4: pricing tracker
+  - [x] Plan-level pricing model with source, currency, interval, usage limits and last-checked date
+  - [x] Tool page "Pricing" section; stale prices warned, unverified prices hidden
+  - [x] Filters: free plan, pay as you go, budget; Compare "Plans and prices" row
+  - [x] Manual update workflow documented (docs/PRICING_UPDATE_WORKFLOW.md); SQL draft `0003_pricing_schema.sql`
+  - [ ] Admin screens for editing pricing (needs the database and admin CMS, Phase 1b-1d)
+  - [ ] Pricing-change history (left for later by the roadmap)
+  - [ ] Real, officially verified prices (Phase 1f)
 - [ ] Phase 5: prompt library
 - [ ] Phase 6: workflow library
 - [ ] Phase 7: accounts and personal workspace
