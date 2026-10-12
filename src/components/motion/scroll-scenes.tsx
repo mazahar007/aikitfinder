@@ -29,6 +29,7 @@ export function ScrollScenes({ children }: { children: ReactNode }) {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     let cleanup: (() => void) | undefined;
+    let mm: { revert: () => void } | undefined;
     let cancelled = false;
 
     (async () => {
@@ -120,9 +121,102 @@ export function ScrollScenes({ children }: { children: ReactNode }) {
             scrollTrigger: { trigger: chapter, start: "top 75%" },
           });
         });
+
+        // Cloud wipes: the cloud rises from below to cover the band.
+        el.querySelectorAll<HTMLElement>("[data-wipe]").forEach((band) => {
+          gsap.fromTo(
+            band.querySelector("[data-wipe-cloud]"),
+            { yPercent: 75 },
+            {
+              yPercent: 0,
+              ease: "none",
+              scrollTrigger: { trigger: band, start: "top bottom", end: "bottom 60%", scrub: 0.5 },
+            },
+          );
+        });
+
+        // Closing call to action: giant words slide in from alternating sides.
+        el.querySelectorAll<HTMLElement>("[data-cta-line]").forEach((line, i) => {
+          gsap.fromTo(
+            line,
+            { xPercent: i % 2 ? -25 : 25, opacity: 0.15 },
+            {
+              xPercent: 0,
+              opacity: 1,
+              ease: "power2.out",
+              scrollTrigger: { trigger: line, start: "top 95%", end: "top 55%", scrub: 0.6 },
+            },
+          );
+        });
+
+        // Zoom card (all sizes): the miniature tool page tilts up into view.
+        el.querySelectorAll<HTMLElement>("[data-zoom]").forEach((section) => {
+          gsap.from(section.querySelectorAll("[data-zoom-callout]"), {
+            x: -40,
+            opacity: 0,
+            stagger: 0.15,
+            duration: 0.7,
+            ease: "power3.out",
+            scrollTrigger: { trigger: section, start: "top 60%" },
+          });
+        });
       }, el);
 
+      // Wide screens only: pinned sections (sideways rail, zooming card).
+      // Small screens keep the native swipeable row and normal scrolling.
+      const media = gsap.matchMedia();
+      mm = media;
+      media.add("(min-width: 1024px)", () => {
+        el.querySelectorAll<HTMLElement>("[data-hscroll]").forEach((section) => {
+          const viewport = section.querySelector<HTMLElement>("[data-hscroll-viewport]");
+          const track = section.querySelector<HTMLElement>("[data-hscroll-track]");
+          if (!viewport || !track) return;
+          viewport.style.overflow = "hidden";
+          const distance = () => Math.max(0, track.scrollWidth - viewport.clientWidth);
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: section,
+              start: "top top",
+              end: () => `+=${distance()}`,
+              pin: true,
+              scrub: 0.6,
+              invalidateOnRefresh: true,
+            },
+          });
+          tl.to(track, { x: () => -distance(), ease: "none" }, 0);
+          const bar = section.querySelector("[data-hscroll-progress]");
+          if (bar) tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, ease: "none" }, 0);
+          return () => {
+            viewport.style.overflow = "";
+          };
+        });
+
+        el.querySelectorAll<HTMLElement>("[data-zoom]").forEach((section) => {
+          const frame = section.querySelector("[data-zoom-frame]");
+          if (!frame) return;
+          gsap.fromTo(
+            frame,
+            { scale: 0.62, rotateX: 18, rotateZ: -4, y: 60 },
+            {
+              scale: 1,
+              rotateX: 0,
+              rotateZ: 0,
+              y: 0,
+              ease: "power1.out",
+              scrollTrigger: {
+                trigger: section,
+                start: "top top",
+                end: "+=80%",
+                pin: true,
+                scrub: 0.6,
+              },
+            },
+          );
+        });
+      });
+
       cleanup = () => {
+        mm?.revert();
         ctx.revert();
         if (story) {
           story.style.backgroundColor = "";

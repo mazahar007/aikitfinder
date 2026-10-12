@@ -1,14 +1,14 @@
 import Link from "next/link";
 
-import {
-  CategoryCard,
-  GuideCard,
-  SectionHeader,
-  ToolCard,
-  WorkflowCard,
-} from "@/components/content/cards";
+import { CategoryCard, GuideCard, SectionHeader, WorkflowCard } from "@/components/content/cards";
 import { SampleNotice } from "@/components/content/sample-notice";
 import { OutlineMarquee, Ribbons, Squiggle, Story } from "@/components/home/showcase";
+import {
+  ClosingCta,
+  CloudWipe,
+  FeaturedRail,
+  ZoomShowcase,
+} from "@/components/home/showcase-scenes";
 import { ScrollScenes } from "@/components/motion/scroll-scenes";
 import { Container } from "@/components/layout/container";
 import { SearchForm } from "@/components/search/search-form";
@@ -107,9 +107,13 @@ export default async function HomePage() {
       <ScrollScenes>
         <Ribbons />
         <Story />
-        <Squiggle className="my-2" />
 
-        <Container className="pt-8">
+        <CloudWipe direction="to-dark" />
+        <FeaturedRail tools={featuredTools} categoryName={categoryName} />
+        <ZoomShowcase />
+        <CloudWipe direction="to-light" />
+
+        <Container className="pt-4">
           <SampleNotice />
         </Container>
 
@@ -132,25 +136,7 @@ export default async function HomePage() {
           </Container>
         </section>
 
-        <section aria-labelledby="featured-heading" className="border-y bg-card">
-          <Container className="py-12">
-            <SectionHeader
-              id="featured-heading"
-              title="Featured tools"
-              description="Chosen by our editors for being useful and beginner-friendly."
-              href="/tools"
-              linkLabel="Explore all tools"
-            />
-            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {featuredTools.map((t, i) => (
-                <li key={t.slug} {...reveal(i)}>
-                  <ToolCard tool={t} categoryName={categoryName(t.categorySlugs[0])} />
-                </li>
-              ))}
-            </ul>
-          </Container>
-        </section>
-
+        <Squiggle className="my-2" />
         <OutlineMarquee words={["Find it", "Learn it", "Use it"]} />
 
         <section aria-labelledby="guides-heading">
@@ -214,6 +200,8 @@ export default async function HomePage() {
             </ul>
           </Container>
         </section>
+
+        <ClosingCta />
       </ScrollScenes>
     </>
   );
