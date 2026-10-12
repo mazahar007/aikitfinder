@@ -21,15 +21,18 @@ Updated after each milestone. Mirrors section 18 of the master brief.
 - [x] Environment variable template created (`.env.example`)
 - [x] Lint / typecheck / format / build commands documented
 
-## Core website (Phase 2)
+## Core website (Phase 2: prototype on sample data)
 
-- [ ] Homepage (shell and hero done; categories, featured tools and guides pending)
-- [ ] Tool directory
-- [ ] Category pages
-- [ ] Tool detail page
-- [ ] Guide page
-- [ ] Search results
-- [ ] Related content
+- [x] Homepage (hero search, categories, featured tools, quick starts, workflows, recently updated)
+- [x] Tool directory (search, filters with counts, sorting, pagination, active filter chips, mobile filter sheet)
+- [x] Category pages (index and per category)
+- [x] Tool detail page (at a glance, quick start, features, settings, prompts, limitations, troubleshooting, related, sources)
+- [x] Guide pages (index grouped by level, numbered steps, expected result, mistakes, troubleshooting, sources)
+- [x] Workflow pages (index and step-by-step detail with input/output per step)
+- [x] Search results (tools, guides, workflows, prompts, settings, troubleshooting; type tabs; empty state)
+- [x] Related content (guides, workflows and similar tools on tool pages)
+- [x] Loading skeletons, empty states and a friendly error page
+- [ ] Owner review of the prototype
 
 ## Backend and admin (Phases 3–4)
 
@@ -78,6 +81,14 @@ Updated after each milestone. Mirrors section 18 of the master brief.
 - [ ] Team/B2B features
 
 ## Known limitations
+
+- All tools, guides and workflows are fictional samples (`src/lib/content/sample/`) and are labelled
+  "Sample" everywhere. Links use the reserved example.com domain.
+- Unknown URLs such as `/tools/does-not-exist` show the not-found page but return HTTP 200 (with a
+  `noindex` tag), because Next.js has already started streaming the page. Revisit in Phase 6 with a
+  request-time check in Proxy.
+- Search is a simple keyword matcher for the prototype; Phase 6 replaces it with PostgreSQL
+  full-text search.
 
 - The shadcn/ui CLI could not reach its registry from the development container. Components were
   written by hand in the same structure using the same libraries (Radix, cva). The CLI can add more

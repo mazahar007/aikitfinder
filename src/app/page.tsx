@@ -1,45 +1,53 @@
 import Link from "next/link";
-import { ArrowRightIcon, BookOpenIcon, CompassIcon, WorkflowIcon } from "lucide-react";
 
+import {
+  CategoryCard,
+  GuideCard,
+  SectionHeader,
+  ToolCard,
+  WorkflowCard,
+} from "@/components/content/cards";
+import { SampleNotice } from "@/components/content/sample-notice";
 import { Container } from "@/components/layout/container";
 import { SearchForm } from "@/components/search/search-form";
 import { Badge } from "@/components/ui/badge";
+import { formatDate } from "@/lib/content/labels";
+import {
+  getCategories,
+  getCategoryToolCounts,
+  getFeaturedGuides,
+  getFeaturedTools,
+  getFeaturedWorkflows,
+  getRecentlyUpdated,
+  getTools,
+} from "@/lib/content/repository";
 
 const suggestions = [
   "Write a blog post",
   "Make a video from text",
-  "Remove an image background",
+  "Summarise a document",
   "Fix my code",
 ];
 
-const pillars = [
-  {
-    title: "Discover",
-    body: "Find AI tools by what you want to get done, your skill level and budget.",
-    href: "/tools",
-    cta: "Explore tools",
-    icon: CompassIcon,
-    accent: "bg-primary-tint text-primary-hover",
-  },
-  {
-    title: "Learn",
-    body: "Follow plain-English guides covering setup, settings, prompts and fixes.",
-    href: "/guides",
-    cta: "Browse guides",
-    icon: BookOpenIcon,
-    accent: "bg-learn-tint text-learn",
-  },
-  {
-    title: "Put it to work",
-    body: "Combine tools into step-by-step workflows you can repeat.",
-    href: "/workflows",
-    cta: "See workflows",
-    icon: WorkflowIcon,
-    accent: "bg-learn-tint text-learn",
-  },
-];
+export default async function HomePage() {
+  const [categories, counts, tools, featuredTools, guides, workflows, recent] = await Promise.all([
+    getCategories(),
+    getCategoryToolCounts(),
+    getTools(),
+    getFeaturedTools(6),
+    getFeaturedGuides(3),
+    getFeaturedWorkflows(3),
+    getRecentlyUpdated(5),
+  ]);
+  const categoryName = (slug: string) =>
+    categories.find((c) => c.slug === slug)?.name.replace(/^AI /, "");
+  const toolNames = (slugs: string[]) =>
+    slugs.map((s) => tools.find((t) => t.slug === s)?.name).filter((n): n is string => !!n);
+  const recentHref = (r: (typeof recent)[number]) =>
+    `/${r.type === "tool" ? "tools" : r.type === "guide" ? "guides" : "workflows"}/${r.item.slug}`;
+  const recentTitle = (r: (typeof recent)[number]) =>
+    r.type === "tool" ? r.item.name : r.item.title;
 
-export default function HomePage() {
   return (
     <>
       <section className="border-b bg-card">
@@ -69,38 +77,102 @@ export default function HomePage() {
         </Container>
       </section>
 
-      <section aria-labelledby="how-heading">
-        <Container className="py-14 sm:py-16">
-          <h2
-            id="how-heading"
-            className="text-2xl font-bold tracking-tight text-heading sm:text-h2"
-          >
-            From idea to result, step by step
-          </h2>
-          <p className="mt-2 max-w-2xl text-muted-foreground">
-            Every tool page and guide follows the same clear structure, so you always know where to
-            look next.
-          </p>
-          <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {pillars.map(({ title, body, href, cta, icon: Icon, accent }) => (
-              <li key={title}>
+      <Container className="pt-8">
+        <SampleNotice />
+      </Container>
+
+      <section aria-labelledby="categories-heading">
+        <Container className="py-12">
+          <SectionHeader
+            id="categories-heading"
+            title="Browse by category"
+            description="Start from what you want to make or get done."
+            href="/categories"
+            linkLabel="All categories"
+          />
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {categories.slice(0, 8).map((c) => (
+              <li key={c.slug}>
+                <CategoryCard category={c} toolCount={counts[c.slug] ?? 0} compact />
+              </li>
+            ))}
+          </ul>
+        </Container>
+      </section>
+
+      <section aria-labelledby="featured-heading" className="border-y bg-card">
+        <Container className="py-12">
+          <SectionHeader
+            id="featured-heading"
+            title="Featured tools"
+            description="Chosen by our editors for being useful and beginner-friendly."
+            href="/tools"
+            linkLabel="Explore all tools"
+          />
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {featuredTools.map((t) => (
+              <li key={t.slug}>
+                <ToolCard tool={t} categoryName={categoryName(t.categorySlugs[0])} />
+              </li>
+            ))}
+          </ul>
+        </Container>
+      </section>
+
+      <section aria-labelledby="guides-heading">
+        <Container className="py-12">
+          <SectionHeader
+            id="guides-heading"
+            title="Beginner quick starts"
+            description="Short, step-by-step guides with a clear result at the end."
+            href="/guides"
+            linkLabel="All guides"
+          />
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {guides.map((g) => (
+              <li key={g.slug}>
+                <GuideCard guide={g} toolNames={toolNames(g.toolSlugs)} />
+              </li>
+            ))}
+          </ul>
+        </Container>
+      </section>
+
+      <section aria-labelledby="workflows-heading" className="border-y bg-card">
+        <Container className="py-12">
+          <SectionHeader
+            id="workflows-heading"
+            title="Popular workflows"
+            description="Combine tools into a process you can repeat."
+            href="/workflows"
+            linkLabel="All workflows"
+          />
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {workflows.map((w) => (
+              <li key={w.slug}>
+                <WorkflowCard workflow={w} />
+              </li>
+            ))}
+          </ul>
+        </Container>
+      </section>
+
+      <section aria-labelledby="recent-heading">
+        <Container className="py-12">
+          <SectionHeader id="recent-heading" title="Recently updated" />
+          <ul className="divide-y rounded-md border bg-card">
+            {recent.map((r) => (
+              <li key={`${r.type}-${r.item.slug}`}>
                 <Link
-                  href={href}
-                  className="group flex h-full flex-col rounded-md border bg-card p-6 transition-[box-shadow,border-color] duration-150 hover:border-input hover:shadow-card-hover"
+                  href={recentHref(r)}
+                  className="flex min-h-14 flex-wrap items-center gap-x-3 gap-y-1 px-4 py-3 hover:bg-surface-subtle"
                 >
-                  <span
-                    className={`inline-flex size-10 items-center justify-center rounded-md ${accent}`}
-                  >
-                    <Icon className="size-5" aria-hidden="true" />
-                  </span>
-                  <span className="mt-4 text-h3 font-semibold text-foreground">{title}</span>
-                  <span className="mt-1 text-muted-foreground">{body}</span>
-                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary">
-                    {cta}
-                    <ArrowRightIcon
-                      className="size-4 transition-transform group-hover:translate-x-0.5"
-                      aria-hidden="true"
-                    />
+                  <Badge variant={r.type === "tool" ? "info" : "learn"} className="capitalize">
+                    {r.type}
+                  </Badge>
+                  <span className="font-medium text-foreground">{recentTitle(r)}</span>
+                  <span className="ml-auto text-sm text-muted-foreground">
+                    Updated {formatDate(r.item.updatedAt)}
                   </span>
                 </Link>
               </li>

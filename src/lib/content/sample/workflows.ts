@@ -1,0 +1,107 @@
+import type { Workflow } from "@/lib/content/types";
+
+/* SAMPLE DATA: fictional multi-tool workflows for prototyping the interface. */
+
+export const sampleWorkflows: Workflow[] = [
+  {
+    slug: "blog-to-social-video",
+    title: "Blog post → short social video",
+    summary: "Reuse one article as a narrated vertical video with a matching thumbnail.",
+    skillLevel: "beginner",
+    estimatedMinutes: 30,
+    outcome: "A vertical video and a thumbnail, ready to post.",
+    steps: [
+      {
+        title: "Write the script",
+        instructions: "Summarise the article into a 6-scene script.",
+        input: "Blog post text",
+        output: "Video script",
+        toolSlug: "draftwise",
+        guideSlug: "blog-post-to-video",
+      },
+      {
+        title: "Generate the video",
+        instructions: "Paste the script, choose 9:16 and review each scene.",
+        input: "Video script",
+        output: "Vertical video with voiceover",
+        toolSlug: "storyreel",
+      },
+      {
+        title: "Make the thumbnail",
+        instructions:
+          "Generate a background with space for your title, then add the text in a design tool.",
+        input: "Video topic",
+        output: "Thumbnail image",
+        toolSlug: "pictora",
+        guideSlug: "first-ai-image",
+      },
+    ],
+    verification: "verified",
+    status: "published",
+    featured: true,
+    lastVerifiedAt: "2026-10-01",
+    updatedAt: "2026-10-08",
+    isSample: true,
+  },
+  {
+    slug: "podcast-to-clips",
+    title: "Podcast episode → captioned clips",
+    summary: "Clean up audio, find the best moments and publish short captioned clips.",
+    skillLevel: "intermediate",
+    estimatedMinutes: 45,
+    outcome: "Three to five short clips with captions.",
+    steps: [
+      {
+        title: "Clean the audio",
+        instructions: "Remove background noise and level the volume.",
+        input: "Raw recording",
+        output: "Clean audio",
+        toolSlug: "voxly",
+      },
+      {
+        title: "Cut and caption",
+        instructions: "Remove silences, pick 30–60 second highlights and add captions.",
+        input: "Clean recording (video)",
+        output: "Captioned vertical clips",
+        toolSlug: "cutwise",
+      },
+    ],
+    verification: "needs-review",
+    status: "published",
+    featured: true,
+    lastVerifiedAt: "2026-07-14",
+    updatedAt: "2026-09-21",
+    isSample: true,
+  },
+  {
+    slug: "meeting-to-action-items",
+    title: "Meeting → shared action items",
+    summary: "Record a meeting, get a summary and send tasks to the team automatically.",
+    skillLevel: "intermediate",
+    estimatedMinutes: 20,
+    outcome: "A summary and task list posted to your team chat after every meeting.",
+    steps: [
+      {
+        title: "Record and summarise",
+        instructions: "Record the meeting (with consent) and generate notes with action items.",
+        input: "Meeting audio",
+        output: "Summary and action items",
+        toolSlug: "notewell",
+      },
+      {
+        title: "Send tasks automatically",
+        instructions: "Trigger a flow when new notes are ready and post action items to chat.",
+        input: "Action items",
+        output: "Chat message with tasks",
+        toolSlug: "flowpilot",
+        guideSlug: "automate-email-summaries",
+      },
+    ],
+    verification: "verified",
+    status: "published",
+    featured: false,
+    lastVerifiedAt: "2026-09-25",
+    updatedAt: "2026-09-25",
+    isSample: true,
+  },
+];

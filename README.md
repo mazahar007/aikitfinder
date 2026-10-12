@@ -7,8 +7,8 @@ built step by step following [`docs/MASTER_BRIEF.md`](docs/MASTER_BRIEF.md), the
 truth. Progress is tracked in [`docs/PROJECT_CHECKLIST.md`](docs/PROJECT_CHECKLIST.md) and the visual
 rules live in [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md).
 
-> Status: **Phase 1 (foundation) complete.** Public pages are placeholders until Phase 2. There is no
-> database, no accounts and no paid service yet.
+> Status: **Phase 2 (UI prototype) complete.** All public pages work against clearly labelled,
+> fictional sample data. There is no database, no accounts and no paid service yet.
 
 ## Stack
 
@@ -78,14 +78,26 @@ Check each platform's current plan terms before any commercial use.
 src/
   app/                 Routes (one folder per URL), root layout, global CSS tokens
   components/
-    layout/            Header, footer, navigation, container, page placeholder
+    content/           Cards, badges, prompt block, sources, empty state, pagination
+    layout/            Header, footer, navigation, breadcrumbs, container, page placeholder
     search/            Search form (header, hero and page variants)
     theme/             Light/dark theme toggle and the no-flash inline script
+    tools/             Tool directory filters, sort and active-filter chips
     ui/                Reusable primitives: Button, Badge, Input, Sheet
   config/site.ts       Site name, description and navigation links
+  lib/content/         Content types, data access (repository), search and tool filtering
+    sample/            Fictional sample data used until the database arrives in Phase 3
   lib/utils.ts         Shared helpers (cn)
 docs/                  Master brief, design system, project checklist
 ```
+
+## Content and data
+
+Pages never import sample data directly. They call the async functions in
+`src/lib/content/repository.ts` (`getTools`, `getTool`, `getGuides`, …). In Phase 3 those functions
+switch to Supabase with the same signatures, so the pages do not change. The types in
+`src/lib/content/types.ts` mirror the planned database tables. A tool can belong to several
+categories; the first one is its primary category.
 
 ## Accessibility baseline
 
