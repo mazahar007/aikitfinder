@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 /*
  * AIKitFinder design tokens
  * -------------------------
@@ -7,15 +9,21 @@
  * the Tailwind utilities generated from @theme below (e.g. bg-primary,
  * text-muted-foreground, border-border) and never hard-code hex values.
  *
- * Every text/background pairing has been checked against WCAG 2.2 AA
- * (see docs/DESIGN_SYSTEM.md). Light theme only for launch; a dark theme can
- * be added later by redefining these variables under a [data-theme] selector.
+ * Two themes share the same token names: light (default) and dark, applied
+ * by setting data-theme="dark" on <html> (see src/components/theme). Every
+ * text/background pairing in both themes meets WCAG 2.2 AA; the ratios are
+ * listed in docs/DESIGN_SYSTEM.md.
  */
 :root {
+  color-scheme: light;
+
   /* Structure */
-  --brand: #0b1b3a; /* deep navy: logo, headings, footer */
-  --on-brand: #cbd5e1; /* body text on navy (12:1) */
-  --on-brand-accent: #7dd3fc; /* logo accent on navy */
+  --brand: #0b1b3a; /* deep navy: footer background */
+  --heading: #0b1b3a; /* headings and logo wordmark */
+  --on-brand: #cbd5e1; /* body text on the footer */
+  --on-brand-accent: #7dd3fc; /* logo accent on the footer */
+  --logo-tile: #0b1b3a;
+  --logo-spark: #2563eb;
 
   /* Surfaces */
   --background: #f7f8fa; /* page canvas */
@@ -23,6 +31,7 @@
   --surface-subtle: #f1f4f8; /* prompt/code blocks, sidebars */
   --border: #dde3ea; /* decorative dividers */
   --input: #8592a3; /* form-field borders (3:1) */
+  --overlay: rgb(15 23 42 / 45%); /* behind dialogs and sheets */
 
   /* Text */
   --foreground: #0f172a;
@@ -49,14 +58,62 @@
   --destructive-foreground: #ffffff;
   --destructive-tint: #fef2f2;
 
+  --shadow-hover-color: rgb(15 23 42 / 8%);
+
   /* Shape */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
 }
 
+/*
+ * Dark theme: a deep navy base rather than pure black (less glare, keeps the
+ * brand feel). Accents get lighter so they stay readable on dark surfaces,
+ * and filled buttons switch to dark text.
+ */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --brand: #070d1a;
+  --heading: #f8fafc;
+  --logo-tile: #1e3a8a;
+  --logo-spark: #7dd3fc;
+
+  --background: #0b1220;
+  --card: #111a2e;
+  --surface-subtle: #18233a;
+  --border: #26324a;
+  --input: #64748b;
+  --overlay: rgb(0 0 0 / 60%);
+
+  --foreground: #e6ebf2;
+  --muted-foreground: #a3b1c6;
+
+  --primary: #60a5fa;
+  --primary-hover: #93c5fd;
+  --primary-foreground: #0b1220;
+  --primary-tint: #172a4d;
+  --ring: #60a5fa;
+
+  --learn: #2dd4bf;
+  --learn-foreground: #0b1220;
+  --learn-tint: #0d2a2a;
+
+  --success: #4ade80;
+  --success-tint: #0b2a17;
+  --warning: #fbbf24;
+  --warning-tint: #2b1d07;
+  --destructive: #f87171;
+  --destructive-foreground: #0b1220;
+  --destructive-tint: #2e1215;
+
+  --shadow-hover-color: rgb(0 0 0 / 40%);
+}
+
 @theme inline {
   --color-brand: var(--brand);
+  --color-heading: var(--heading);
+  --color-overlay: var(--overlay);
   --color-on-brand: var(--on-brand);
   --color-on-brand-accent: var(--on-brand-accent);
   --color-background: var(--background);
@@ -89,7 +146,7 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 
-  --shadow-card-hover: 0 4px 16px rgb(15 23 42 / 8%);
+  --shadow-card-hover: 0 4px 16px var(--shadow-hover-color);
 
   /* Type scale (desktop); headings step down on small screens in components */
   --text-display: 3rem;

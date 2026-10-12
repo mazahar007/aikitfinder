@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { themeInitScript } from "@/components/theme/theme-script";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
 
@@ -28,6 +29,9 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   applicationName: siteConfig.name,
+  // Preview deployments (e.g. *.vercel.app) stay out of search engines until
+  // the real domain is live and NEXT_PUBLIC_SITE_INDEXABLE is set to "true".
+  robots: siteConfig.indexable ? undefined : { index: false, follow: false },
   openGraph: {
     type: "website",
     siteName: siteConfig.name,
@@ -38,13 +42,26 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0b1b3a",
-  colorScheme: "light",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#111a2e" },
+  ],
+  colorScheme: "light dark",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}>
+    // data-theme is corrected by the inline script before paint, so React must
+    // not warn about the attribute differing from the server HTML.
+    <html
+      lang="en"
+      data-theme="light"
+      suppressHydrationWarning
+      className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className="flex min-h-full flex-col">
         <a
           href="#main"

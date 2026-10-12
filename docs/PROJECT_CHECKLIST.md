@@ -9,13 +9,15 @@ Updated after each milestone. Mirrors section 18 of the master brief.
 - [x] Working brand selected: AIKitFinder; preferred domain aikitfinder.com (registration not yet confirmed)
 - [ ] Hosting and commercial-use terms checked
 - [x] Initial sitemap proposed (approval pending with Phase 2 review)
-- [x] Design direction approved (navy / blue / teal, Inter + JetBrains Mono, light theme)
+- [x] Design direction approved (navy / blue / teal, Inter + JetBrains Mono, light and dark themes)
 
 ## Foundation (Phase 1)
 
 - [x] Project setup documented (README)
 - [x] Shared layout and design tokens created
 - [x] Responsive shell completed (header, mobile menu, footer)
+- [x] Light and dark themes (follows device setting, no flash, remembered choice)
+- [x] Preview deployments kept out of search engines (`NEXT_PUBLIC_SITE_INDEXABLE`)
 - [x] Environment variable template created (`.env.example`)
 - [x] Lint / typecheck / format / build commands documented
 

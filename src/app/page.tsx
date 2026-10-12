@@ -47,7 +47,7 @@ export default function HomePage() {
           <Badge variant="info" className="mb-5">
             Free to use · No sign-up
           </Badge>
-          <h1 className="mx-auto max-w-3xl text-[2.25rem] leading-tight font-extrabold tracking-tight text-balance text-brand sm:text-display">
+          <h1 className="mx-auto max-w-3xl text-[2.25rem] leading-tight font-extrabold tracking-tight text-balance text-heading sm:text-display">
             Find the right AI tool. Learn it. Use it.
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lead text-muted-foreground">
@@ -71,7 +71,10 @@ export default function HomePage() {
 
       <section aria-labelledby="how-heading">
         <Container className="py-14 sm:py-16">
-          <h2 id="how-heading" className="text-2xl font-bold tracking-tight text-brand sm:text-h2">
+          <h2
+            id="how-heading"
+            className="text-2xl font-bold tracking-tight text-heading sm:text-h2"
+          >
             From idea to result, step by step
           </h2>
           <p className="mt-2 max-w-2xl text-muted-foreground">

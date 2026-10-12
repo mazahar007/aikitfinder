@@ -24,7 +24,7 @@ export function PagePlaceholder({ title, description, phase }: PagePlaceholderPr
           <ConstructionIcon aria-hidden="true" />
           In progress · {phase}
         </Badge>
-        <h1 className="mt-4 text-3xl font-bold tracking-tight text-brand sm:text-h1">{title}</h1>
+        <h1 className="mt-4 text-3xl font-bold tracking-tight text-heading sm:text-h1">{title}</h1>
         <p className="mt-3 text-lead text-muted-foreground">{description}</p>
         <p className="mt-6 text-muted-foreground">
           This page is part of the AIKitFinder build and is not ready yet. Nothing here is final

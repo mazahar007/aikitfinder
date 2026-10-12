@@ -33,7 +33,7 @@ async function SearchStatus({
 export default function SearchPage({ searchParams }: PageProps<"/search">) {
   return (
     <Container className="max-w-3xl py-12 sm:py-16">
-      <h1 className="text-3xl font-bold tracking-tight text-brand sm:text-h1">Search</h1>
+      <h1 className="text-3xl font-bold tracking-tight text-heading sm:text-h1">Search</h1>
       {/* The query comes from the URL, so this part renders per request. */}
       <Suspense fallback={<div className="mt-6 h-16 animate-pulse rounded-lg bg-surface-subtle" />}>
         <SearchStatus searchParams={searchParams} />

@@ -53,9 +53,24 @@ Run `pnpm check && pnpm build` before every commit.
 ## Environment variables
 
 See [`.env.example`](.env.example). Copy it to `.env.local` (git-ignored) and never commit real keys.
-Only `NEXT_PUBLIC_SITE_URL` is used today; the Supabase and admin variables are listed for later
-phases. Anything prefixed `NEXT_PUBLIC_` is visible in the browser; `SUPABASE_SERVICE_ROLE_KEY` must
+Today the app uses `NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_SITE_INDEXABLE`. The Supabase and admin
+variables are listed for later phases. Anything prefixed `NEXT_PUBLIC_` is visible in the browser; `SUPABASE_SERVICE_ROLE_KEY` must
 stay server-only.
+
+## Deploying a preview (Vercel or Netlify)
+
+Both platforms build this project with no extra configuration:
+
+1. Sign in to [Vercel](https://vercel.com) or [Netlify](https://netlify.com) with GitHub.
+2. Import the `aikitfinder` repository. The framework is detected as Next.js and pnpm is detected
+   from `pnpm-lock.yaml`.
+3. Leave `NEXT_PUBLIC_SITE_INDEXABLE` unset (or `false`) so the temporary `*.vercel.app` /
+   `*.netlify.app` address stays out of Google. The site URL is detected automatically.
+4. Deploy. Every push to a branch gets its own preview link.
+
+When the real domain is ready, add it in the hosting dashboard, then set
+`NEXT_PUBLIC_SITE_URL=https://aikitfinder.com` and `NEXT_PUBLIC_SITE_INDEXABLE=true` and redeploy.
+Check each platform's current plan terms before any commercial use.
 
 ## Project structure
 
@@ -65,6 +80,7 @@ src/
   components/
     layout/            Header, footer, navigation, container, page placeholder
     search/            Search form (header, hero and page variants)
+    theme/             Light/dark theme toggle and the no-flash inline script
     ui/                Reusable primitives: Button, Badge, Input, Sheet
   config/site.ts       Site name, description and navigation links
   lib/utils.ts         Shared helpers (cn)

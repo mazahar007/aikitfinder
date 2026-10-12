@@ -22,14 +22,14 @@ export function LogoMark({
         width="32"
         height="32"
         rx="8"
-        fill={inverted ? "rgb(255 255 255 / 0.12)" : "var(--brand)"}
+        fill={inverted ? "rgb(255 255 255 / 0.12)" : "var(--logo-tile)"}
       />
       <circle cx="14" cy="14" r="6.5" fill="none" stroke="#fff" strokeWidth="2.5" />
       <path d="M19 19l5.5 5.5" stroke="#fff" strokeWidth="2.75" strokeLinecap="round" />
       <path
         d="M14 10.5l1 2.5 2.5 1-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1z"
-        fill={inverted ? "var(--on-brand-accent)" : "var(--primary)"}
-        stroke={inverted ? "var(--on-brand-accent)" : "var(--primary)"}
+        fill={inverted ? "var(--on-brand-accent)" : "var(--logo-spark)"}
+        stroke={inverted ? "var(--on-brand-accent)" : "var(--logo-spark)"}
         strokeWidth="0.75"
         strokeLinejoin="round"
       />
@@ -48,7 +48,7 @@ export function Logo({ className, inverted = false }: { className?: string; inve
       )}
     >
       <LogoMark inverted={inverted} />
-      <span className={cn("text-lg", inverted ? "text-white" : "text-brand")}>
+      <span className={cn("text-lg", inverted ? "text-white" : "text-heading")}>
         AIKit<span className={inverted ? "text-on-brand-accent" : "text-primary"}>Finder</span>
       </span>
     </Link>

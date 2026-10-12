@@ -2,12 +2,27 @@
  * Site-wide settings and navigation. Change labels or links here rather than
  * inside components so the header, footer and metadata stay consistent.
  */
+/**
+ * Public base URL. Set NEXT_PUBLIC_SITE_URL explicitly for the real domain;
+ * otherwise fall back to the URL Vercel or Netlify provide at build time.
+ */
+function siteUrl() {
+  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  }
+  if (process.env.URL) return process.env.URL; // Netlify
+  return "http://localhost:3000";
+}
+
 export const siteConfig = {
   name: "AIKitFinder",
   tagline: "Discover AI. Build Smarter.",
   description:
     "Find the right AI tools, learn how to use them, and put them to work with practical guides, settings explanations and workflows.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  url: siteUrl(),
+  /** Allow search engines to index the site. Turn on only for the real domain. */
+  indexable: process.env.NEXT_PUBLIC_SITE_INDEXABLE === "true",
 } as const;
 
 export type NavItem = { title: string; href: string };

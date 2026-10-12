@@ -7,6 +7,7 @@ import { Logo } from "@/components/layout/logo";
 import { MainNav, NavLinks } from "@/components/layout/main-nav";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { SearchForm } from "@/components/search/search-form";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Button } from "@/components/ui/button";
 
 export function SiteHeader() {
@@ -29,6 +30,7 @@ export function SiteHeader() {
               <span className="sr-only">Search</span>
             </Link>
           </Button>
+          <ThemeToggle />
           <Suspense fallback={null}>
             <MobileNav />
           </Suspense>

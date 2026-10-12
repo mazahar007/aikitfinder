@@ -14,10 +14,11 @@ yet**. Validate it with a few real users after the Phase 2 prototype.
    Status colours always come with an icon and a word.
 3. **Calm, documentation-grade look.** No neon glow or heavy gradients, which lower text contrast and
    date quickly.
-4. **Light theme first** for long reading sessions. Dark mode can be added later by redefining the
-   variables.
+4. **Light and dark themes.** The site follows the device setting until the visitor picks one
+   with the sun/moon button in the header; the choice is remembered on that device. An inline script
+   in `<head>` applies the theme before the first paint, so there is no flash.
 
-## Colour tokens
+## Colour tokens (light theme)
 
 | Token (CSS variable)      | Hex                   | Job                                           | Contrast                   |
 | ------------------------- | --------------------- | --------------------------------------------- | -------------------------- |
@@ -42,6 +43,28 @@ yet**. Validate it with a few real users after the Phase 2 prototype.
 | `--ring`                  | `#2563EB`             | 2px focus ring, 2px offset                    | 4.86:1 on background       |
 
 All ratios were calculated with the WCAG 2.2 relative-luminance formula.
+
+## Dark theme
+
+Same token names, redefined under `:root[data-theme="dark"]`. The base is deep navy, not pure black,
+which causes less glare and keeps the brand feel. Accents are lighter so they stay readable, and
+filled buttons switch to dark text.
+
+| Token                     | Hex                   | Check                                   | Contrast       |
+| ------------------------- | --------------------- | --------------------------------------- | -------------- |
+| `--background`            | `#0B1220`             | foreground `#E6EBF2` on it              | 15.63:1 (AAA)  |
+| `--card`                  | `#111A2E`             | foreground on it                        | 14.48:1 (AAA)  |
+| `--surface-subtle`        | `#18233A`             | foreground on it                        | 13.08:1 (AAA)  |
+| `--heading`               | `#F8FAFC`             | on card                                 | 16.57:1 (AAA)  |
+| `--muted-foreground`      | `#A3B1C6`             | on card                                 | 7.98:1 (AAA)   |
+| `--primary`               | `#60A5FA`             | link text on card / dark text on button | 6.82 / 7.36:1  |
+| `--primary-hover`         | `#93C5FD`             | on `--primary-tint` `#172A4D`           | 7.90:1         |
+| `--learn`                 | `#2DD4BF`             | on card / dark text on button           | 9.32 / 10.06:1 |
+| `--success` / `-tint`     | `#4ADE80` / `#0B2A17` | text on tint                            | 8.88:1         |
+| `--warning` / `-tint`     | `#FBBF24` / `#2B1D07` | text on tint                            | 9.82:1         |
+| `--destructive` / `-tint` | `#F87171` / `#2E1215` | text on tint                            | 6.26:1         |
+| `--input`                 | `#64748B`             | border on card (UI)                     | 3.64:1         |
+| `--brand` (footer)        | `#070D1A`             | `--on-brand` text on it                 | 13.08:1 (AAA)  |
 
 ## Typography
 
