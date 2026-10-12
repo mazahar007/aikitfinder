@@ -30,6 +30,7 @@ export type NavItem = { title: string; href: string };
 export const mainNav: NavItem[] = [
   { title: "Explore Tools", href: "/tools" },
   { title: "Guides", href: "/guides" },
+  { title: "Prompts", href: "/prompts" },
   { title: "Workflows", href: "/workflows" },
   { title: "Deals", href: "/deals" },
   { title: "About", href: "/about" },
@@ -42,6 +43,7 @@ export const footerNav: { title: string; items: NavItem[] }[] = [
       { title: "AI tools", href: "/tools" },
       { title: "Categories", href: "/categories" },
       { title: "Guides", href: "/guides" },
+      { title: "Prompts", href: "/prompts" },
       { title: "Workflows", href: "/workflows" },
       { title: "Deals", href: "/deals" },
       { title: "Compare tools", href: "/compare" },

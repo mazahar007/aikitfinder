@@ -133,6 +133,11 @@ Followed in the file's own order. The roadmap file is not stored in the repo.
   - [ ] Pricing-change history (left for later by the roadmap)
   - [ ] Real, officially verified prices (Phase 1f)
 - [ ] Phase 5: prompt library
+  - [x] `/prompts` and `/prompts/[slug]`: search, filters, fill-in blanks, copy with feedback, instructions, expected result, labelled example output, compatible tools, related guides and prompts, source and review info
+  - [x] Tool-page prompts included in the library; search links to it; Prompts in nav and footer; sitemap
+  - [x] Original sample prompts, all marked untested; SQL draft `0004_prompts_schema.sql`
+  - [ ] Accounts, saved prompts, private collections, user submissions (Phase 7)
+  - [ ] Real prompts that someone has actually run and reviewed (Phase 1f)
 - [ ] Phase 6: workflow library
 - [ ] Phase 7: accounts and personal workspace
 - [ ] Phase 8: AI assistant, automation, integrations

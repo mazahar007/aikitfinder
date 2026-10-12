@@ -202,3 +202,62 @@ update steps are in `docs/PRICING_UPDATE_WORKFLOW.md`.
   lowercase currency code. A public role sees plans only for verified pricing of
   published tools and cannot read `admin_notes`. The foreign key that forces a plan
   to belong to a pricing record is declared but was not separately exercised.
+
+## Prompt library (Phase 5)
+
+Types: `Prompt`, `PromptVariable` in `src/lib/content/types.ts`; helpers in
+`src/lib/content/prompt-utils.ts` and `prompt-query.ts`; SQL draft in
+`supabase/migrations/0004_prompts_schema.sql` (not applied anywhere).
+
+- **Pages:** `/prompts` (search, category, skill level and "works with" filters,
+  pagination) and `/prompts/[slug]`.
+- **One library:** original sample prompts (`sample/prompts.ts`) plus the prompts
+  written on tool pages, turned into library entries by `getPrompts()`. A tool
+  page links each of its prompts to the library page with the same slug, and
+  site search now sends prompt hits to the library page.
+- **Fill in the blanks:** every `[name]` in a prompt becomes an input
+  (`PromptPlayground`). The preview shows filled values and highlights blanks
+  still empty; "Copy prompt" copies the finished text, leaving empty blanks as
+  `[name]`. Values stay in the page (nothing is sent anywhere), and replacement
+  is literal, so values containing `$&` or `[brackets]` are copied as typed.
+- **Each prompt page shows:** the prompt, instructions, expected result, an
+  example output (always labelled "Illustrative example, not a guaranteed
+  result"), cautions, the tools it is known to suit, related guides and
+  prompts, author, origin, last-reviewed date and tested status.
+- **Honesty rules:** "Tested" is true only if someone ran the prompt and checked
+  the result (the database refuses `tested` without a review date). All sample
+  prompts are untested. Tool compatibility is listed only for checked tools; an
+  empty list says it is not confirmed. Prompts are original, not copied from
+  other collections; the page says so.
+- **Not built yet (later in the roadmap):** accounts, saved prompts, private
+  collections, user submissions, prompt version comparison.
+
+### Header change that came with it
+
+The sixth top-nav link (Prompts) made the header 163px wider than a 768px
+screen. The full navigation now starts at 1024px; below that the menu button is
+used. Verified at 360, 600, 768, 900, 1023, 1024, 1100, 1280 and 1440px: no
+overflow, same header height.
+
+### Sample data correction
+
+Sample prompts on the fictional tools were marked "Tested". A fictional tool
+cannot have been tested, so they are now "Untested", matching the library rule.
+
+## Checks run for Phase 5
+
+- `pnpm check` and `pnpm build` pass.
+- 11 cases for the placeholder and fill logic passed in a throwaway script
+  (repeated blanks, empty values, trimming, values containing blanks or `$&`,
+  mismatched variable lists). This repo has no test runner yet, so it is not
+  committed.
+- Playwright at 1280, 768 and 375px: list, page 2, search, each filter, invalid
+  parameters ignored, empty state, the fill-in form (labels, counter, copy with
+  filled and unfilled blanks, reset, special characters, keyboard typing), the
+  example-output label, tool-derived prompts, the tool-page link, site search, no
+  console errors, no overflow (after the header fix).
+- The four SQL migrations loaded into a temporary PostgreSQL 16, then were
+  deleted. Rejected: `tested` without a review date, a bad slug, a variable name
+  containing brackets. A public role sees only published prompts, only links to
+  published tools, and cannot read `admin_notes`.
+- Not tested: screen readers, and browsers other than Chromium.

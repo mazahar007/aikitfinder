@@ -426,7 +426,15 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
                         {p.tested ? "Tested" : "Untested"}
                       </Badge>
                     </div>
-                    <p className="mt-1 text-sm text-muted-foreground">{p.task}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {p.task}{" "}
+                      <Link
+                        href={`/prompts/${p.slug}`}
+                        className="font-medium text-primary hover:underline"
+                      >
+                        Fill in the blanks in the prompt library
+                      </Link>
+                    </p>
                     <div className="mt-3">
                       <PromptBlock text={p.text} />
                     </div>

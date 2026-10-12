@@ -1,4 +1,10 @@
-import { getCategories, getGuides, getTools, getWorkflows } from "@/lib/content/repository";
+import {
+  getCategories,
+  getGuides,
+  getPrompts,
+  getTools,
+  getWorkflows,
+} from "@/lib/content/repository";
 import {
   queryTerms,
   scoreDocument,
@@ -36,11 +42,12 @@ export async function searchContent(query: string): Promise<SearchResult[]> {
   const terms = queryTerms(query);
   if (terms.length === 0) return [];
 
-  const [tools, guides, workflows, categories] = await Promise.all([
+  const [tools, guides, workflows, categories, prompts] = await Promise.all([
     getTools(),
     getGuides(),
     getWorkflows(),
     getCategories(),
+    getPrompts(),
   ]);
   // Strict matching first; if nothing matches, retry with relaxed matching.
   const strict = collect("strict");
@@ -79,25 +86,6 @@ export async function searchContent(query: string): Promise<SearchResult[]> {
         ]),
       );
 
-      for (const prompt of tool.prompts) {
-        push(
-          {
-            type: "prompt",
-            title: prompt.title,
-            description: prompt.task,
-            href: `/tools/${tool.slug}#prompt-${prompt.slug}`,
-            context: tool.name,
-            isSample: tool.isSample,
-          },
-          score([
-            { text: prompt.title, weight: 8 },
-            { text: prompt.task, weight: 5 },
-            { text: prompt.text, weight: 2 },
-            { text: tool.name, weight: 3 },
-          ]),
-        );
-      }
-
       for (const setting of tool.settings) {
         push(
           {
@@ -135,6 +123,31 @@ export async function searchContent(query: string): Promise<SearchResult[]> {
           ]),
         );
       }
+    }
+
+    // Prompts from the library (this includes the ones written on tool pages).
+    for (const prompt of prompts) {
+      const toolNames = prompt.toolSlugs
+        .map((slug) => tools.find((t) => t.slug === slug)?.name)
+        .filter((n): n is string => !!n);
+      push(
+        {
+          type: "prompt",
+          title: prompt.title,
+          description: prompt.useCase,
+          href: `/prompts/${prompt.slug}`,
+          context: toolNames[0],
+          skillLevel: prompt.skillLevel,
+          isSample: prompt.isSample,
+        },
+        score([
+          { text: prompt.title, weight: 8 },
+          { text: prompt.tags, weight: 6 },
+          { text: prompt.useCase, weight: 5 },
+          { text: toolNames, weight: 3 },
+          { text: prompt.text, weight: 2 },
+        ]),
+      );
     }
 
     for (const guide of guides) {

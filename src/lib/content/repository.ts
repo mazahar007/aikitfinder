@@ -11,10 +11,12 @@ import { cacheLife } from "next/cache";
 import { dealStatus, type DealView } from "@/lib/content/deal-status";
 import { sampleCategories } from "@/lib/content/sample/categories";
 import { sampleDeals } from "@/lib/content/sample/deals";
+import { samplePrompts } from "@/lib/content/sample/prompts";
 import { sampleGuides } from "@/lib/content/sample/guides";
 import { sampleTools } from "@/lib/content/sample/tools";
 import { sampleWorkflows } from "@/lib/content/sample/workflows";
-import type { Category, Guide, Tool, Workflow } from "@/lib/content/types";
+import { promptVariables } from "@/lib/content/prompt-utils";
+import type { Category, Guide, Prompt, Tool, Workflow } from "@/lib/content/types";
 
 const published = <T extends { status: string }>(items: T[]) =>
   items.filter((item) => item.status === "published");
@@ -137,6 +139,58 @@ export async function getFeaturedWorkflows(limit = 3): Promise<Workflow[]> {
 
 export async function getWorkflowsForTool(toolSlug: string): Promise<Workflow[]> {
   return published(sampleWorkflows).filter((w) => w.steps.some((s) => s.toolSlug === toolSlug));
+}
+
+// Prompts ---------------------------------------------------------------------
+
+/** Prompts written on a tool page, shown in the library too. */
+function promptsFromTools(): Prompt[] {
+  return published(sampleTools).flatMap((tool) =>
+    tool.prompts.map<Prompt>((p) => ({
+      slug: p.slug,
+      title: p.title,
+      useCase: p.task,
+      categorySlugs: tool.categorySlugs,
+      tags: tool.tags.slice(0, 4),
+      skillLevel: tool.skillLevel,
+      text: p.text,
+      variables: p.placeholders.map((name) => ({
+        name,
+        description: "Replace this with your own details.",
+      })),
+      instructions: [
+        "Replace each highlighted part with your own details.",
+        `Paste the result into ${tool.name} and review what it gives you.`,
+        "Adjust one detail at a time if the first result is not what you wanted.",
+      ],
+      expectedOutput: p.expectedOutput,
+      caveats: p.caveats,
+      toolSlugs: [tool.slug],
+      author: tool.isSample ? "AIKitFinder (sample)" : "AIKitFinder",
+      originNote: `Written for the ${tool.name} page.`,
+      tested: p.tested,
+      status: "published",
+      lastReviewedAt: tool.lastVerifiedAt,
+      updatedAt: tool.updatedAt,
+      isSample: tool.isSample,
+    })),
+  );
+}
+
+/** Every published prompt: library prompts plus the ones written on tool pages. */
+export async function getPrompts(): Promise<Prompt[]> {
+  return [...published(samplePrompts), ...promptsFromTools()].map((p) => ({
+    ...p,
+    variables: promptVariables(p.text, p.variables),
+  }));
+}
+
+export async function getPrompt(slug: string): Promise<Prompt | undefined> {
+  return (await getPrompts()).find((p) => p.slug === slug);
+}
+
+export async function getPromptsForTool(toolSlug: string): Promise<Prompt[]> {
+  return (await getPrompts()).filter((p) => p.toolSlugs.includes(toolSlug));
 }
 
 // Deals -----------------------------------------------------------------------

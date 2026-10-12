@@ -256,3 +256,45 @@ export type Deal = {
   updatedAt: string;
   isSample: boolean;
 };
+
+/** A blank in a prompt, written as [name] in the prompt text. */
+export type PromptVariable = {
+  name: string;
+  description: string;
+  /** An example value, shown as the input's placeholder. */
+  example?: string;
+};
+
+/**
+ * A prompt in the library. Prompts written for a specific tool page are also
+ * listed here (see getPrompts), so there is one place to search them.
+ */
+export type Prompt = {
+  slug: string;
+  title: string;
+  /** What the prompt helps you do, in one sentence. */
+  useCase: string;
+  categorySlugs: string[];
+  /** Free tags for task, content type and role, e.g. "summary", "email", "student". */
+  tags: string[];
+  skillLevel: SkillLevel;
+  text: string;
+  variables: PromptVariable[];
+  /** Steps for using it well. */
+  instructions: string[];
+  expectedOutput: string;
+  /** Illustration only: shown with a label saying results vary. */
+  exampleOutput?: string;
+  caveats?: string;
+  /** Tools it is known to suit. Only set when we have checked. */
+  toolSlugs: string[];
+  author: string;
+  /** Where the text comes from, e.g. "Original text written for AIKitFinder". */
+  originNote: string;
+  /** True only if someone actually ran it and checked the result. */
+  tested: boolean;
+  status: ContentStatus;
+  lastReviewedAt?: string;
+  updatedAt: string;
+  isSample: boolean;
+};

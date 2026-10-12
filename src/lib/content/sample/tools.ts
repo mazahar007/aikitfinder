@@ -176,7 +176,7 @@ export const sampleTools: Tool[] = [
         placeholders: ["length", "audience", "number", "article text"],
         expectedOutput: "A scene-by-scene script ready to paste into the editor.",
         caveats: "Check facts in the summary; shortening can drop important context.",
-        tested: true,
+        tested: false,
       },
       {
         slug: "product-explainer",
@@ -329,7 +329,7 @@ export const sampleTools: Tool[] = [
         placeholders: ["subject", "left/right"],
         expectedOutput: "A thumbnail background with room for your own title text.",
         caveats: "Add the title text in a design tool; generated text is unreliable.",
-        tested: true,
+        tested: false,
       },
     ],
     troubleshooting: [
@@ -424,7 +424,7 @@ export const sampleTools: Tool[] = [
         text: "Create an outline for a [length]-word blog post about [topic] for [audience]. Include a hook, 4–6 sections with one-line summaries, and a conclusion.",
         placeholders: ["length", "topic", "audience"],
         expectedOutput: "A structured outline you can expand section by section.",
-        tested: true,
+        tested: false,
       },
       {
         slug: "summarise-document",
@@ -434,7 +434,7 @@ export const sampleTools: Tool[] = [
         placeholders: ["number", "time", "text"],
         expectedOutput: "A short bulleted summary.",
         caveats: "Check numbers against the original.",
-        tested: true,
+        tested: false,
       },
     ],
     troubleshooting: [

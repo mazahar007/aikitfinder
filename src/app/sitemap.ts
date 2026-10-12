@@ -5,6 +5,7 @@ import {
   getAllCategories,
   getDeals,
   getGuides,
+  getPrompts,
   getTools,
   getWorkflows,
 } from "@/lib/content/repository";
@@ -14,6 +15,7 @@ const staticPaths = [
   "/tools",
   "/categories",
   "/guides",
+  "/prompts",
   "/workflows",
   "/deals",
   "/about",
@@ -31,12 +33,13 @@ const staticPaths = [
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (!siteConfig.indexable) return [];
 
-  const [categories, tools, guides, workflows, deals] = await Promise.all([
+  const [categories, tools, guides, workflows, deals, prompts] = await Promise.all([
     getAllCategories(),
     getTools(),
     getGuides(),
     getWorkflows(),
     getDeals(),
+    getPrompts(),
   ]);
   const real = <T extends { isSample: boolean }>(items: T[]) => items.filter((i) => !i.isSample);
   // Empty categories are thin pages: list a category only once it has a real tool.
@@ -66,6 +69,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...real(deals)
       .filter((d) => d.state === "active" || d.state === "upcoming")
       .map((d) => ({ url: url(`/deals/${d.slug}`), lastModified: d.updatedAt, priority: 0.5 })),
+    ...real(prompts).map((p) => ({
+      url: url(`/prompts/${p.slug}`),
+      lastModified: p.updatedAt,
+      priority: 0.6,
+    })),
     ...real(workflows).map((w) => ({
       url: url(`/workflows/${w.slug}`),
       lastModified: w.updatedAt,

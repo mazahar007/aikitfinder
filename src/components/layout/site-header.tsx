@@ -19,7 +19,7 @@ export function SiteHeader() {
     >
       <Container className="flex h-16 items-center gap-4 lg:gap-6">
         <Logo />
-        <nav aria-label="Main" className="hidden md:block">
+        <nav aria-label="Main" className="hidden lg:block">
           {/* The active link depends on the URL, so it streams in; the
               fallback renders the same links without highlighting. */}
           <Suspense fallback={<NavLinks pathname={null} />}>
