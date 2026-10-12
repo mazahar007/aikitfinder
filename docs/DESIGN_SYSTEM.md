@@ -113,13 +113,17 @@ The homepage adds a scroll-linked "story" layer inspired by editorial motion sit
 shapes, words and colours. GSAP 3 (free standard licence) is loaded with a dynamic import inside
 `src/components/motion/scroll-scenes.tsx`, so it is downloaded only on the homepage (about 43 KB).
 
-| Effect           | What it does                                                                                                |
-| ---------------- | ----------------------------------------------------------------------------------------------------------- |
-| Kinetic ribbons  | Three tilted pills of oversized words (Discover · Learn · Create · Automate) slide sideways with the scroll |
-| Story chapters   | Four chapters; the section background fades between pastel chapter colours (`--story-1` to `--story-4`)     |
-| Line-art drawing | Each chapter's illustration draws its strokes as it scrolls in; accent dots pop in                          |
-| Outline marquee  | A line of huge outlined words ("Find it → Learn it → Use it") slides with the scroll                        |
-| Squiggle divider | A dashed wavy line between the story and the directory sections                                             |
+| Effect                 | What it does                                                                                                                             |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Kinetic ribbons        | Three tilted pills of oversized words (Discover · Learn · Create · Automate) slide sideways with the scroll                              |
+| Story chapters         | Four chapters; the section background fades between pastel chapter colours (`--story-1` to `--story-4`)                                  |
+| Line-art drawing       | Each chapter's illustration draws its strokes as it scrolls in; accent dots pop in                                                       |
+| Outline marquee        | A line of huge outlined words ("Find it → Learn it → Use it") slides with the scroll                                                     |
+| Squiggle divider       | A dashed wavy line between the story and the directory sections                                                                          |
+| Cloud wipes            | A cloud-edged band rises to carry the page into the dark navy zone, and out again                                                        |
+| Featured rail          | On wide screens the dark section pins and the featured tools slide sideways with a progress line; on phones it is a native swipeable row |
+| Zoom card              | A miniature tool page tilts up and grows to full size while the section is pinned (wide screens); the three callouts slide in            |
+| Closing call to action | "Start exploring AI tools" in giant words that slide in from alternating sides; the whole block is one link                              |
 
 The server-rendered markup is complete without JavaScript: line art is fully drawn, each chapter
 shows its own colour, and ribbons sit still. GSAP only enhances it, and it does not run at all
