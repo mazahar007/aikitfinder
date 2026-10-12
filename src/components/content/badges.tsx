@@ -72,7 +72,7 @@ export function VerificationBadge({
 }) {
   const { variant, icon: Icon } = verificationVariant[status];
   return (
-    <Badge variant={variant}>
+    <Badge variant={variant} className="max-w-full flex-wrap whitespace-normal">
       <Icon aria-hidden="true" />
       {verificationLabel[status]}
       {date ? ` · ${formatDate(date)}` : null}

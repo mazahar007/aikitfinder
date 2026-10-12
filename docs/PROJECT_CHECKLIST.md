@@ -99,3 +99,24 @@ Updated after each milestone. Mirrors section 18 of the master brief.
   components later from a normal machine.
 - Placeholder pages are clearly labelled "In progress". Privacy and Terms must be written before
   public launch.
+
+## Feature roadmap (AIKitFinder_Feature_Roadmap_for_Claude.md)
+
+Followed in the file's own order. The roadmap file is not stored in the repo.
+
+- [x] Phase 0: repository inspection and plan
+- [ ] Phase 1: reliable AI tools directory
+  - [x] 1a: data model fields, subcategories, alternatives, sitemap, SQL draft (docs/DATA_MODEL.md)
+  - [ ] 1b: Supabase connection, typed data access, seed data, RLS (needs the owner's Supabase project)
+  - [ ] 1c: database-backed search and filters
+  - [ ] 1d: admin CMS
+  - [ ] 1e: CSV import
+  - [ ] 1f: real tool data, mobile and accessibility checks
+- [ ] Phase 2: deals, credits, coupons, free trials
+- [ ] Phase 3: tool comparison
+- [ ] Phase 4: pricing tracker
+- [ ] Phase 5: prompt library
+- [ ] Phase 6: workflow library
+- [ ] Phase 7: accounts and personal workspace
+- [ ] Phase 8: AI assistant, automation, integrations
+- [ ] Phase 9: newsletter, partnerships, growth

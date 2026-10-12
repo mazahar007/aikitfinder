@@ -28,12 +28,21 @@ export type Source = {
   checkedAt?: string;
 };
 
+/** Where a tool can be used. Only set when verified from the official site. */
+export type Platform = "web" | "desktop" | "ios" | "android" | "browser-extension" | "api";
+
 export type Category = {
   slug: string;
   name: string;
   description: string;
   /** Key into the icon map in components/content/category-icon.tsx. */
   icon: string;
+  /**
+   * Set for a subcategory: the slug of its top-level parent. Subcategories are
+   * one level deep. A tool in a subcategory lists both the parent and the
+   * subcategory in `categorySlugs`, so parent pages and counts include it.
+   */
+  parentSlug?: string;
 };
 
 export type ToolSetting = {
@@ -82,6 +91,14 @@ export type Tool = {
   /** Only set when verified; undefined renders as "Not verified yet". */
   pricingModel?: PricingModel;
   freePlan?: string;
+  /** Free trial details (length, card required) when the official site states them. */
+  freeTrial?: string;
+  /** Short pricing summary with its own source and check date (details come in the pricing tracker). */
+  pricingNote?: { text: string; sourceUrl?: string; checkedAt?: string };
+  /** Platforms the tool runs on, when verified. Undefined means unknown. */
+  platforms?: Platform[];
+  /** Slugs of similar tools a visitor might choose instead. Only set from reliable knowledge. */
+  alternativeSlugs?: string[];
   /** true / false when verified; undefined when unknown. */
   apiAvailable?: boolean;
   apiNotes?: string;

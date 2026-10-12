@@ -10,15 +10,16 @@ import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { Container } from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
 import {
-  getCategories,
+  getAllCategories,
   getCategory,
   getGuidesInCategory,
+  getSubcategories,
   getToolsInCategory,
 } from "@/lib/content/repository";
 import { reveal } from "@/lib/motion";
 
 export async function generateStaticParams() {
-  const categories = await getCategories();
+  const categories = await getAllCategories();
   return categories.map((c) => ({ slug: c.slug }));
 }
 
@@ -40,7 +41,12 @@ export default async function CategoryPage({ params }: PageProps<"/categories/[s
   const category = await getCategory(slug);
   if (!category) notFound();
 
-  const [tools, guides] = await Promise.all([getToolsInCategory(slug), getGuidesInCategory(slug)]);
+  const [tools, guides, subcategories, parent] = await Promise.all([
+    getToolsInCategory(slug),
+    getGuidesInCategory(slug),
+    getSubcategories(slug),
+    category.parentSlug ? getCategory(category.parentSlug) : undefined,
+  ]);
   const shortName = category.name.replace(/^AI /, "");
 
   return (
@@ -49,6 +55,9 @@ export default async function CategoryPage({ params }: PageProps<"/categories/[s
         items={[
           { label: "Home", href: "/" },
           { label: "Categories", href: "/categories" },
+          ...(parent
+            ? [{ label: parent.name.replace(/^AI /, ""), href: `/categories/${parent.slug}` }]
+            : []),
           { label: shortName },
         ]}
       />
@@ -65,11 +74,28 @@ export default async function CategoryPage({ params }: PageProps<"/categories/[s
       </div>
       {tools.length ? <SampleNotice className="mt-6" /> : null}
 
+      {subcategories.length ? (
+        <nav aria-label={`${shortName} subcategories`} className="mt-6">
+          <ul className="flex flex-wrap gap-2">
+            {subcategories.map((s) => (
+              <li key={s.slug}>
+                <Link
+                  href={`/categories/${s.slug}`}
+                  className="inline-flex min-h-11 items-center rounded-full border bg-card px-4 text-sm font-medium text-foreground hover:border-primary hover:text-primary"
+                >
+                  {s.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ) : null}
+
       <section aria-labelledby="category-tools" className="mt-10">
         <SectionHeader
           id="category-tools"
           title={`Tools (${tools.length})`}
-          href={tools.length ? `/tools?category=${slug}` : undefined}
+          href={tools.length && !category.parentSlug ? `/tools?category=${slug}` : undefined}
           linkLabel="Filter these tools"
         />
         {tools.length ? (

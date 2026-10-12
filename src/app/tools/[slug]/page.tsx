@@ -25,9 +25,10 @@ import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { Container } from "@/components/layout/container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { pricingLabel, skillLevelLabel } from "@/lib/content/labels";
+import { platformLabel, pricingLabel, skillLevelLabel } from "@/lib/content/labels";
 import {
-  getCategories,
+  getAllCategories,
+  getAlternatives,
   getGuidesForTool,
   getSimilarTools,
   getTool,
@@ -109,11 +110,12 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
   const tool = await getTool(slug);
   if (!tool) notFound();
 
-  const [categories, guides, workflows, similar] = await Promise.all([
-    getCategories(),
+  const [categories, guides, workflows, similar, alternatives] = await Promise.all([
+    getAllCategories(),
     getGuidesForTool(tool.slug),
     getWorkflowsForTool(tool.slug),
     getSimilarTools(tool),
+    getAlternatives(tool),
   ]);
   const primaryCategory = categories.find((c) => c.slug === tool.categorySlugs[0]);
   const categoryName = (s: string) =>
@@ -201,7 +203,7 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
         <h2 id="glance-heading" className="text-sm font-semibold text-heading">
           At a glance
         </h2>
-        <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-5 md:grid-cols-3 lg:grid-cols-6">
+        <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-5 md:grid-cols-3 lg:grid-cols-4">
           <Fact label="Best for">{tool.useCases[0] ?? "—"}</Fact>
           <Fact label="Skill level">
             <LevelBadge level={tool.skillLevel} />
@@ -210,6 +212,12 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
             {tool.pricingModel ? pricingLabel[tool.pricingModel] : <PricingBadge />}
           </Fact>
           <Fact label="Free plan">{tool.freePlan ?? "Not verified yet"}</Fact>
+          <Fact label="Free trial">{tool.freeTrial ?? "Not verified yet"}</Fact>
+          <Fact label="Platforms">
+            {tool.platforms?.length
+              ? tool.platforms.map((p) => platformLabel[p]).join(", ")
+              : "Not verified yet"}
+          </Fact>
           <Fact label="API">
             {tool.apiAvailable === true ? (
               <ApiBadge />
@@ -503,6 +511,18 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
             ) : (
               <p className="text-muted-foreground">No guides for this tool yet.</p>
             )}
+            {alternatives.length ? (
+              <>
+                <h3 className="mt-8 font-semibold text-heading">Alternatives</h3>
+                <ul className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  {alternatives.map((t, i) => (
+                    <li key={t.slug} {...reveal(i)}>
+                      <ToolCard tool={t} categoryName={categoryName(t.categorySlugs[0])} />
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : null}
             {similar.length ? (
               <>
                 <h3 className="mt-8 font-semibold text-heading">Similar tools</h3>

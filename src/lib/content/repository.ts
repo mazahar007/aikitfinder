@@ -20,8 +20,18 @@ const byUpdatedDesc = <T extends { updatedAt: string }>(a: T, b: T) =>
 
 // Categories ----------------------------------------------------------------
 
+/** Top-level categories only (what the homepage, category index and filters list). */
 export async function getCategories(): Promise<Category[]> {
+  return sampleCategories.filter((c) => !c.parentSlug);
+}
+
+/** Every category including subcategories (for routes, names and validation). */
+export async function getAllCategories(): Promise<Category[]> {
   return sampleCategories;
+}
+
+export async function getSubcategories(parentSlug: string): Promise<Category[]> {
+  return sampleCategories.filter((c) => c.parentSlug === parentSlug);
 }
 
 export async function getCategory(slug: string): Promise<Category | undefined> {
@@ -60,6 +70,11 @@ export async function getFeaturedTools(limit = 6): Promise<Tool[]> {
 
 export async function getToolsInCategory(categorySlug: string): Promise<Tool[]> {
   return published(sampleTools).filter((t) => t.categorySlugs.includes(categorySlug));
+}
+
+/** Tools the record names as alternatives (only published ones; order preserved). */
+export async function getAlternatives(tool: Tool): Promise<Tool[]> {
+  return getToolsBySlugs(tool.alternativeSlugs ?? []);
 }
 
 /** Other tools sharing the primary category, for "Similar tools". */

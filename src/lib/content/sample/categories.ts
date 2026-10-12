@@ -9,6 +9,20 @@ export const sampleCategories: Category[] = [
     icon: "clapperboard",
   },
   {
+    slug: "text-to-video",
+    name: "Text to Video",
+    description: "Describe or paste a script and get a finished video.",
+    icon: "clapperboard",
+    parentSlug: "video-generation",
+  },
+  {
+    slug: "image-to-video",
+    name: "Image to Video",
+    description: "Animate a still image into a short clip.",
+    icon: "clapperboard",
+    parentSlug: "video-generation",
+  },
+  {
     slug: "image-generation",
     name: "AI Image Generation",
     description: "Create images and illustrations from a written description.",

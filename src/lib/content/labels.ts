@@ -1,4 +1,4 @@
-import type { PricingModel, SkillLevel, VerificationStatus } from "@/lib/content/types";
+import type { Platform, PricingModel, SkillLevel, VerificationStatus } from "@/lib/content/types";
 
 export const skillLevels: SkillLevel[] = ["beginner", "intermediate", "advanced"];
 export const pricingModels: PricingModel[] = ["free", "freemium", "paid", "open-source"];
@@ -14,6 +14,15 @@ export const pricingLabel: Record<PricingModel, string> = {
   freemium: "Freemium",
   paid: "Paid",
   "open-source": "Open source",
+};
+
+export const platformLabel: Record<Platform, string> = {
+  web: "Web",
+  desktop: "Desktop app",
+  ios: "iOS",
+  android: "Android",
+  "browser-extension": "Browser extension",
+  api: "API",
 };
 
 export const verificationLabel: Record<VerificationStatus, string> = {
