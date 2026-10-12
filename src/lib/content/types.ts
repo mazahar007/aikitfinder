@@ -174,3 +174,49 @@ export type Workflow = {
   updatedAt: string;
   isSample: boolean;
 };
+
+/** What kind of offer it is. */
+export type DealType = "credits" | "discount" | "coupon" | "free-trial";
+
+/** Who an offer is aimed at. Never imply every visitor qualifies. */
+export type DealEligibility =
+  "anyone" | "students" | "educators" | "developers" | "startups" | "nonprofits";
+
+/**
+ * What the visitor sees. Derived from dates and verification, never typed in
+ * by hand (see lib/content/deal-status.ts).
+ */
+export type DealStatus = "active" | "upcoming" | "expired" | "needs-verification";
+
+export type Deal = {
+  slug: string;
+  title: string;
+  /** Provider name as shown to visitors. */
+  provider: string;
+  /** Set when the provider has a page in the directory. */
+  toolSlug?: string;
+  type: DealType;
+  summary: string;
+  /** Credit amount or discount, only if the provider states it explicitly. */
+  amount?: string;
+  couponCode?: string;
+  eligibility: DealEligibility[];
+  eligibilityNotes: string;
+  /** Region restrictions, if any. */
+  regions?: string;
+  /** ISO dates. Only set when an official source gives them. */
+  startsOn?: string;
+  endsOn?: string;
+  termsUrl: string;
+  claimUrl: string;
+  claimSteps: string[];
+  sources: Source[];
+  /** True when the claim link earns us a commission. Must be disclosed. */
+  affiliate: boolean;
+  verification: VerificationStatus;
+  /** Editorial publishing state (draft, published, ...). */
+  status: ContentStatus;
+  lastVerifiedAt?: string;
+  updatedAt: string;
+  isSample: boolean;
+};

@@ -6,7 +6,11 @@
  * Supabase queries with the same signatures, so the UI does not change.
  * Functions are async for that reason.
  */
+import { cacheLife } from "next/cache";
+
+import { dealStatus, type DealView } from "@/lib/content/deal-status";
 import { sampleCategories } from "@/lib/content/sample/categories";
+import { sampleDeals } from "@/lib/content/sample/deals";
 import { sampleGuides } from "@/lib/content/sample/guides";
 import { sampleTools } from "@/lib/content/sample/tools";
 import { sampleWorkflows } from "@/lib/content/sample/workflows";
@@ -133,6 +137,28 @@ export async function getFeaturedWorkflows(limit = 3): Promise<Workflow[]> {
 
 export async function getWorkflowsForTool(toolSlug: string): Promise<Workflow[]> {
   return published(sampleWorkflows).filter((w) => w.steps.some((s) => s.toolSlug === toolSlug));
+}
+
+// Deals -----------------------------------------------------------------------
+
+/**
+ * Published offers with their current status. Status depends on today's date,
+ * so this is cached for an hour (and recomputed after) rather than frozen at
+ * build time.
+ */
+export async function getDeals(): Promise<DealView[]> {
+  "use cache";
+  cacheLife("hours");
+  const today = new Date().toISOString().slice(0, 10);
+  return published(sampleDeals).map((deal) => ({ ...deal, state: dealStatus(deal, today) }));
+}
+
+export async function getDeal(slug: string): Promise<DealView | undefined> {
+  return (await getDeals()).find((d) => d.slug === slug);
+}
+
+export async function getDealsForTool(toolSlug: string): Promise<DealView[]> {
+  return (await getDeals()).filter((d) => d.toolSlug === toolSlug);
 }
 
 // Mixed -----------------------------------------------------------------------

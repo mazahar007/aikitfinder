@@ -31,6 +31,7 @@ export const mainNav: NavItem[] = [
   { title: "Explore Tools", href: "/tools" },
   { title: "Guides", href: "/guides" },
   { title: "Workflows", href: "/workflows" },
+  { title: "Deals", href: "/deals" },
   { title: "About", href: "/about" },
 ];
 
@@ -42,6 +43,7 @@ export const footerNav: { title: string; items: NavItem[] }[] = [
       { title: "Categories", href: "/categories" },
       { title: "Guides", href: "/guides" },
       { title: "Workflows", href: "/workflows" },
+      { title: "Deals", href: "/deals" },
       { title: "Search", href: "/search" },
     ],
   },

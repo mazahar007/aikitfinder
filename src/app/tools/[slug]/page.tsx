@@ -18,6 +18,7 @@ import {
   VerificationBadge,
 } from "@/components/content/badges";
 import { GuideCard, ToolCard, WorkflowCard } from "@/components/content/cards";
+import { DealCard } from "@/components/content/deal-card";
 import { PromptBlock } from "@/components/content/prompt-block";
 import { SourcesList } from "@/components/content/sources-list";
 import { ToolLogo } from "@/components/content/tool-logo";
@@ -29,6 +30,7 @@ import { platformLabel, pricingLabel, skillLevelLabel } from "@/lib/content/labe
 import {
   getAllCategories,
   getAlternatives,
+  getDealsForTool,
   getGuidesForTool,
   getSimilarTools,
   getTool,
@@ -110,12 +112,13 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
   const tool = await getTool(slug);
   if (!tool) notFound();
 
-  const [categories, guides, workflows, similar, alternatives] = await Promise.all([
+  const [categories, guides, workflows, similar, alternatives, deals] = await Promise.all([
     getAllCategories(),
     getGuidesForTool(tool.slug),
     getWorkflowsForTool(tool.slug),
     getSimilarTools(tool),
     getAlternatives(tool),
+    getDealsForTool(tool.slug),
   ]);
   const primaryCategory = categories.find((c) => c.slug === tool.categorySlugs[0]);
   const categoryName = (s: string) =>
@@ -511,6 +514,18 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
             ) : (
               <p className="text-muted-foreground">No guides for this tool yet.</p>
             )}
+            {deals.length ? (
+              <>
+                <h3 className="mt-8 font-semibold text-heading">Deals and free trials</h3>
+                <ul className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  {deals.map((d, i) => (
+                    <li key={d.slug} {...reveal(i)}>
+                      <DealCard deal={d} />
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : null}
             {alternatives.length ? (
               <>
                 <h3 className="mt-8 font-semibold text-heading">Alternatives</h3>

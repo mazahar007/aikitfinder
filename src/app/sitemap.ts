@@ -1,7 +1,13 @@
 import type { MetadataRoute } from "next";
 
 import { siteConfig } from "@/config/site";
-import { getAllCategories, getGuides, getTools, getWorkflows } from "@/lib/content/repository";
+import {
+  getAllCategories,
+  getDeals,
+  getGuides,
+  getTools,
+  getWorkflows,
+} from "@/lib/content/repository";
 
 const staticPaths = [
   "",
@@ -9,6 +15,7 @@ const staticPaths = [
   "/categories",
   "/guides",
   "/workflows",
+  "/deals",
   "/about",
   "/contact",
   "/privacy",
@@ -24,11 +31,12 @@ const staticPaths = [
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (!siteConfig.indexable) return [];
 
-  const [categories, tools, guides, workflows] = await Promise.all([
+  const [categories, tools, guides, workflows, deals] = await Promise.all([
     getAllCategories(),
     getTools(),
     getGuides(),
     getWorkflows(),
+    getDeals(),
   ]);
   const real = <T extends { isSample: boolean }>(items: T[]) => items.filter((i) => !i.isSample);
   // Empty categories are thin pages: list a category only once it has a real tool.
@@ -54,6 +62,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: g.updatedAt,
       priority: 0.7,
     })),
+    // Only active, verified offers: expired or unconfirmed ones are noindex.
+    ...real(deals)
+      .filter((d) => d.state === "active" || d.state === "upcoming")
+      .map((d) => ({ url: url(`/deals/${d.slug}`), lastModified: d.updatedAt, priority: 0.5 })),
     ...real(workflows).map((w) => ({
       url: url(`/workflows/${w.slug}`),
       lastModified: w.updatedAt,

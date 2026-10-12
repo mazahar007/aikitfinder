@@ -1,4 +1,12 @@
-import type { Platform, PricingModel, SkillLevel, VerificationStatus } from "@/lib/content/types";
+import type {
+  DealEligibility,
+  DealStatus,
+  DealType,
+  Platform,
+  PricingModel,
+  SkillLevel,
+  VerificationStatus,
+} from "@/lib/content/types";
 
 export const skillLevels: SkillLevel[] = ["beginner", "intermediate", "advanced"];
 export const pricingModels: PricingModel[] = ["free", "freemium", "paid", "open-source"];
@@ -42,3 +50,37 @@ const dateFormatter = new Intl.DateTimeFormat("en-GB", {
 export function formatDate(iso: string) {
   return dateFormatter.format(new Date(`${iso.slice(0, 10)}T00:00:00Z`));
 }
+
+export const dealTypes: DealType[] = ["credits", "discount", "coupon", "free-trial"];
+
+export const dealTypeLabel: Record<DealType, string> = {
+  credits: "Free credits",
+  discount: "Discount",
+  coupon: "Coupon",
+  "free-trial": "Free trial",
+};
+
+export const dealEligibilities: DealEligibility[] = [
+  "anyone",
+  "students",
+  "educators",
+  "developers",
+  "startups",
+  "nonprofits",
+];
+
+export const eligibilityLabel: Record<DealEligibility, string> = {
+  anyone: "Open to anyone",
+  students: "Students",
+  educators: "Educators",
+  developers: "Developers",
+  startups: "Startups",
+  nonprofits: "Nonprofits",
+};
+
+export const dealStatusLabel: Record<DealStatus, string> = {
+  active: "Active",
+  upcoming: "Upcoming",
+  expired: "Expired",
+  "needs-verification": "Needs verification",
+};

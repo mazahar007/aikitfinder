@@ -113,6 +113,11 @@ Followed in the file's own order. The roadmap file is not stored in the repo.
   - [ ] 1e: CSV import
   - [ ] 1f: real tool data, mobile and accessibility checks
 - [ ] Phase 2: deals, credits, coupons, free trials
+  - [x] Deals directory `/deals` and offer pages `/deals/[slug]` on labelled sample data (types, filters, derived status, claim guide, sources, disclosure)
+  - [x] Offers shown on related tool pages; nav and sitemap updated
+  - [x] SQL draft `0002_deals_schema.sql`
+  - [ ] Admin tools to update, expire and review offers (needs the database and admin CMS, Phase 1b-1d)
+  - [ ] Real, officially sourced offers (needs the real tool data step, Phase 1f)
 - [ ] Phase 3: tool comparison
 - [ ] Phase 4: pricing tracker
 - [ ] Phase 5: prompt library

@@ -60,3 +60,49 @@ judgement, not a score, and is never shown as a rating.
   read-only visitor role sees only `published` tools and cannot insert.
 - Supabase-specific behaviour (its `anon` / `authenticated` roles, `auth`
   schema) is not tested yet; that happens in 1b with a real project.
+
+## Deals (Phase 2)
+
+Types: `Deal`, `DealType`, `DealEligibility`, `DealStatus` in
+`src/lib/content/types.ts`. SQL draft: `supabase/migrations/0002_deals_schema.sql`
+(not applied anywhere).
+
+- **Offer types:** free credits, discount, coupon, free trial.
+- **Eligibility:** anyone, students, educators, developers, startups,
+  nonprofits. Notes and region limits are free text from the provider's terms.
+  The UI always says that being listed does not mean a visitor qualifies.
+- **Amounts and dates** are optional and set only when the provider states them.
+  Missing means "Not stated", never a guess.
+- **Status is derived, not stored** (`src/lib/content/deal-status.ts`):
+  1. an end date in the past is **Expired**;
+  2. not verified, or not re-checked in the last 60 days, is **Needs
+     verification** (even if the dates look fine);
+  3. a verified offer before its start date is **Upcoming**;
+  4. otherwise **Active**.
+     So an offer cannot stay "active" after it ends or after we stop checking it.
+     The sample offers will drift to "Needs verification" over time for this reason.
+- **Visibility:** `/deals` hides expired offers by default (a link shows them).
+  Expired and unconfirmed offer pages are `noindex` and left out of the sitemap.
+  Sample offers are never in the sitemap.
+- **Affiliate links** are labelled on the card and disclosed on the offer page,
+  and get `rel="sponsored"`.
+- **Admin-only notes** (`admin_notes`) are hidden from visitors with
+  column-level privileges in the SQL draft, so public queries must list columns
+  instead of using `select *`.
+- The deals list is cached for an hour (`"use cache"`) because status depends on
+  today's date.
+
+## Checks run for Phase 2
+
+- `pnpm check` and `pnpm build` pass.
+- The status rules were run against 11 cases (boundaries such as "ends today",
+  60 vs 61 days since the last check, unverified offers with future start dates)
+  using a throwaway script; this repo has no test runner yet, so the script is
+  not committed.
+- Playwright (desktop 1280px and mobile 375px): default list, each filter, the
+  expired view, empty state, coupon copy button, all warning banners, tool page
+  offers, no horizontal overflow, no console errors.
+- Both SQL migrations loaded into a temporary PostgreSQL 16, then were deleted.
+  Verified: bad date order, "verified" without a date, empty eligibility and a
+  non-http claim link are rejected; a public role sees only published offers and
+  cannot read `admin_notes`, use `select *`, or write.
