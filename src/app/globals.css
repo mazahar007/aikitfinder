@@ -61,6 +61,12 @@
 
   --shadow-hover-color: rgb(15 23 42 / 8%);
 
+  /* Homepage story chapters (pastels; body and link text checked AA on each) */
+  --story-1: #e0e7ff; /* Discover */
+  --story-2: #ccfbf1; /* Learn */
+  --story-3: #fef3c7; /* Create */
+  --story-4: #dcfce7; /* Automate */
+
   /* Shape */
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -109,6 +115,11 @@
   --destructive-tint: #2e1215;
 
   --shadow-hover-color: rgb(0 0 0 / 40%);
+
+  --story-1: #1e1b4b;
+  --story-2: #042f2e;
+  --story-3: #2a1b05;
+  --story-4: #052e16;
 }
 
 @theme inline {

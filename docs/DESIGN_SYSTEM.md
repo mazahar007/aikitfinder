@@ -107,6 +107,24 @@ decoration for its own sake.
 | Circular theme reveal              | Light/dark switch                        | The theme changed from this button    |
 | Check-mark pop                     | Copy buttons                             | Copied successfully                   |
 
+### Homepage showcase (GSAP)
+
+The homepage adds a scroll-linked "story" layer inspired by editorial motion sites, using our own
+shapes, words and colours. GSAP 3 (free standard licence) is loaded with a dynamic import inside
+`src/components/motion/scroll-scenes.tsx`, so it is downloaded only on the homepage (about 43 KB).
+
+| Effect           | What it does                                                                                                |
+| ---------------- | ----------------------------------------------------------------------------------------------------------- |
+| Kinetic ribbons  | Three tilted pills of oversized words (Discover · Learn · Create · Automate) slide sideways with the scroll |
+| Story chapters   | Four chapters; the section background fades between pastel chapter colours (`--story-1` to `--story-4`)     |
+| Line-art drawing | Each chapter's illustration draws its strokes as it scrolls in; accent dots pop in                          |
+| Outline marquee  | A line of huge outlined words ("Find it → Learn it → Use it") slides with the scroll                        |
+| Squiggle divider | A dashed wavy line between the story and the directory sections                                             |
+
+The server-rendered markup is complete without JavaScript: line art is fully drawn, each chapter
+shows its own colour, and ribbons sit still. GSAP only enhances it, and it does not run at all
+under reduced motion. Other pages do not load GSAP.
+
 Rules:
 
 - Only `transform` and `opacity` animate, so motion stays smooth on low-end phones.

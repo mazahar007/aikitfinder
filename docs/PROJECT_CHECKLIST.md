@@ -33,6 +33,9 @@ Updated after each milestone. Mirrors section 18 of the master brief.
 - [x] Related content (guides, workflows and similar tools on tool pages)
 - [x] Loading skeletons, empty states and a friendly error page
 - [x] Motion system (page transitions, logo morph, scroll reveal, hero effects; reduced-motion safe)
+- [x] Homepage showcase, step 1 (GSAP ribbons, story chapters with colour shifts, line-art drawing, outline marquee)
+- [ ] Homepage showcase, step 2 (shape wipe, pinned card zoom, horizontal scroll, closing CTA)
+- [ ] Homepage showcase, step 3 (logo mascot, current-section chip)
 - [ ] Owner review of the prototype
 
 ## Backend and admin (Phases 3–4)

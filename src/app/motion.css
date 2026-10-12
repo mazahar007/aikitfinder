@@ -236,6 +236,62 @@
   animation: pop var(--dur-base) var(--ease-out);
 }
 
+/* --------------------------------------------------- homepage showcase */
+
+/* Kinetic ribbons: oversized words inside tilted pills (enhanced by GSAP). */
+.ribbons {
+  position: relative;
+  overflow: hidden;
+  padding-block: clamp(2.5rem, 8vw, 6rem);
+}
+.ribbon {
+  display: flex;
+  width: max-content;
+  align-items: center;
+  gap: 0.35em;
+  border-radius: 999px;
+  padding: 0.08em 0.5em 0.14em;
+  font-size: clamp(2.6rem, 9vw, 7.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  white-space: nowrap;
+  will-change: transform;
+}
+.ribbon + .ribbon {
+  margin-top: -0.05em;
+}
+.ribbon-star {
+  display: inline-block;
+  width: 0.45em;
+  height: 0.45em;
+  flex: none;
+  background: currentColor;
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+}
+
+/* Story chapters fade between colours (the colour token is set by GSAP). */
+[data-story] {
+  transition: background-color 700ms var(--ease-out);
+}
+
+/* Line art is fully drawn by default; GSAP animates it from 0 when allowed. */
+.line-art [pathLength] {
+  fill: none;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Dashed, wavy divider between sections. */
+.squiggle {
+  display: block;
+  width: 100%;
+  height: 24px;
+  color: var(--input);
+}
+
 /* ------------------------------------------------------- reading progress */
 
 .reading-progress {
