@@ -129,7 +129,11 @@ async function ToolsDirectory({
               <ul className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {result.items.map((tool, i) => (
                   <li key={tool.slug} {...reveal(i)}>
-                    <ToolCard tool={tool} categoryName={categoryName(tool.categorySlugs[0])} />
+                    <ToolCard
+                      tool={tool}
+                      categoryName={categoryName(tool.categorySlugs[0])}
+                      compare
+                    />
                   </li>
                 ))}
               </ul>

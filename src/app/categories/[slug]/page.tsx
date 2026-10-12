@@ -102,7 +102,7 @@ export default async function CategoryPage({ params }: PageProps<"/categories/[s
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {tools.map((t, i) => (
               <li key={t.slug} {...reveal(i)}>
-                <ToolCard tool={t} />
+                <ToolCard tool={t} compare />
               </li>
             ))}
           </ul>

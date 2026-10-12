@@ -119,6 +119,11 @@ Followed in the file's own order. The roadmap file is not stored in the repo.
   - [ ] Admin tools to update, expire and review offers (needs the database and admin CMS, Phase 1b-1d)
   - [ ] Real, officially sourced offers (needs the real tool data step, Phase 1f)
 - [ ] Phase 3: tool comparison
+  - [x] `/compare` with 2-4 tools, differences-only toggle, unknown values shown, no scores or winners
+  - [x] Compare buttons on tool cards and tool pages, tray kept in sessionStorage, link from alternatives
+  - [x] Mobile table scroll with pinned row labels, keyboard and dark mode checked
+  - [ ] Plan-level pricing and usage limits rows (needs the pricing tracker data, Phase 4)
+  - [ ] Real, verified tool data to compare (Phase 1f)
 - [ ] Phase 4: pricing tracker
 - [ ] Phase 5: prompt library
 - [ ] Phase 6: workflow library

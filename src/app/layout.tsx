@@ -1,8 +1,10 @@
+import { Suspense } from "react";
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { CompareTray } from "@/components/compare/compare-tray";
 import { PointerSpotlight } from "@/components/motion/pointer-spotlight";
 import { themeInitScript } from "@/components/theme/theme-script";
 import { siteConfig } from "@/config/site";
@@ -76,6 +78,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </main>
         <SiteFooter />
         <PointerSpotlight />
+        {/* Reads the URL (to hide itself on /compare), so it streams in. */}
+        <Suspense fallback={null}>
+          <CompareTray />
+        </Suspense>
       </body>
     </html>
   );

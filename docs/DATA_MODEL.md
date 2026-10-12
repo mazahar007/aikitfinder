@@ -106,3 +106,49 @@ Types: `Deal`, `DealType`, `DealEligibility`, `DealStatus` in
   Verified: bad date order, "verified" without a date, empty eligibility and a
   non-http claim link are rejected; a public role sees only published offers and
   cannot read `admin_notes`, use `select *`, or write.
+
+## Comparison (Phase 3)
+
+`/compare?tools=a,b,c,d` shows two to four tools side by side. The URL is the
+source of truth, so a comparison can be shared and works without JavaScript.
+
+- **Rows** (`src/components/compare/compare-table.tsx`): category, skill level,
+  best for, audience; pricing model, free plan, free trial, pricing note;
+  platforms, public API, official docs; inputs, outputs, features, limitations;
+  verification status and date, official site, sources. Every value comes from
+  existing tool fields. A missing value shows "Not verified yet", never a guess.
+- **No scores, ratings, stars or winner.** The page says so. Differences are
+  shown by a "Show differences only" toggle that hides rows where every tool has
+  the same value (an all-unknown row counts as the same).
+- **Picking tools:** the "Compare" button on tool cards (tools list, categories,
+  alternatives and similar tools) and tool pages adds to a tray at the bottom of
+  the screen. The tray is kept in the browser tab's sessionStorage (up to four
+  tools; nothing is sent to a server) and is hidden on `/compare`, where the URL
+  replaces it. The picker form on `/compare` adds tools too.
+- **Limits:** more than four slugs are cut to four with a notice; unknown or
+  repeated slugs are ignored.
+- **SEO:** every comparison is `noindex, follow` with canonical `/compare`, and
+  `/compare` is not in the sitemap (each selection would be a thin page).
+- **Accessibility:** a real table with caption, column and row headers; the
+  scroll area is keyboard-focusable; the button uses `aria-pressed`; the tray
+  announces counts politely; remove links name the tool.
+- **Mobile:** the table scrolls sideways inside its own region with the row
+  labels pinned on the left. Screen-reader-only text is contained in that region
+  (`relative`), because otherwise it widened the whole page.
+
+Not built on purpose: star ratings and 5-level "Basic/Good/Excellent" scores from
+the reference screenshots (they would be unverified opinions), PDF export (needs a
+new dependency), and plan-level prices (that is the pricing tracker phase).
+
+## Checks run for Phase 3
+
+- `pnpm check` and `pnpm build` pass.
+- Playwright on desktop (1280px) and mobile (375px): picking tools from cards,
+  the 4-tool limit, persistence across pages, the tray's "Compare now" state,
+  opening `/compare`, 23 table rows (18 data rows), differences-only toggle,
+  removing and adding tools, 5 slugs cut to 4, one-tool prompt, example pairs,
+  the tool-page link, `noindex`, keyboard toggle with Space, dark mode, no
+  console errors, no horizontal page overflow. Two bugs found and fixed during
+  testing: the mobile page overflow above, and tray chips whose names collapsed
+  on narrow screens.
+- Not tested: screen readers, and browsers other than Chromium.

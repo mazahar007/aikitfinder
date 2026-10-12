@@ -8,6 +8,7 @@ import {
   SampleBadge,
   VerificationBadge,
 } from "@/components/content/badges";
+import { CompareButton } from "@/components/compare/compare-button";
 import { CategoryIcon } from "@/components/content/category-icon";
 import { Kicker } from "@/components/content/kicker";
 import { ToolLogo } from "@/components/content/tool-logo";
@@ -28,10 +29,13 @@ export function ToolCard({
   tool,
   categoryName,
   headingLevel = "h3",
+  compare = false,
 }: {
   tool: Tool;
   categoryName?: string;
   headingLevel?: "h2" | "h3";
+  /** Show the "Compare" button (directory-style lists only). */
+  compare?: boolean;
 }) {
   const Heading = headingLevel;
   return (
@@ -57,6 +61,11 @@ export function ToolCard({
         <VerificationBadge status={tool.verification} date={tool.lastVerifiedAt} />
         {tool.isSample ? <SampleBadge /> : null}
       </div>
+      {compare ? (
+        <div className="mt-3">
+          <CompareButton slug={tool.slug} name={tool.name} />
+        </div>
+      ) : null}
     </article>
   );
 }

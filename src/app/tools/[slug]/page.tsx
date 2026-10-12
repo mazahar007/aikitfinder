@@ -18,6 +18,7 @@ import {
   VerificationBadge,
 } from "@/components/content/badges";
 import { GuideCard, ToolCard, WorkflowCard } from "@/components/content/cards";
+import { CompareButton } from "@/components/compare/compare-button";
 import { DealCard } from "@/components/content/deal-card";
 import { PromptBlock } from "@/components/content/prompt-block";
 import { SourcesList } from "@/components/content/sources-list";
@@ -26,6 +27,7 @@ import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { Container } from "@/components/layout/container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { COMPARE_MAX, compareHref } from "@/lib/content/compare";
 import { platformLabel, pricingLabel, skillLevelLabel } from "@/lib/content/labels";
 import {
   getAllCategories,
@@ -185,6 +187,7 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
               </a>
             </Button>
           ) : null}
+          <CompareButton slug={tool.slug} name={tool.name} />
         </div>
       </header>
 
@@ -528,11 +531,22 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
             ) : null}
             {alternatives.length ? (
               <>
-                <h3 className="mt-8 font-semibold text-heading">Alternatives</h3>
+                <div className="mt-8 flex flex-wrap items-center justify-between gap-2">
+                  <h3 className="font-semibold text-heading">Alternatives</h3>
+                  <Link
+                    href={compareHref(
+                      [tool.slug, ...alternatives.map((a) => a.slug)].slice(0, COMPARE_MAX),
+                    )}
+                    className="inline-flex min-h-11 items-center text-sm font-medium text-primary hover:underline"
+                  >
+                    Compare {tool.name} with{" "}
+                    {alternatives.length === 1 ? alternatives[0].name : "its alternatives"}
+                  </Link>
+                </div>
                 <ul className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                   {alternatives.map((t, i) => (
                     <li key={t.slug} {...reveal(i)}>
-                      <ToolCard tool={t} categoryName={categoryName(t.categorySlugs[0])} />
+                      <ToolCard tool={t} categoryName={categoryName(t.categorySlugs[0])} compare />
                     </li>
                   ))}
                 </ul>
@@ -544,7 +558,7 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
                 <ul className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                   {similar.map((t, i) => (
                     <li key={t.slug} {...reveal(i)}>
-                      <ToolCard tool={t} categoryName={categoryName(t.categorySlugs[0])} />
+                      <ToolCard tool={t} categoryName={categoryName(t.categorySlugs[0])} compare />
                     </li>
                   ))}
                 </ul>
