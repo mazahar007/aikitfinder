@@ -9,6 +9,7 @@ import {
   VerificationBadge,
 } from "@/components/content/badges";
 import { CategoryIcon } from "@/components/content/category-icon";
+import { Kicker } from "@/components/content/kicker";
 import { ToolLogo } from "@/components/content/tool-logo";
 import { Badge } from "@/components/ui/badge";
 import type { Category, Guide, Tool, Workflow } from "@/lib/content/types";
@@ -117,10 +118,13 @@ export function CategoryCard({
   category,
   toolCount,
   compact = false,
+  toolNames,
 }: {
   category: Category;
   toolCount?: number;
   compact?: boolean;
+  /** A few tool names shown as chips, so the card previews what's inside. */
+  toolNames?: string[];
 }) {
   return (
     <article className={cn(cardBase, compact ? "p-4" : "p-5")}>
@@ -135,6 +139,19 @@ export function CategoryCard({
       {!compact ? (
         <p className="mt-1 text-sm text-muted-foreground">{category.description}</p>
       ) : null}
+      {toolNames?.length ? (
+        <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Example tools">
+          {toolNames.map((name) => (
+            <li
+              key={name}
+              data-tool-chip
+              className="rounded-full border bg-surface-subtle px-2 py-0.5 text-xs text-muted-foreground"
+            >
+              {name}
+            </li>
+          ))}
+        </ul>
+      ) : null}
       {toolCount !== undefined ? (
         <p className="mt-auto pt-2 text-xs text-muted-foreground">
           {toolCount === 0 ? "No tools yet" : `${toolCount} ${toolCount === 1 ? "tool" : "tools"}`}
@@ -147,12 +164,15 @@ export function CategoryCard({
 /** Section heading with an optional "View all" link. */
 export function SectionHeader({
   id,
+  kicker,
   title,
   description,
   href,
   linkLabel,
 }: {
   id: string;
+  /** Pill label above the title, matching the homepage story chapters. */
+  kicker?: string;
   title: string;
   description?: string;
   href?: string;
@@ -161,6 +181,11 @@ export function SectionHeader({
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
       <div>
+        {kicker ? (
+          <div className="mb-3">
+            <Kicker label={kicker} />
+          </div>
+        ) : null}
         <h2 id={id} className="text-2xl font-bold tracking-tight text-heading sm:text-h2">
           {title}
         </h2>

@@ -2,13 +2,14 @@ import Link from "next/link";
 
 import { CategoryCard, GuideCard, SectionHeader, WorkflowCard } from "@/components/content/cards";
 import { SampleNotice } from "@/components/content/sample-notice";
-import { OutlineMarquee, Ribbons, Squiggle, Story } from "@/components/home/showcase";
+import { OutlineMarquee, Ribbons, Squiggle } from "@/components/home/showcase";
 import {
   ClosingCta,
   CloudWipe,
   FeaturedRail,
   ZoomShowcase,
 } from "@/components/home/showcase-scenes";
+import { Story } from "@/components/home/story";
 import { ScrollScenes } from "@/components/motion/scroll-scenes";
 import { Container } from "@/components/layout/container";
 import { SearchForm } from "@/components/search/search-form";
@@ -21,8 +22,12 @@ import {
   getFeaturedGuides,
   getFeaturedTools,
   getFeaturedWorkflows,
+  getGuide,
   getRecentlyUpdated,
+  getTool,
   getTools,
+  getToolsBySlugs,
+  getWorkflow,
 } from "@/lib/content/repository";
 
 const typingExamples = [
@@ -50,6 +55,19 @@ export default async function HomePage() {
     getFeaturedWorkflows(3),
     getRecentlyUpdated(5),
   ]);
+  // Content for the story previews (one example per chapter).
+  const [discoverTools, storyGuide, promptTool, storyWorkflow] = await Promise.all([
+    getToolsBySlugs(["storyreel", "draftwise", "pictora"]),
+    getGuide("blog-post-to-video"),
+    getTool("storyreel"),
+    getWorkflow("blog-to-social-video"),
+  ]);
+  const storyPrompt = promptTool?.prompts[0];
+  const exampleTools = (categorySlug: string) =>
+    tools
+      .filter((t) => t.categorySlugs.includes(categorySlug))
+      .slice(0, 2)
+      .map((t) => t.name);
   const categoryName = (slug: string) =>
     categories.find((c) => c.slug === slug)?.name.replace(/^AI /, "");
   const toolNames = (slugs: string[]) =>
@@ -106,9 +124,16 @@ export default async function HomePage() {
 
       <ScrollScenes>
         <Ribbons />
-        <Story />
-
-        <CloudWipe direction="to-dark" />
+        {storyGuide && promptTool && storyPrompt && storyWorkflow ? (
+          <Story
+            discoverTools={discoverTools}
+            guide={storyGuide}
+            promptTool={promptTool}
+            prompt={storyPrompt}
+            workflow={storyWorkflow}
+            workflowTools={tools}
+          />
+        ) : null}
         <FeaturedRail tools={featuredTools} categoryName={categoryName} />
         <ZoomShowcase />
         <CloudWipe direction="to-light" />
@@ -121,15 +146,21 @@ export default async function HomePage() {
           <Container className="py-12">
             <SectionHeader
               id="categories-heading"
+              kicker="Explore"
               title="Browse by category"
               description="Start from what you want to make or get done."
               href="/categories"
               linkLabel="All categories"
             />
-            <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-              {categories.slice(0, 8).map((c, i) => (
+            <ul data-category-grid className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              {categories.map((c, i) => (
                 <li key={c.slug} {...reveal(i, 4)}>
-                  <CategoryCard category={c} toolCount={counts[c.slug] ?? 0} compact />
+                  <CategoryCard
+                    category={c}
+                    toolCount={counts[c.slug] ?? 0}
+                    toolNames={exampleTools(c.slug)}
+                    compact
+                  />
                 </li>
               ))}
             </ul>
@@ -143,6 +174,7 @@ export default async function HomePage() {
           <Container className="py-12">
             <SectionHeader
               id="guides-heading"
+              kicker="Learn"
               title="Beginner quick starts"
               description="Short, step-by-step guides with a clear result at the end."
               href="/guides"
@@ -162,6 +194,7 @@ export default async function HomePage() {
           <Container className="py-12">
             <SectionHeader
               id="workflows-heading"
+              kicker="Automate"
               title="Popular workflows"
               description="Combine tools into a process you can repeat."
               href="/workflows"
@@ -179,7 +212,7 @@ export default async function HomePage() {
 
         <section aria-labelledby="recent-heading">
           <Container className="py-12">
-            <SectionHeader id="recent-heading" title="Recently updated" />
+            <SectionHeader id="recent-heading" kicker="Fresh" title="Recently updated" />
             <ul className="divide-y rounded-md border bg-card">
               {recent.map((r, i) => (
                 <li key={`${r.type}-${r.item.slug}`} {...reveal(i, 1)}>

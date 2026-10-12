@@ -107,6 +107,24 @@ decoration for its own sake.
 | Circular theme reveal              | Light/dark switch                        | The theme changed from this button    |
 | Check-mark pop                     | Copy buttons                             | Copied successfully                   |
 
+### Homepage narrative
+
+The homepage reads as one story of what AIKitFinder does, so motion and ordinary sections feel like
+the same page:
+
+1. **Hero:** search first ("What do you want to do?").
+2. **Ribbons:** brand rhythm (Discover · Learn · Create · Automate).
+3. **Story, four chapters:** each pairs a promise with a live preview of the real feature, built
+   from the same data as the pages it links to: search results (Discover), guide steps (Learn), a
+   prompt with highlighted placeholders (Create), and a tool-to-tool workflow (Automate).
+4. **Dark zone:** featured tools rail with floating category stickers, then the zooming tool-page
+   preview.
+5. **Directory:** categories (with example tools on each card), guides, workflows, recently updated.
+6. **Closing call to action.**
+
+Every section uses the same label style (the `Kicker` pill, with an outlined number in the story),
+the same heading scale and the same card language.
+
 ### Homepage showcase (GSAP)
 
 The homepage adds a scroll-linked "story" layer inspired by editorial motion sites, using our own

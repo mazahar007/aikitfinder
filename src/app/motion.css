@@ -114,6 +114,15 @@
   }
 }
 
+@keyframes sticker-float {
+  from {
+    translate: 0 -6px;
+  }
+  to {
+    translate: 0 8px;
+  }
+}
+
 @keyframes header-raise {
   to {
     box-shadow: 0 6px 24px -12px rgb(15 23 42 / 25%);
@@ -318,6 +327,9 @@
   }
   .search-glow:focus-within {
     animation: spin-angle 4s linear infinite;
+  }
+  .sticker {
+    animation: sticker-float 3.8s var(--ease-in-out) infinite alternate;
   }
 
   /* Staggered entrance for hero content on first paint. */

@@ -24,6 +24,7 @@
   --on-brand: #cbd5e1; /* body text on the footer */
   --on-brand-accent: #7dd3fc; /* logo accent on the footer */
   --logo-tile: #0b1b3a;
+  --zone: #0b1b3a; /* homepage dark "featured" zone */
   --logo-spark: #2563eb;
 
   /* Surfaces */
@@ -84,6 +85,7 @@
   --brand: #070d1a;
   --heading: #f8fafc;
   --logo-tile: #1e3a8a;
+  --zone: #1a2c5c; /* lifted from the page so the zone still reads as a band */
   --logo-spark: #7dd3fc;
 
   --background: #0b1220;
@@ -125,6 +127,7 @@
 @theme inline {
   --color-brand: var(--brand);
   --color-heading: var(--heading);
+  --color-zone: var(--zone);
   --color-overlay: var(--overlay);
   --color-on-brand: var(--on-brand);
   --color-on-brand-accent: var(--on-brand-accent);

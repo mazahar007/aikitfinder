@@ -2,60 +2,144 @@ import Link from "next/link";
 import { ArrowRightIcon, BadgeCheckIcon, CopyIcon, SlidersHorizontalIcon } from "lucide-react";
 
 import { ToolCard } from "@/components/content/cards";
+import { CategoryIcon } from "@/components/content/category-icon";
+import { Kicker } from "@/components/content/kicker";
 import type { Tool } from "@/lib/content/types";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------ cloud wipe */
 
 /** Soft "cloud" top edge: a row of rounded bumps of different sizes. */
-function cloudPath() {
-  const bumps = [
-    [150, 70],
-    [190, 95],
-    [130, 60],
-    [220, 105],
-    [160, 75],
-    [140, 85],
-    [210, 100],
-  ];
-  let d = "M0 200 L0 110";
+function cloudPath(bumps: [number, number][], base: number) {
+  let d = `M0 200 L0 ${base}`;
   for (const [w, h] of bumps) d += ` a${w / 2} ${h} 0 0 1 ${w} 0`;
-  return `${d} L1200 110 L1200 200 Z`;
+  return `${d} L1200 ${base} L1200 200 Z`;
 }
-const CLOUD = cloudPath();
+// Two layers of overlapping bumps read as one soft, natural cloud bank.
+const CLOUD_BACK = cloudPath(
+  [
+    [110, 70],
+    [170, 95],
+    [140, 80],
+    [200, 110],
+    [120, 75],
+    [180, 100],
+    [130, 70],
+    [150, 90],
+  ],
+  95,
+);
+const CLOUD_FRONT = cloudPath(
+  [
+    [150, 60],
+    [190, 85],
+    [130, 50],
+    [220, 95],
+    [160, 65],
+    [140, 75],
+    [210, 90],
+  ],
+  120,
+);
 
 /**
  * A band where a cloud-shaped colour rises to cover the screen, handing the
  * page over to the next section's colour. Without motion it is a static
  * cloud edge.
  *
- * - "to-dark":  page background → brand navy (enters the dark zone)
- * - "to-light": brand navy → page background (leaves the dark zone)
+ * - "to-dark":  current background → the dark zone colour
+ * - "to-light": the dark zone → page background
+ *
+ * `seamless` leaves the band transparent so the cloud rises straight out of
+ * whatever colour sits behind it (used at the end of the story).
  */
-export function CloudWipe({ direction }: { direction: "to-dark" | "to-light" }) {
+export function CloudWipe({
+  direction,
+  seamless = false,
+}: {
+  direction: "to-dark" | "to-light";
+  seamless?: boolean;
+}) {
   const toDark = direction === "to-dark";
   return (
     <div
       data-wipe
       aria-hidden="true"
-      className={cn("relative h-[38vh] overflow-hidden", toDark ? "bg-background" : "bg-brand")}
+      className={cn(
+        "relative h-[24vh] min-h-40 overflow-hidden",
+        seamless ? "bg-transparent" : toDark ? "bg-background" : "bg-zone",
+      )}
     >
       <div
         data-wipe-cloud
         className={cn(
           "absolute inset-x-0 bottom-0 h-full",
-          toDark ? "text-brand" : "text-background",
+          toDark ? "text-zone" : "text-background",
         )}
       >
         <svg
           viewBox="0 0 1200 200"
           preserveAspectRatio="none"
-          className="absolute inset-x-0 top-0 h-[45%] w-full"
+          className="absolute inset-x-0 top-0 h-[50%] w-full"
         >
-          <path d={CLOUD} fill="currentColor" />
+          <path d={CLOUD_BACK} fill="currentColor" opacity="0.45" />
+          <path d={CLOUD_FRONT} fill="currentColor" />
         </svg>
-        <div className="absolute inset-x-0 top-[44%] bottom-0 bg-current" />
+        <div className="absolute inset-x-0 top-[49%] bottom-0 bg-current" />
       </div>
+    </div>
+  );
+}
+
+/* --------------------------------------------------------------- stickers */
+
+const stickers = [
+  {
+    icon: "clapperboard",
+    label: "Video",
+    pos: "top-[6%] left-[36%]",
+    rot: "-rotate-6",
+    speed: 1.2,
+  },
+  { icon: "image", label: "Images", pos: "top-[10%] left-[60%]", rot: "rotate-3", speed: 0.6 },
+  { icon: "code", label: "Code", pos: "top-[5%] right-[5%]", rot: "rotate-6", speed: 1 },
+  { icon: "pen", label: "Writing", pos: "bottom-[9%] left-[10%]", rot: "rotate-4", speed: 0.8 },
+  { icon: "audio", label: "Voice", pos: "bottom-[7%] left-[48%]", rot: "-rotate-3", speed: 1.4 },
+  {
+    icon: "workflow",
+    label: "Automation",
+    pos: "bottom-[11%] right-[8%]",
+    rot: "-rotate-6",
+    speed: 0.7,
+  },
+];
+
+/**
+ * Category "stickers" floating in the space above and below the featured
+ * rail: a hint of the breadth of the directory. They bob gently (CSS) and
+ * drift at different speeds while the rail is pinned (GSAP). Wide screens only.
+ */
+function Stickers() {
+  return (
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden lg:block">
+      {stickers.map((s, i) => (
+        <span key={s.label} className={cn("absolute", s.pos)}>
+          <span data-sticker data-speed={s.speed} className="block">
+            <span
+              className={cn(
+                "sticker inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white shadow-lg backdrop-blur",
+                s.rot,
+              )}
+              style={{ animationDelay: `${i * -1.3}s` }}
+            >
+              <span className="inline-flex size-7 items-center justify-center rounded-full bg-on-brand-accent text-zone">
+                <CategoryIcon icon={s.icon} className="size-4" />
+              </span>
+              {s.label}
+            </span>
+          </span>
+        </span>
+      ))}
     </div>
   );
 }
@@ -78,16 +162,15 @@ export function FeaturedRail({
     <section
       data-hscroll
       aria-labelledby="featured-heading"
-      className="relative overflow-hidden bg-brand py-16 text-on-brand lg:flex lg:min-h-screen lg:flex-col lg:justify-center"
+      className="relative overflow-hidden bg-zone py-16 text-on-brand lg:flex lg:min-h-screen lg:flex-col lg:justify-center"
     >
+      <Stickers />
       <div className="mx-auto flex w-full max-w-[1200px] flex-wrap items-end justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <div>
-          <p className="text-sm font-semibold tracking-widest text-on-brand-accent uppercase">
-            Editor’s picks
-          </p>
+          <Kicker label="Editor’s picks" inverted />
           <h2
             id="featured-heading"
-            className="mt-2 text-4xl font-extrabold tracking-tight text-white sm:text-6xl"
+            className="mt-4 text-4xl font-extrabold tracking-tight text-white sm:text-6xl"
           >
             Featured tools
           </h2>
@@ -97,7 +180,7 @@ export function FeaturedRail({
         </div>
         <Link
           href="/tools"
-          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/30 px-5 font-semibold text-white transition-colors hover:bg-white hover:text-brand"
+          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/30 px-5 font-semibold text-white transition-colors hover:bg-white hover:text-zone"
         >
           Explore all tools
           <ArrowRightIcon className="size-4" aria-hidden="true" />
@@ -167,16 +250,14 @@ export function ZoomShowcase() {
     <section
       data-zoom
       aria-labelledby="zoom-heading"
-      className="relative overflow-hidden bg-brand py-20 text-on-brand lg:flex lg:min-h-screen lg:items-center"
+      className="relative overflow-hidden bg-zone py-20 text-on-brand lg:flex lg:min-h-screen lg:items-center"
     >
       <div className="mx-auto grid w-full max-w-[1200px] items-center gap-12 px-4 sm:px-6 lg:grid-cols-[1fr_1.3fr] lg:px-8">
         <div>
-          <p className="text-sm font-semibold tracking-widest text-on-brand-accent uppercase">
-            Every tool page
-          </p>
+          <Kicker label="Every tool page" inverted />
           <h2
             id="zoom-heading"
-            className="mt-2 text-4xl font-extrabold tracking-tight text-balance text-white sm:text-6xl"
+            className="mt-4 text-4xl font-extrabold tracking-tight text-balance text-white sm:text-6xl"
           >
             One page. Everything you need.
           </h2>
@@ -195,7 +276,7 @@ export function ZoomShowcase() {
           </ul>
           <Link
             href="/tools/storyreel"
-            className="mt-8 inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-5 font-semibold text-brand transition-transform duration-200 hover:-translate-y-0.5"
+            className="mt-8 inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-5 font-semibold text-zone transition-transform duration-200 hover:-translate-y-0.5"
           >
             Open a sample tool page
             <ArrowRightIcon className="size-4" aria-hidden="true" />

@@ -149,6 +149,48 @@ export function ScrollScenes({ children }: { children: ReactNode }) {
           );
         });
 
+        // Story previews: the feature preview builds itself piece by piece.
+        el.querySelectorAll<HTMLElement>("[data-chapter]").forEach((chapter) => {
+          const items = chapter.querySelectorAll("[data-preview-item]");
+          if (!items.length) return;
+          gsap.from(items, {
+            y: 18,
+            opacity: 0,
+            duration: 0.55,
+            ease: "power2.out",
+            stagger: 0.09,
+            scrollTrigger: { trigger: chapter, start: "top 62%" },
+          });
+        });
+
+        // Category grid: icons pop and example tools appear in sequence.
+        el.querySelectorAll<HTMLElement>("[data-category-grid]").forEach((grid) => {
+          // Explicit end values, and the icon's own hover transition switched
+          // off while GSAP drives it; inline styles are cleared afterwards.
+          gsap.fromTo(
+            grid.querySelectorAll(".card-icon"),
+            { scale: 0, rotate: -25, transition: "none" },
+            {
+              scale: 1,
+              rotate: 0,
+              duration: 0.6,
+              ease: "back.out(2.2)",
+              stagger: 0.05,
+              clearProps: "transform,scale,rotate,transition",
+              scrollTrigger: { trigger: grid, start: "top 80%" },
+            },
+          );
+          gsap.from(grid.querySelectorAll("[data-tool-chip]"), {
+            y: 8,
+            opacity: 0,
+            duration: 0.4,
+            ease: "power2.out",
+            stagger: 0.03,
+            delay: 0.25,
+            scrollTrigger: { trigger: grid, start: "top 80%" },
+          });
+        });
+
         // Zoom card (all sizes): the miniature tool page tilts up into view.
         el.querySelectorAll<HTMLElement>("[data-zoom]").forEach((section) => {
           gsap.from(section.querySelectorAll("[data-zoom-callout]"), {
@@ -186,6 +228,11 @@ export function ScrollScenes({ children }: { children: ReactNode }) {
           tl.to(track, { x: () => -distance(), ease: "none" }, 0);
           const bar = section.querySelector("[data-hscroll-progress]");
           if (bar) tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, ease: "none" }, 0);
+          // Stickers drift upward at different speeds while the rail slides.
+          section.querySelectorAll<HTMLElement>("[data-sticker]").forEach((sticker) => {
+            const speed = Number(sticker.dataset.speed ?? 1);
+            tl.fromTo(sticker, { y: 40 * speed }, { y: -60 * speed, ease: "none" }, 0);
+          });
           return () => {
             viewport.style.overflow = "";
           };
@@ -213,6 +260,15 @@ export function ScrollScenes({ children }: { children: ReactNode }) {
             },
           );
         });
+      });
+
+      // Pinned sections add scroll space, so every trigger below them must be
+      // measured after they exist: sort by page position and re-measure, and
+      // again once web fonts have settled the layout.
+      ScrollTrigger.sort();
+      ScrollTrigger.refresh();
+      document.fonts?.ready.then(() => {
+        if (!cancelled) ScrollTrigger.refresh();
       });
 
       cleanup = () => {
