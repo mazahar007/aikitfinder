@@ -34,6 +34,7 @@ export const mainNav: NavItem[] = [
   { title: "Workflows", href: "/workflows" },
   { title: "Deals", href: "/deals" },
   { title: "About", href: "/about" },
+  { title: "VoiceHub", href: "/voicehub" },
 ];
 
 export const footerNav: { title: string; items: NavItem[] }[] = [
