@@ -269,7 +269,7 @@ export default function VoiceHubPage() {
         <p className="mt-1 text-slate-600">
           This studio is the VoiceHub section inside AIKitFinder. The standalone
           full voice SaaS lives separately at{" "}
-          <a className="underline" href="https://yourvoice-ghorowa.vercel.app">yourvoice</a>.
+          <a className="underline" href="https://voicehubo.vercel.app">voicehubo.vercel.app</a>.
           This page does not claim to be that full SaaS.
         </p>
       </div>
