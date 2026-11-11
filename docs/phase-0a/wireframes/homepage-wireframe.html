@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AIKitFinder parent homepage wireframe (Phase 0A, not implemented)</title>
+    <style>
+      :root {
+        --bg: #0a0c16;
+        --panel: #121829;
+        --panel2: #171d31;
+        --line: #2a3350;
+        --text: #eef1f8;
+        --muted: #98a2bd;
+        --violet: #7c5cf6;
+        --pink: #ec4899;
+        --cyan: #22b8cf;
+        --note: #f5c542;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font:
+          15px/1.5 Inter,
+          system-ui,
+          sans-serif;
+      }
+      .wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 32px;
+      }
+      .banner {
+        background: var(--note);
+        color: #1b1400;
+        font-size: 13px;
+        font-weight: 600;
+        text-align: center;
+        padding: 6px 12px;
+      }
+      section,
+      header,
+      footer {
+        position: relative;
+        border-bottom: 1px dashed var(--line);
+      }
+      .tag {
+        position: absolute;
+        left: 8px;
+        top: 8px;
+        font:
+          600 11px/1 ui-monospace,
+          monospace;
+        color: var(--note);
+        letter-spacing: 0.04em;
+      }
+      .pad {
+        padding-block: 64px;
+      }
+      h1 {
+        font-size: 54px;
+        line-height: 1.05;
+        margin: 14px 0;
+        letter-spacing: -0.02em;
+      }
+      h2 {
+        font-size: 30px;
+        margin: 0 0 8px;
+        letter-spacing: -0.01em;
+      }
+      h3 {
+        font-size: 19px;
+        margin: 0 0 6px;
+      }
+      p {
+        margin: 0;
+        color: var(--muted);
+      }
+      .lead {
+        font-size: 18px;
+        max-width: 520px;
+      }
+      .row {
+        display: flex;
+        gap: 24px;
+      }
+      .col {
+        flex: 1;
+        min-width: 0;
+      }
+      .box {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 22px;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        min-height: 46px;
+        padding: 0 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        border: 1px solid var(--line);
+        color: var(--text);
+        white-space: nowrap;
+      }
+      .btn.v {
+        background: var(--violet);
+        border-color: var(--violet);
+      }
+      .btn.c {
+        background: var(--cyan);
+        border-color: var(--cyan);
+        color: #04222a;
+      }
+      .btn.ghost {
+        background: transparent;
+      }
+      .pill {
+        display: inline-block;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        color: var(--muted);
+      }
+      .pill.c {
+        border-color: var(--cyan);
+        color: var(--cyan);
+      }
+      .pill.v {
+        border-color: var(--violet);
+        color: #b6a4ff;
+      }
+      .pill.w {
+        border-color: var(--note);
+        color: var(--note);
+      }
+      .ph {
+        background: repeating-linear-gradient(
+          45deg,
+          var(--panel2),
+          var(--panel2) 10px,
+          #1b2238 10px,
+          #1b2238 20px
+        );
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        color: var(--muted);
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 8px;
+      }
+      .bar {
+        height: 10px;
+        border-radius: 5px;
+        background: #26304c;
+        margin: 8px 0;
+      }
+      nav.top {
+        display: flex;
+        align-items: center;
+        gap: 26px;
+        height: 68px;
+      }
+      nav.top .links {
+        display: flex;
+        gap: 22px;
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .logo {
+        font-weight: 800;
+        font-size: 19px;
+      }
+      .logo span {
+        color: #b6a4ff;
+      }
+      .sp {
+        flex: 1;
+      }
+      .cdir {
+        border-top: 3px solid var(--cyan);
+      }
+      .cflow {
+        border-top: 3px solid var(--violet);
+      }
+      ul.clean {
+        margin: 12px 0 18px;
+        padding-left: 18px;
+        color: var(--muted);
+      }
+      .steps {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+      }
+      .step {
+        flex: 1;
+        min-width: 100px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px 8px;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .step.gate {
+        border-color: var(--pink);
+        color: #f9a8d4;
+      }
+      .grid3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+      }
+      .grid4 {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+      }
+      .faq div {
+        border-bottom: 1px solid var(--line);
+        padding: 14px 0;
+        display: flex;
+        justify-content: space-between;
+        font-weight: 600;
+      }
+      .foot {
+        display: grid;
+        grid-template-columns: 1.6fr repeat(4, 1fr);
+        gap: 24px;
+        font-size: 14px;
+        color: var(--muted);
+      }
+      .foot b {
+        color: var(--text);
+        display: block;
+        margin-bottom: 8px;
+      }
+      .foot > div > span {
+        display: block;
+        margin: 4px 0;
+      }
+      .center {
+        text-align: center;
+      }
+      .center .lead {
+        margin: 0 auto;
+      }
+      .mt {
+        margin-top: 28px;
+      }
+      /* mobile variant */
+      body.m .wrap {
+        padding: 0 18px;
+      }
+      body.m h1 {
+        font-size: 34px;
+      }
+      body.m h2 {
+        font-size: 24px;
+      }
+      body.m .pad {
+        padding-block: 40px;
+      }
+      body.m .row.keep {
+        display: flex;
+      }
+      body.m .row.keep > * {
+        margin-bottom: 0;
+      }
+      body.m .row,
+      body.m .grid3,
+      body.m .grid4,
+      body.m .foot {
+        display: block;
+      }
+      body.m .row > *,
+      body.m .grid3 > *,
+      body.m .grid4 > *,
+      body.m .foot > * {
+        margin-bottom: 16px;
+      }
+      body.m nav.top .links,
+      body.m nav.top .desk {
+        display: none;
+      }
+      body.m .btn {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 10px;
+      }
+      body.m nav.top .btn {
+        width: auto;
+        margin: 0;
+        min-height: 40px;
+        padding: 0 12px;
+      }
+      body.m .steps {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+      body:not(.m) .mob {
+        display: none;
+      }
+      .overlay {
+        background: rgba(4, 6, 12, 0.72);
+        padding: 40px 0;
+      }
+      .modal {
+        max-width: 420px;
+        margin: 0 auto;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+      }
+      .field {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        height: 44px;
+        margin: 6px 0 14px;
+        padding: 10px 12px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .tabs {
+        display: flex;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 14px 0;
+      }
+      .tabs span {
+        flex: 1;
+        text-align: center;
+        padding: 9px;
+        font-weight: 600;
+        color: var(--muted);
+      }
+      .tabs span.on {
+        background: var(--violet);
+        color: #fff;
+      }
+      .drawer {
+        max-width: 330px;
+        margin-left: auto;
+        background: var(--panel);
+        border-left: 1px solid var(--line);
+        padding: 20px;
+      }
+      .drawer div.i {
+        padding: 13px 0;
+        border-bottom: 1px solid var(--line);
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="banner">
+      WIREFRAME — proposed AIKitFinder parent homepage. Structure and copy only. Not a visual design
+      and not implemented.
+    </div>
+
+    <header>
+      <span class="tag">A · HEADER (sticky)</span>
+      <div class="wrap">
+        <nav class="top">
+          <div class="logo">AIKit<span>Finder</span></div>
+          <div class="links">
+            <span>Products ▾</span><span>How it works</span><span>Trust</span><span>Help</span>
+          </div>
+          <div class="sp"></div>
+          <span class="pill desk">◐ Theme</span>
+          <span class="btn ghost desk">Log in</span>
+          <span class="btn v">Sign up</span>
+          <span class="btn ghost mob">☰</span>
+        </nav>
+      </div>
+    </header>
+
+    <section>
+      <span class="tag">B · HERO — both product choices visible without scrolling</span>
+      <div class="wrap pad">
+        <div class="row" style="align-items: center">
+          <div class="col">
+            <span class="pill v">One account · Two AI products</span>
+            <h1>Discover AI tools.<br />Create content with AI.</h1>
+            <p class="lead">
+              AIKitFinder is home to two separate products: a directory for finding and comparing AI
+              tools, and AutoFlow AI, a studio for planning and producing video content.
+            </p>
+            <div class="mt">
+              <span class="btn c">Explore AI Tools →</span>
+              <span class="btn v">Explore AutoFlow AI →</span>
+            </div>
+            <p class="mt" style="font-size: 13px">
+              Browsing the directory needs no account. AutoFlow AI is in development.
+            </p>
+          </div>
+          <div class="col">
+            <div class="row">
+              <div class="box col cdir">
+                <span class="pill c">AI Tools Directory</span>
+                <div class="ph" style="height: 38px; margin: 12px 0">Search field mock</div>
+                <div class="bar" style="width: 90%"></div>
+                <div class="bar" style="width: 70%"></div>
+                <div class="bar" style="width: 80%"></div>
+                <p style="font-size: 12px">Preview built from real Directory components</p>
+              </div>
+              <div class="box col cflow">
+                <span class="pill v">AutoFlow AI</span>
+                <div class="ph" style="height: 38px; margin: 12px 0">Pipeline stepper mock</div>
+                <div class="bar" style="width: 60%"></div>
+                <div class="bar" style="width: 85%"></div>
+                <div class="bar" style="width: 50%"></div>
+                <p style="font-size: 12px">Labelled “Preview — not yet available”</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="products">
+      <span class="tag">C · CHOOSE YOUR PRODUCT — two visibly different cards</span>
+      <div class="wrap pad">
+        <h2>Two products. Use either one on its own.</h2>
+        <p class="lead">Pick the one that matches what you want to do today.</p>
+        <div class="row mt">
+          <div class="box col cdir">
+            <span class="pill c">Available · sample data</span>
+            <h3 class="mt">AI Tools Directory</h3>
+            <p>For anyone choosing an AI tool.</p>
+            <ul class="clean">
+              <li>Search by task, category, price and platform</li>
+              <li>Compare up to four tools side by side</li>
+              <li>Guides, prompts and step-by-step workflows</li>
+              <li>Sources and a last-checked date on every profile</li>
+            </ul>
+            <p style="font-size: 13px; margin-bottom: 14px">
+              Account: not needed to browse. Needed later to save tools.
+            </p>
+            <span class="btn c">Explore AI Tools →</span>
+          </div>
+          <div class="box col cflow">
+            <span class="pill v">In development</span>
+            <h3 class="mt">AutoFlow AI</h3>
+            <p>For creators producing YouTube video content.</p>
+            <ul class="clean">
+              <li>Research topics and write scripts with AI</li>
+              <li>Voiceover and subtitles in many languages</li>
+              <li>Video assembly, thumbnail and metadata</li>
+              <li>You review and approve before anything is published</li>
+            </ul>
+            <p style="font-size: 13px; margin-bottom: 14px">Account: required for the workspace.</p>
+            <span class="btn v">Explore AutoFlow AI →</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="how-it-works">
+      <span class="tag">D · HOW IT WORKS — relationship between the products</span>
+      <div class="wrap pad">
+        <h2>How AIKitFinder fits together</h2>
+        <div class="grid3 mt">
+          <div class="box">
+            <span class="pill c">1 · Discover</span>
+            <h3 class="mt">Find the right tool</h3>
+            <p>The Directory explains what each tool does, what it costs and where to verify it.</p>
+          </div>
+          <div class="box">
+            <span class="pill v">2 · Create</span>
+            <h3 class="mt">Produce content</h3>
+            <p>AutoFlow AI guides a video from research to a reviewed, publish-ready package.</p>
+          </div>
+          <div class="box">
+            <span class="pill">3 · One account</span>
+            <h3 class="mt">Sign in once</h3>
+            <p>One login works in both products. Each keeps its own workspace and data.</p>
+          </div>
+        </div>
+        <p class="mt" style="font-size: 13px">
+          Note shown on page: tools listed in the Directory are not connected to AutoFlow AI unless
+          an integration is stated.
+        </p>
+        <div class="steps">
+          <div class="step">Research</div>
+          <div class="step">Script</div>
+          <div class="step">Voice</div>
+          <div class="step">Video</div>
+          <div class="step">Thumbnail</div>
+          <div class="step">SEO</div>
+          <div class="step gate">Your approval</div>
+          <div class="step">Publish</div>
+        </div>
+        <p style="font-size: 12px; margin-top: 8px">
+          AutoFlow pipeline strip. Every step carries a “Planned” label until it is built.
+        </p>
+      </div>
+    </section>
+
+    <section id="trust">
+      <span class="tag">E · TRUST AND TRANSPARENCY</span>
+      <div class="wrap pad">
+        <h2>What you can rely on</h2>
+        <div class="grid4 mt">
+          <div class="box">
+            <h3>Checked against sources</h3>
+            <p>Tool facts link to the official source and show when they were last checked.</p>
+          </div>
+          <div class="box">
+            <h3>Samples are labelled</h3>
+            <p>Demo records are marked “Sample” and never shown as verified.</p>
+          </div>
+          <div class="box">
+            <h3>You approve publishing</h3>
+            <p>AutoFlow AI will never publish without your explicit approval.</p>
+          </div>
+          <div class="box">
+            <h3>Honest status</h3>
+            <p>Features that are not built yet are labelled as planned.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="help">
+      <span class="tag">F · FAQ — accurate answers only</span>
+      <div class="wrap pad">
+        <h2>Questions</h2>
+        <div class="faq mt">
+          <div><span>Do I need an account?</span><span>+</span></div>
+          <div><span>Is AIKitFinder free?</span><span>+</span></div>
+          <div><span>How is tool information verified?</span><span>+</span></div>
+          <div><span>Which AI providers does AutoFlow AI use?</span><span>+</span></div>
+          <div><span>Will AutoFlow AI post to my channels automatically?</span><span>+</span></div>
+          <div><span>What happens to my data?</span><span>+</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <span class="tag">G · FINAL CTA</span>
+      <div class="wrap pad center">
+        <h2>Where would you like to start?</h2>
+        <div class="mt">
+          <span class="btn c">Explore AI Tools →</span>
+          <span class="btn v">Explore AutoFlow AI →</span>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span class="tag">H · FOOTER — real destinations only</span>
+      <div class="wrap pad">
+        <div class="foot">
+          <div>
+            <div class="logo">AIKit<span>Finder</span></div>
+            <p class="mt" style="font-size: 13px">
+              Independent guide. Tool names belong to their owners.
+            </p>
+          </div>
+          <div><b>Products</b><span>AI Tools Directory</span><span>AutoFlow AI</span></div>
+          <div>
+            <b>Directory</b><span>Tools</span><span>Categories</span><span>Guides</span
+            ><span>Prompts</span><span>Workflows</span><span>Compare</span>
+          </div>
+          <div>
+            <b>AIKitFinder</b><span>About</span><span>Editorial policy</span><span>Contact</span
+            ><span>Help</span>
+          </div>
+          <div><b>Legal</b><span>Privacy</span><span>Terms</span></div>
+        </div>
+      </div>
+    </footer>
+
+    <section class="overlay">
+      <span class="tag">STATE 1 · SHARED AUTH MODAL (opens over any page)</span>
+      <div class="wrap">
+        <div class="modal">
+          <div class="row keep" style="align-items: center">
+            <h3 class="col" style="margin: 0">Create your AIKitFinder account</h3>
+            <span>✕</span>
+          </div>
+          <p style="font-size: 13px">One account for the Directory and AutoFlow AI.</p>
+          <div class="tabs"><span class="on">Sign up</span><span>Log in</span></div>
+          <label>Email</label>
+          <div class="field">you@example.com</div>
+          <label>Password</label>
+          <div class="field">•••••••• &nbsp; (show)</div>
+          <span class="btn v" style="width: 100%; justify-content: center">Create account</span>
+          <p style="font-size: 12px; margin-top: 12px">
+            After sign-in you return to:
+            <b style="color: var(--text)">the page or action you chose</b>. Error, loading and
+            success states appear inline.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="overlay mob">
+      <span class="tag">STATE 2 · MOBILE MENU DRAWER</span>
+      <div class="drawer">
+        <div class="row keep" style="align-items: center">
+          <b class="col">Menu</b><span>✕</span>
+        </div>
+        <div class="i">AI Tools Directory <span class="pill c">Product</span></div>
+        <div class="i">AutoFlow AI <span class="pill v">Product</span></div>
+        <div class="i">How it works</div>
+        <div class="i">Trust</div>
+        <div class="i">Help</div>
+        <div class="i">◐ Theme</div>
+        <div class="mt">
+          <span class="btn v" style="width: 100%; justify-content: center">Sign up</span>
+          <span class="btn ghost" style="width: 100%; justify-content: center; margin-top: 10px"
+            >Log in</span
+          >
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
