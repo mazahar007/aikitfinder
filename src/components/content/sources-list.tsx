@@ -10,16 +10,19 @@ export function SourcesList({
   verification,
   lastVerifiedAt,
   updatedAt,
+  isSample = false,
 }: {
   sources: Source[];
   verification: VerificationStatus;
   lastVerifiedAt?: string;
   updatedAt: string;
+  /** Fictional sample record: never shown as verified. */
+  isSample?: boolean;
 }) {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-        <VerificationBadge status={verification} date={lastVerifiedAt} />
+        <VerificationBadge status={verification} date={lastVerifiedAt} sample={isSample} />
         <span>Last updated {formatDate(updatedAt)}</span>
       </div>
       {sources.length ? (

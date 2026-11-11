@@ -59,7 +59,11 @@ export function ToolCard({
         {tool.apiAvailable ? <ApiBadge /> : null}
       </div>
       <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-4">
-        <VerificationBadge status={tool.verification} date={tool.lastVerifiedAt} />
+        <VerificationBadge
+          status={tool.verification}
+          date={tool.lastVerifiedAt}
+          sample={tool.isSample}
+        />
         {tool.isSample ? <SampleBadge /> : null}
       </div>
       {compare ? (

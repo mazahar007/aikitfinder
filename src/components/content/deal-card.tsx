@@ -96,7 +96,11 @@ export function DealCard({ deal }: { deal: DealView }) {
         For: {deal.eligibility.map((e) => eligibilityLabel[e]).join(", ")}
       </p>
       <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-4">
-        <VerificationBadge status={deal.verification} date={deal.lastVerifiedAt} />
+        <VerificationBadge
+          status={deal.verification}
+          date={deal.lastVerifiedAt}
+          sample={deal.isSample}
+        />
         {deal.isSample ? <SampleBadge /> : null}
       </div>
     </article>

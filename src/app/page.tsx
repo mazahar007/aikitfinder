@@ -83,8 +83,8 @@ export default async function HomePage() {
         <div className="aurora" aria-hidden="true" />
         <div className="hero-grid" aria-hidden="true" />
         <Container className="relative py-16 text-center sm:py-24">
-          <Badge variant="info" className="enter mb-5" style={enterDelay(0)}>
-            Free to use · No sign-up
+          <Badge variant="warning" className="enter mb-5" style={enterDelay(0)}>
+            Prototype · sample data
           </Badge>
           <h1 className="mx-auto max-w-3xl text-[2.25rem] leading-tight font-extrabold tracking-tight text-balance text-heading sm:text-display">
             <span className="enter inline-block" style={enterDelay(1)}>
@@ -102,12 +102,12 @@ export default async function HomePage() {
             style={enterDelay(4)}
           >
             Explore AI tools, understand their settings, follow practical tutorials, and discover
-            workflows that help you get better results.
+            step-by-step workflows.
           </p>
           <div className="enter mx-auto mt-8 max-w-2xl" style={enterDelay(5)}>
             <SearchForm variant="hero" id="hero-search" typingExamples={typingExamples} />
           </div>
-          <ul className="mt-4 flex flex-wrap justify-center gap-2" aria-label="Popular searches">
+          <ul className="mt-4 flex flex-wrap justify-center gap-2" aria-label="Example searches">
             {suggestions.map((q, i) => (
               <li key={q} className="enter-fade" style={enterDelay(6 + i)}>
                 <Link
@@ -121,6 +121,11 @@ export default async function HomePage() {
           </ul>
         </Container>
       </section>
+
+      {/* Shown before the first sample record, so nothing fictional is read as real. */}
+      <Container className="py-4">
+        <SampleNotice />
+      </Container>
 
       <ScrollScenes>
         <Ribbons />
@@ -137,10 +142,6 @@ export default async function HomePage() {
         <FeaturedRail tools={featuredTools} categoryName={categoryName} />
         <ZoomShowcase />
         <CloudWipe direction="to-light" />
-
-        <Container className="pt-4">
-          <SampleNotice />
-        </Container>
 
         <section aria-labelledby="categories-heading">
           <Container className="py-12">
@@ -195,7 +196,7 @@ export default async function HomePage() {
             <SectionHeader
               id="workflows-heading"
               kicker="Automate"
-              title="Popular workflows"
+              title="Example workflows"
               description="Combine tools into a process you can repeat."
               href="/workflows"
               linkLabel="All workflows"

@@ -86,7 +86,11 @@ export default async function WorkflowPage({ params }: PageProps<"/workflows/[sl
             About {summed ?? workflow.estimatedMinutes} minutes
             <span className="text-xs">(editor’s estimate for a first run)</span>
           </span>
-          <VerificationBadge status={workflow.verification} date={workflow.lastVerifiedAt} />
+          <VerificationBadge
+            status={workflow.verification}
+            date={workflow.lastVerifiedAt}
+            sample={workflow.isSample}
+          />
         </div>
       </header>
 
@@ -251,12 +255,14 @@ export default async function WorkflowPage({ params }: PageProps<"/workflows/[sl
           <ul className="mt-1 list-disc space-y-1 pl-5 text-muted-foreground">
             {pricing.free.length ? (
               <li>
-                Verified free plan: <ToolNames tools={pricing.free} />
+                {workflow.isSample ? "Free plan (sample data)" : "Verified free plan"}:{" "}
+                <ToolNames tools={pricing.free} />
               </li>
             ) : null}
             {pricing.paidOnly.length ? (
               <li>
-                Verified, no free plan: <ToolNames tools={pricing.paidOnly} />
+                {workflow.isSample ? "No free plan (sample data)" : "Verified, no free plan"}:{" "}
+                <ToolNames tools={pricing.paidOnly} />
               </li>
             ) : null}
             {pricing.notVerified.length ? (

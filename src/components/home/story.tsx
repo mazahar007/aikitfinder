@@ -44,7 +44,7 @@ function DiscoverPreview({ tools }: { tools: Tool[] }) {
         </span>
       </div>
       <p data-preview-item className="mt-3 text-xs font-medium text-muted-foreground">
-        {tools.length} matching tools
+        {tools.length} sample results
       </p>
       <ul className="mt-2 space-y-2">
         {tools.map((t) => (
@@ -108,8 +108,8 @@ function CreatePreview({ tool, prompt }: { tool: Tool; prompt: PromptTemplate })
       <div data-preview-item className="flex items-center gap-2">
         <ToolLogo name={tool.name} className="size-8 text-[11px]" />
         <span className="text-sm font-semibold text-heading">{prompt.title}</span>
-        <span className="ml-auto rounded-sm border border-success/40 bg-success-tint px-1.5 text-[11px] font-semibold text-success">
-          Tested
+        <span className="ml-auto rounded-sm border border-warning/40 bg-warning-tint px-1.5 text-[11px] font-semibold text-warning">
+          Sample
         </span>
       </div>
       <div
@@ -240,7 +240,7 @@ export function Story(props: StoryProps) {
       token: "--story-3",
       kicker: "Create",
       title: "Copy a prompt. Get a result.",
-      body: "Ready-made prompts highlight exactly which parts to change and tell you what output to expect, so your first try is a good one.",
+      body: "Ready-made prompts highlight exactly which parts to change and tell you what output to expect.",
       href: `/tools/${props.promptTool.slug}#prompts`,
       cta: "See prompts",
       preview: <CreatePreview tool={props.promptTool} prompt={props.prompt} />,

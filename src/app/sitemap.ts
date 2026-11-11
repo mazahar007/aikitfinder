@@ -17,7 +17,6 @@ const staticPaths = [
   "/guides",
   "/prompts",
   "/workflows",
-  "/deals",
   "/about",
   "/contact",
   "/privacy",

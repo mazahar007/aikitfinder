@@ -238,7 +238,11 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
             )}
           </Fact>
           <Fact label="Information">
-            <VerificationBadge status={tool.verification} date={tool.lastVerifiedAt} />
+            <VerificationBadge
+              status={tool.verification}
+              date={tool.lastVerifiedAt}
+              sample={tool.isSample}
+            />
           </Fact>
         </dl>
       </section>
@@ -373,7 +377,7 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
                   <article key={s.name} className="rounded-md border bg-card p-5">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <h3 className="font-semibold text-heading">{s.name}</h3>
-                      <VerificationBadge status={s.verification} />
+                      <VerificationBadge status={s.verification} sample={tool.isSample} />
                     </div>
                     <p className="mt-2">{s.explanation}</p>
                     <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-3">
@@ -422,8 +426,8 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
                   <article key={p.slug} id={`prompt-${p.slug}`} className="scroll-mt-24">
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="font-semibold text-heading">{p.title}</h3>
-                      <Badge variant={p.tested ? "success" : "neutral"}>
-                        {p.tested ? "Tested" : "Untested"}
+                      <Badge variant={p.tested && !tool.isSample ? "success" : "neutral"}>
+                        {p.tested && !tool.isSample ? "Tested" : "Untested"}
                       </Badge>
                     </div>
                     <p className="mt-1 text-sm text-muted-foreground">
@@ -588,6 +592,7 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
               verification={tool.verification}
               lastVerifiedAt={tool.lastVerifiedAt}
               updatedAt={tool.updatedAt}
+              isSample={tool.isSample}
             />
           </Section>
         </div>

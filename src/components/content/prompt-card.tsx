@@ -5,9 +5,11 @@ import { LevelBadge, SampleBadge } from "@/components/content/badges";
 import { Badge } from "@/components/ui/badge";
 import type { Prompt } from "@/lib/content/types";
 
-export function TestedBadge({ tested }: { tested: boolean }) {
+/** A fictional sample prompt is never shown as tested. */
+export function TestedBadge({ tested, sample = false }: { tested: boolean; sample?: boolean }) {
+  const shown = tested && !sample;
   return (
-    <Badge variant={tested ? "success" : "neutral"}>{tested ? "Tested" : "Not tested yet"}</Badge>
+    <Badge variant={shown ? "success" : "neutral"}>{shown ? "Tested" : "Not tested yet"}</Badge>
   );
 }
 
@@ -25,7 +27,7 @@ export function PromptCard({ prompt, toolNames }: { prompt: Prompt; toolNames: s
       <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{prompt.useCase}</p>
       <div className="mt-3 flex flex-wrap gap-1.5">
         <LevelBadge level={prompt.skillLevel} />
-        <TestedBadge tested={prompt.tested} />
+        <TestedBadge tested={prompt.tested} sample={prompt.isSample} />
         {prompt.tags.slice(0, 2).map((tag) => (
           <Badge key={tag} variant="neutral">
             {tag}

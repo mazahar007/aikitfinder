@@ -32,10 +32,17 @@ export const mainNav: NavItem[] = [
   { title: "Guides", href: "/guides" },
   { title: "Prompts", href: "/prompts" },
   { title: "Workflows", href: "/workflows" },
-  { title: "Deals", href: "/deals" },
   { title: "About", href: "/about" },
-  { title: "VoiceHub", href: "/voicehub" },
 ];
+
+/*
+ * Deliberately not linked from the navigation or footer. The routes and code
+ * stay in place:
+ *  - /deals: every offer is fictional sample data. Link it again only when
+ *    real, verified and maintained deal data exists.
+ *  - /voicehub: becoming part of AutoFlow AI's Voiceover Studio. Kept for
+ *    the planned migration (docs/planning/VOICEHUB_MIGRATION_PLAN.md).
+ */
 
 export const footerNav: { title: string; items: NavItem[] }[] = [
   {
@@ -46,7 +53,6 @@ export const footerNav: { title: string; items: NavItem[] }[] = [
       { title: "Guides", href: "/guides" },
       { title: "Prompts", href: "/prompts" },
       { title: "Workflows", href: "/workflows" },
-      { title: "Deals", href: "/deals" },
       { title: "Compare tools", href: "/compare" },
       { title: "Search", href: "/search" },
     ],

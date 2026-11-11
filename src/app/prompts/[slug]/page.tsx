@@ -98,7 +98,7 @@ export default async function PromptPage({ params }: PageProps<"/prompts/[slug]"
         <p className="mt-2 text-lead text-muted-foreground">{prompt.useCase}</p>
         <div className="mt-4 flex flex-wrap items-center gap-2">
           <LevelBadge level={prompt.skillLevel} />
-          <TestedBadge tested={prompt.tested} />
+          <TestedBadge tested={prompt.tested} sample={prompt.isSample} />
           {categoryNames.map((c) => (
             <Link key={c.slug} href={`/categories/${c.slug}`}>
               <Badge variant="info">{c.name.replace(/^AI /, "")}</Badge>
@@ -227,7 +227,9 @@ export default async function PromptPage({ params }: PageProps<"/prompts/[slug]"
                 Tested
               </dt>
               <dd className="mt-1">
-                {prompt.tested ? "Yes, someone ran it and checked the result." : "Not tested yet."}
+                {prompt.tested && !prompt.isSample
+                  ? "Yes, someone ran it and checked the result."
+                  : "Not tested yet."}
               </dd>
             </div>
           </dl>

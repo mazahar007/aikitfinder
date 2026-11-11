@@ -167,7 +167,7 @@ export function FeaturedRail({
       <Stickers />
       <div className="mx-auto flex w-full max-w-[1200px] flex-wrap items-end justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <div>
-          <Kicker label="Editor’s picks" inverted />
+          <Kicker label="Sample tools" inverted />
           <h2
             id="featured-heading"
             className="mt-4 text-4xl font-extrabold tracking-tight text-white sm:text-6xl"
@@ -294,7 +294,7 @@ export function ZoomShowcase() {
               <span className="size-2.5 rounded-full bg-warning/70" />
               <span className="size-2.5 rounded-full bg-success/70" />
               <span className="ml-3 truncate rounded-md bg-card px-3 py-0.5 text-xs text-muted-foreground">
-                aikitfinder.com/tools/storyreel
+                /tools/storyreel
               </span>
             </div>
             <div className="space-y-4 p-5 text-sm sm:p-6">
@@ -308,8 +308,8 @@ export function ZoomShowcase() {
                     Turns a script into a narrated video
                   </p>
                 </div>
-                <span className="ml-auto rounded-sm border border-success/40 bg-success-tint px-2 py-0.5 text-xs font-semibold text-success">
-                  ✓ Verified
+                <span className="ml-auto rounded-sm border border-warning/40 bg-warning-tint px-2 py-0.5 text-xs font-semibold text-warning">
+                  Sample
                 </span>
               </div>
               <div className="grid grid-cols-3 gap-2 rounded-lg border p-3 text-xs">
@@ -387,9 +387,7 @@ export function ClosingCta() {
             {line}
           </span>
         ))}
-        <span className="mt-6 block text-right text-muted-foreground">
-          Free to use · No sign-up needed
-        </span>
+        <span className="mt-6 block text-right text-muted-foreground">Prototype · sample data</span>
       </Link>
     </section>
   );

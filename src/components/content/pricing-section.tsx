@@ -89,6 +89,7 @@ export function PricingSection({ tool, today }: { tool: Tool; today: string }) {
         <VerificationBadge
           status={stale ? "needs-review" : pricing.verification}
           date={pricing.checkedAt}
+          sample={tool.isSample}
         />
         <OfficialLink href={pricing.pricingUrl}>Official pricing page</OfficialLink>
         {pricing.apiPricingUrl ? (

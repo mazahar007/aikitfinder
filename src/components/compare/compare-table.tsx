@@ -186,8 +186,14 @@ function groups(categories: Category[], today: string): Group[] {
         {
           label: "Information",
           cell: (t) => ({
-            key: `${t.verification}|${t.lastVerifiedAt ?? ""}`,
-            node: <VerificationBadge status={t.verification} date={t.lastVerifiedAt} />,
+            key: t.isSample ? "sample" : `${t.verification}|${t.lastVerifiedAt ?? ""}`,
+            node: (
+              <VerificationBadge
+                status={t.verification}
+                date={t.lastVerifiedAt}
+                sample={t.isSample}
+              />
+            ),
           }),
         },
         { label: "Official site", cell: (t) => externalLink(t.officialUrl, "Visit site") },

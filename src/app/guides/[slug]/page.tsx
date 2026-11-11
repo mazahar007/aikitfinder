@@ -67,7 +67,11 @@ export default async function GuidePage({ params }: PageProps<"/guides/[slug]">)
             <ClockIcon className="size-4" aria-hidden="true" />
             About {guide.estimatedMinutes} minutes
           </span>
-          <VerificationBadge status={guide.verification} date={guide.lastVerifiedAt} />
+          <VerificationBadge
+            status={guide.verification}
+            date={guide.lastVerifiedAt}
+            sample={guide.isSample}
+          />
         </div>
       </header>
 
@@ -203,6 +207,7 @@ export default async function GuidePage({ params }: PageProps<"/guides/[slug]">)
             verification={guide.verification}
             lastVerifiedAt={guide.lastVerifiedAt}
             updatedAt={guide.updatedAt}
+            isSample={guide.isSample}
           />
         </div>
       </section>

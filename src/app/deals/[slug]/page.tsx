@@ -138,7 +138,9 @@ export default async function DealPage({ params }: PageProps<"/deals/[slug]">) {
           <Fact label="Starts">{deal.startsOn ? formatDate(deal.startsOn) : "Not stated"}</Fact>
           <Fact label="Ends">{deal.endsOn ? formatDate(deal.endsOn) : "No end date stated"}</Fact>
           <Fact label="Last checked">
-            {deal.lastVerifiedAt ? formatDate(deal.lastVerifiedAt) : "Not checked yet"}
+            {deal.lastVerifiedAt && !deal.isSample
+              ? formatDate(deal.lastVerifiedAt)
+              : "Not checked yet"}
           </Fact>
         </dl>
         {deal.couponCode ? (
@@ -219,6 +221,7 @@ export default async function DealPage({ params }: PageProps<"/deals/[slug]">) {
             verification={deal.verification}
             lastVerifiedAt={deal.lastVerifiedAt}
             updatedAt={deal.updatedAt}
+            isSample={deal.isSample}
           />
         </Section>
       </div>

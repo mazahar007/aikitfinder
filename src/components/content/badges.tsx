@@ -65,17 +65,24 @@ const verificationVariant = {
 export function VerificationBadge({
   status,
   date,
+  sample = false,
 }: {
   status: VerificationStatus;
   /** Adds "· 1 Oct 2026" after the label. */
   date?: string;
+  /**
+   * Fictional sample records are never shown as verified or reviewed, and
+   * never with a verification date, whatever their demo fields say.
+   */
+  sample?: boolean;
 }) {
-  const { variant, icon: Icon } = verificationVariant[status];
+  const shown = sample ? "unverified" : status;
+  const { variant, icon: Icon } = verificationVariant[shown];
   return (
     <Badge variant={variant} className="max-w-full flex-wrap whitespace-normal">
       <Icon aria-hidden="true" />
-      {verificationLabel[status]}
-      {date ? ` · ${formatDate(date)}` : null}
+      {verificationLabel[shown]}
+      {date && !sample ? ` · ${formatDate(date)}` : null}
     </Badge>
   );
 }
