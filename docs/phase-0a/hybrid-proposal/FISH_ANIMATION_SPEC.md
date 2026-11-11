@@ -50,7 +50,7 @@ swimming across and back.
 | Property      | Desktop                         | Mobile              |
 | ------------- | ------------------------------- | ------------------- |
 | Speed         | 36–62 px per second             | 24–50 px per second |
-| One full loop | Roughly 80–90 seconds           | Roughly 25 seconds  |
+| One full loop | Roughly 80 seconds              | Roughly 20 seconds  |
 | Turning       | At most 0.75 radians per second | Same                |
 | Vertical bob  | ±12 px, slow                    | ±5 px               |
 
