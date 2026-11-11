@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import {
   elevenLabsApiKey,
   isElevenLabsConfigured,
+  isPublicGenerationEnabled,
   validateTtsInput,
   FALLBACK_VOICES,
 } from "@/lib/voicehub/elevenlabs";
@@ -13,6 +14,17 @@ import { canSpend, recordGeneration } from "@/lib/voicehub/credits";
 // Without a key: 503 with a clear Bengali message and NO fake audio.
 // Demo wallet: 402 when the demo credit runs out.
 export async function POST(req: Request) {
+  // Containment: refuse before reading the body or touching the API key.
+  if (!isPublicGenerationEnabled()) {
+    return NextResponse.json(
+      {
+        error:
+          "Voice generation is temporarily turned off while sign-in and usage limits are added. No audio was created.",
+        generation_disabled: true,
+      },
+      { status: 503, headers: { "Cache-Control": "no-store" } },
+    );
+  }
   let body: unknown;
   try {
     body = await req.json();

@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { isElevenLabsConfigured, MODEL_IDS, FALLBACK_VOICES } from "@/lib/voicehub/elevenlabs";
+import {
+  isElevenLabsConfigured,
+  isPublicGenerationEnabled,
+  MODEL_IDS,
+  FALLBACK_VOICES,
+} from "@/lib/voicehub/elevenlabs";
 import { demoCredits } from "@/lib/voicehub/credits";
 
 // Health check — presence only, never validates the key against
@@ -12,6 +17,7 @@ export async function GET() {
     version: "1.0.0",
     elevenlabs_configured: configured,
     demo_mode: !configured,
+    generation_enabled: isPublicGenerationEnabled(),
     supabase: false,
     supabase_note: "VoiceHub V1 runs on the in-memory DEMO credit ledger; database wiring is a later step.",
     models: MODEL_IDS,

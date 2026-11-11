@@ -33,6 +33,17 @@ export function elevenLabsApiKey(): string {
   return process.env.ELEVENLABS_API_KEY ?? "";
 }
 
+// Security containment (Phase 0 audit, finding S2).
+// POST /api/voicehub/tts spends paid ElevenLabs credits and has no sign-in,
+// no rate limit and no durable usage cap, so public generation is OFF by
+// default. It stays off until authentication, rate limiting and per-user
+// limits exist. Setting VOICEHUB_PUBLIC_GENERATION=enabled re-opens the
+// endpoint to anyone who can reach the site: use it only on a private,
+// non-public environment for testing.
+export function isPublicGenerationEnabled(): boolean {
+  return process.env.VOICEHUB_PUBLIC_GENERATION === "enabled";
+}
+
 export const MAX_CHARS = 5000;
 export const MIN_CHARS = 1;
 

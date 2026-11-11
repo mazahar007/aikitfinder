@@ -32,6 +32,7 @@ export default function VoiceHubPage() {
   const [health, setHealth] = useState<{
     elevenlabs_configured: boolean;
     demo_mode: boolean;
+    generation_enabled?: boolean;
     demo_credits?: { remaining: number; used: number; total: number };
   } | null>(null);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
@@ -133,6 +134,12 @@ export default function VoiceHubPage() {
         change the AI tool finder pages.
       </p>
 
+      {health && health.generation_enabled === false && (
+        <div className="mt-6 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+          <strong>Temporarily turned off:</strong> Voice generation is paused while sign-in and
+          usage limits are added. You can still write and review text here; no audio is created.
+        </div>
+      )}
       {health && !health.elevenlabs_configured && (
         <div className="mt-6 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
           <strong>Demo mode:</strong> The ElevenLabs API key is not set for this
@@ -239,7 +246,7 @@ export default function VoiceHubPage() {
         <button
           type="button"
           className="rounded-md bg-slate-900 px-5 py-2.5 font-semibold text-white disabled:opacity-50"
-          disabled={busy || chars === 0 || overLimit}
+          disabled={busy || chars === 0 || overLimit || health?.generation_enabled === false}
           onClick={generate}
         >
           {busy ? "Generating voice…" : "Generate voice"}
