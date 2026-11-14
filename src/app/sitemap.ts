@@ -12,6 +12,8 @@ import {
 
 const staticPaths = [
   "",
+  "/directory",
+  "/autoflow",
   "/tools",
   "/categories",
   "/guides",

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { CategoryCard, GuideCard, SectionHeader, WorkflowCard } from "@/components/content/cards";
@@ -14,6 +15,8 @@ import { ScrollScenes } from "@/components/motion/scroll-scenes";
 import { Container } from "@/components/layout/container";
 import { SearchForm } from "@/components/search/search-form";
 import { Badge } from "@/components/ui/badge";
+import { products } from "@/config/products";
+import { directoryDescription, siteConfig } from "@/config/site";
 import { formatDate } from "@/lib/content/labels";
 import { enterDelay, reveal } from "@/lib/motion";
 import {
@@ -45,7 +48,14 @@ const suggestions = [
   "Fix my code",
 ];
 
-export default async function HomePage() {
+export const metadata: Metadata = {
+  title: { absolute: `${products.directory.name} | ${siteConfig.name}` },
+  description: directoryDescription,
+  alternates: { canonical: products.directory.home },
+};
+
+/** Home of the AI Tools Directory (the site's homepage until Phase 1; moved here unchanged). */
+export default async function DirectoryHomePage() {
   const [categories, counts, tools, featuredTools, guides, workflows, recent] = await Promise.all([
     getCategories(),
     getCategoryToolCounts(),

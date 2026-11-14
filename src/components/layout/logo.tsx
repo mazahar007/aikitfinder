@@ -37,11 +37,23 @@ export function LogoMark({
   );
 }
 
-export function Logo({ className, inverted = false }: { className?: string; inverted?: boolean }) {
+export function Logo({
+  className,
+  inverted = false,
+  href = "/",
+  descriptor,
+}: {
+  className?: string;
+  inverted?: boolean;
+  /** Where the logo leads: the parent home by default, or a product's own home. */
+  href?: string;
+  /** Product name shown after the wordmark, e.g. "Directory". */
+  descriptor?: string;
+}) {
   return (
     <Link
-      href="/"
-      aria-label={`${siteConfig.name} home`}
+      href={href}
+      aria-label={descriptor ? `${siteConfig.name} ${descriptor} home` : `${siteConfig.name} home`}
       className={cn(
         "inline-flex items-center gap-2 rounded-md font-extrabold tracking-tight",
         className,
@@ -50,6 +62,16 @@ export function Logo({ className, inverted = false }: { className?: string; inve
       <LogoMark inverted={inverted} />
       <span className={cn("text-lg", inverted ? "text-white" : "text-heading")}>
         AIKit<span className={inverted ? "text-on-brand-accent" : "text-primary"}>Finder</span>
+        {descriptor ? (
+          <span
+            className={cn(
+              "ml-1.5 font-medium",
+              inverted ? "text-on-brand" : "text-muted-foreground",
+            )}
+          >
+            {descriptor}
+          </span>
+        ) : null}
       </span>
     </Link>
   );

@@ -1,11 +1,7 @@
-import { Suspense } from "react";
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Instrument_Serif, Inter, Inter_Tight, JetBrains_Mono } from "next/font/google";
 
-import { SiteFooter } from "@/components/layout/site-footer";
-import { SiteHeader } from "@/components/layout/site-header";
-import { CompareTray } from "@/components/compare/compare-tray";
-import { PointerSpotlight } from "@/components/motion/pointer-spotlight";
+import { AuthProvider } from "@/components/auth/auth-provider";
 import { themeInitScript } from "@/components/theme/theme-script";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
@@ -24,10 +20,26 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
+// Display faces of the approved parent and AutoFlow designs.
+const interTight = Inter_Tight({
+  variable: "--font-inter-tight",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  display: "swap",
+});
+
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument-serif",
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: `${siteConfig.name}: Find the right AI tool. Learn it. Use it.`,
+    default: `${siteConfig.name}: Discover AI tools. Create content with AI.`,
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
@@ -47,7 +59,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#111a2e" },
+    { media: "(prefers-color-scheme: dark)", color: "#07071a" },
   ],
   colorScheme: "light dark",
 };
@@ -60,7 +72,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       data-theme="light"
       suppressHydrationWarning
-      className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${jetbrainsMono.variable} ${interTight.variable} ${instrumentSerif.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
@@ -72,16 +84,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
-        <SiteHeader />
-        <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
-          {children}
-        </main>
-        <SiteFooter />
-        <PointerSpotlight />
-        {/* Reads the URL (to hide itself on /compare), so it streams in. */}
-        <Suspense fallback={null}>
-          <CompareTray />
-        </Suspense>
+        {/* Each product adds its own header, <main id="main"> and footer in its route group layout. */}
+        {/* One shared Sign up / Log in dialog for all three products. */}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

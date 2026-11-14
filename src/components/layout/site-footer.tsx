@@ -2,15 +2,16 @@ import Link from "next/link";
 
 import { Container } from "@/components/layout/container";
 import { Logo } from "@/components/layout/logo";
-import { footerNav, siteConfig } from "@/config/site";
+import { products } from "@/config/products";
+import { directoryDescription, footerNav, siteConfig } from "@/config/site";
 
 export function SiteFooter() {
   return (
     <footer className="mt-auto bg-brand text-on-brand">
       <Container className="grid grid-cols-2 gap-x-6 gap-y-10 py-12 md:grid-cols-[1.5fr_repeat(3,1fr)]">
         <div className="col-span-2 max-w-xs md:col-span-1">
-          <Logo inverted />
-          <p className="mt-3 text-sm leading-relaxed">{siteConfig.description}</p>
+          <Logo inverted href={products.directory.home} descriptor="Directory" />
+          <p className="mt-3 text-sm leading-relaxed">{directoryDescription}</p>
         </div>
         {footerNav.map((group) => (
           <nav key={group.title} aria-label={group.title}>

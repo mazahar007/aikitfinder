@@ -19,20 +19,25 @@ export const siteConfig = {
   name: "AIKitFinder",
   tagline: "Discover AI. Build Smarter.",
   description:
-    "Find the right AI tools, learn how to use them, and put them to work with practical guides, settings explanations and workflows.",
+    "AIKitFinder is home to two separate products: a directory for finding and comparing AI tools, and AutoFlow AI, a studio for planning and producing video content.",
   url: siteUrl(),
   /** Allow search engines to index the site. Turn on only for the real domain. */
   indexable: process.env.NEXT_PUBLIC_SITE_INDEXABLE === "true",
 } as const;
 
+/** Shown in the Directory's own footer. */
+export const directoryDescription =
+  "Find the right AI tools, learn how to use them, and put them to work with practical guides, settings explanations and workflows.";
+
 export type NavItem = { title: string; href: string };
 
 export const mainNav: NavItem[] = [
   { title: "Explore Tools", href: "/tools" },
+  { title: "Categories", href: "/categories" },
   { title: "Guides", href: "/guides" },
   { title: "Prompts", href: "/prompts" },
   { title: "Workflows", href: "/workflows" },
-  { title: "About", href: "/about" },
+  { title: "Compare", href: "/compare" },
 ];
 
 /*
@@ -48,6 +53,7 @@ export const footerNav: { title: string; items: NavItem[] }[] = [
   {
     title: "Explore",
     items: [
+      { title: "Directory home", href: "/directory" },
       { title: "AI tools", href: "/tools" },
       { title: "Categories", href: "/categories" },
       { title: "Guides", href: "/guides" },
@@ -60,6 +66,8 @@ export const footerNav: { title: string; items: NavItem[] }[] = [
   {
     title: "AIKitFinder",
     items: [
+      { title: "AIKitFinder home", href: "/" },
+      { title: "AutoFlow AI", href: "/autoflow" },
       { title: "About", href: "/about" },
       { title: "Editorial policy", href: "/editorial-policy" },
       { title: "Contact", href: "/contact" },

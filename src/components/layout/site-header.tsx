@@ -9,6 +9,7 @@ import { MobileNav } from "@/components/layout/mobile-nav";
 import { SearchForm } from "@/components/search/search-form";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Button } from "@/components/ui/button";
+import { products } from "@/config/products";
 
 export function SiteHeader() {
   return (
@@ -18,7 +19,7 @@ export function SiteHeader() {
       className="header-scroll sticky top-0 z-40 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/85"
     >
       <Container className="flex h-16 items-center gap-4 lg:gap-6">
-        <Logo />
+        <Logo href={products.directory.home} descriptor="Directory" />
         <nav aria-label="Main" className="hidden lg:block">
           {/* The active link depends on the URL, so it streams in; the
               fallback renders the same links without highlighting. */}
@@ -34,6 +35,12 @@ export function SiteHeader() {
               <span className="sr-only">Search</span>
             </Link>
           </Button>
+          <Link
+            href="/#products"
+            className="hidden h-11 items-center rounded-md px-3 text-sm font-medium text-muted-foreground hover:bg-surface-subtle hover:text-foreground xl:inline-flex"
+          >
+            All products
+          </Link>
           <ThemeToggle />
           <Suspense fallback={null}>
             <MobileNav />
