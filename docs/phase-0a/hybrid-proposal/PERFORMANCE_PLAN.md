@@ -7,15 +7,16 @@ approval; nothing here is implemented in the application yet.
 
 From `homepage-hybrid-proposal.html`, in headless Chromium:
 
-| Measure                                                                          | Value                                                                                             |
-| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Animation script                                                                 | 17.5 KB, 5.9 KB compressed                                                                        |
-| Libraries                                                                        | None                                                                                              |
-| Images, models, video                                                            | None                                                                                              |
-| Network requests caused by the animation                                         | 0                                                                                                 |
-| Drawing surface                                                                  | One 2D canvas                                                                                     |
-| Frames drawn when the hero is off-screen, the tab is hidden, or motion is paused | 0 (verified)                                                                                      |
-| Frame rate in the test                                                           | About 40 per second desktop, 60 mobile — on a machine without a graphics card, so indicative only |
+| Measure                                                                          | Value                                                                                                                                                                                                         |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Animation script                                                                 | 25.9 KB, 7.6 KB compressed (this includes review-only test hooks that will not ship)                                                                                                                          |
+| Libraries                                                                        | None                                                                                                                                                                                                          |
+| Images, models, video                                                            | None                                                                                                                                                                                                          |
+| Network requests caused by the animation                                         | 0                                                                                                                                                                                                             |
+| Drawing surface                                                                  | One 2D canvas                                                                                                                                                                                                 |
+| Script time for one animation frame (simulate and issue drawing commands)        | 0.07 ms desktop, 0.04 ms economy and mobile, measured over 600 frames. Rasterizing is extra and not included                                                                                                  |
+| Frames drawn when the hero is off-screen, the tab is hidden, or motion is paused | 0 (verified)                                                                                                                                                                                                  |
+| Frame rate in the test                                                           | About 30 per second on a machine with no graphics card. The rate was the same with full and economy drawing, so the limit there is page compositing (blur and large gradients), not the fish. Indicative only |
 
 For comparison, the original sample's hero loads a 6.2 MB 3D model, a 3D library and two large
 photographs.
@@ -36,34 +37,39 @@ photographs.
 
 ## 3. Running cost
 
-| Technique                             | Detail                                                                                                                       |
-| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| One animation loop                    | A single `requestAnimationFrame` loop drives fish, particles, light and the preview shift                                    |
-| Stop when not visible                 | An intersection observer stops the loop when less than 5% of the hero is on screen                                           |
-| Stop when the tab is hidden           | Page-visibility check                                                                                                        |
-| Stop when paused or reduced           | No loop runs at all; one still frame is drawn                                                                                |
-| Resolution cap                        | Canvas at most 1.5× device pixels (1.25× in lightweight mode)                                                                |
-| Frame cap on mobile                   | 30 frames per second                                                                                                         |
-| Adaptive quality                      | If frames stay slower than about 35 per second for roughly two seconds, switch to lightweight mode for the rest of the visit |
-| Cheap drawing                         | Gradients and paths only. No blur filters or shadows on the canvas; the glow is a radial gradient                            |
-| Pointer handling                      | One passive listener; the position is only stored, and all work happens in the animation loop                                |
-| Resize                                | Debounced 150 ms                                                                                                             |
-| No per-frame allocation in production | Reuse point arrays and gradients where possible (the proposal allocates small objects per frame; to tidy at implementation)  |
+| Technique                             | Detail                                                                                                                                                             |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| One animation loop                    | A single `requestAnimationFrame` loop drives fish, particles, light and the preview shift                                                                          |
+| Stop when not visible                 | An intersection observer stops the loop when less than 5% of the hero is on screen                                                                                 |
+| Stop when the tab is hidden           | Page-visibility check                                                                                                                                              |
+| Stop when paused or reduced           | No loop runs at all; one still frame is drawn                                                                                                                      |
+| Resolution cap                        | Canvas at most 1.5× device pixels (1.25× in lightweight mode)                                                                                                      |
+| Frame cap on mobile                   | 30 frames per second                                                                                                                                               |
+| Adaptive quality                      | If frames stay slower than about 35 per second for roughly two seconds, switch to economy drawing for the rest of the visit. The route and fish size do not change |
+| Cheap drawing                         | Gradients and paths only. No blur filters or shadows on the canvas; the glow is a radial gradient; the pointer light repaints only its own 840 px square           |
+| Pointer handling                      | One passive listener; the position is only stored, and all work happens in the animation loop                                                                      |
+| Layout changes                        | Recalculated 150 ms after a resize, after web fonts load, and when the hero changes size                                                                           |
+| No per-frame allocation in production | Reuse point arrays and gradients where possible (the proposal allocates small objects per frame; to tidy at implementation)                                        |
 
-## 4. Lightweight mode
+## 4. Lightweight modes
 
-Triggered by: hero narrower than 721 px, touch as the primary pointer, two or fewer processor
-cores, 2 GB or less memory, data-saver, or the adaptive check above.
+Phone mode (hero narrower than 721 px, or touch as the primary pointer) has its own lane and
+smaller fish. Economy drawing (two or fewer processor cores, 2 GB or less memory, data-saver, or
+the adaptive check) keeps the route and only draws more cheaply. Phone mode always uses economy
+drawing.
+
+In phone mode:
 
 | Reduction                                                                                                                                                                                                                |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | One smaller fish with 16 segments, flat shading, a single tail layer                                                                                                                                                     |
 | 14 particles instead of 44                                                                                                                                                                                               |
-| No pointer light, no pointer response, no preview shift                                                                                                                                                                  |
+| No pointer light, no pointer response, no preview shift (economy on desktop keeps the pointer lean)                                                                                                                      |
 | 30 frames per second                                                                                                                                                                                                     |
 | **To add at implementation:** on mobile, size the canvas to the fish's lane only (about 390×170 px) instead of the whole hero. The proposal's mobile canvas covers the full hero (about 390×1,316 px), which is wasteful |
 
-The device rule was tightened during testing: an earlier threshold of four cores wrongly put
+Two defects were found and fixed during testing: the automatic fallback originally switched a
+slow desktop to the phone's route (the two modes are now separate), and an earlier threshold of four cores wrongly put
 ordinary desktops into lightweight mode.
 
 ## 5. Other hero costs to watch
@@ -83,7 +89,7 @@ Targets to be confirmed against a deployed build on real devices; none is a curr
 
 | Budget                          | Target                                             |
 | ------------------------------- | -------------------------------------------------- |
-| Animation code                  | 8 KB compressed or less                            |
+| Animation code                  | 8 KB compressed or less, without the test hooks    |
 | Added requests                  | 0 (1 if split into its own chunk)                  |
 | Layout shift from the hero      | 0                                                  |
 | Time for the headline to appear | Unchanged by the animation                         |

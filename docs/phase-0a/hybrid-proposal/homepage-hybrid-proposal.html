@@ -9,7 +9,7 @@
       visual design plus an original, code-drawn fish and ambient hero layer.
       Not application code and not deployed. Copy follows the approved
       Phase 0A content decisions. Fonts are open-licensed Google Fonts.
-      URL states:  ?state=modal   ?state=menu   ?view=identity   ?lite=1 (force mobile/low-power mode)
+      URL states:  ?state=modal   ?state=menu   ?view=identity   ?lite=1 (phone mode)   ?eco=1 (economy drawing)   ?full=1 (no automatic fallback)
     -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -311,8 +311,8 @@
       /* ───────────── Hero ───────────── */
       .hero {
         position: relative;
-        min-height: 920px;
-        padding: 156px 0 132px;
+        min-height: 960px;
+        padding: 132px 0 132px;
         overflow: hidden;
         isolation: isolate;
         background:
@@ -903,10 +903,8 @@
         pointer-events: none;
       }
       .motion-btn {
-        position: absolute;
-        top: 96px;
-        right: max(var(--gutter), calc((100vw - var(--max)) / 2 + var(--gutter)));
-        z-index: 3;
+        position: static;
+        flex: none;
         display: inline-flex;
         align-items: center;
         gap: 8px;
@@ -962,8 +960,8 @@
         .stage .gate {
           translate: none;
         }
-        .stage {
-          margin-top: 132px;
+        .hero .hero-grid .stage {
+          margin-top: 132px; /* open water above the previews: the fish's lane */
         }
       }
 
@@ -3751,7 +3749,9 @@
         var W = 0,
           H = 0,
           dpr = 1,
-          lite = false;
+          lite = false,
+          eco = false,
+          ecoForced = false;
         var seed = 7;
         function rnd() {
           seed = (seed * 16807) % 2147483647;
@@ -3765,7 +3765,7 @@
           t = 0;
 
         function Fish() {
-          this.n = lite ? 16 : 24;
+          this.n = eco ? 16 : 24;
           this.pts = [];
           this.h = Math.PI; // heading
           this.alpha = 0;
@@ -3775,8 +3775,9 @@
           var r = hero.getBoundingClientRect();
           W = Math.round(r.width);
           H = Math.round(r.height);
-          lite = q.has("lite") || W < 721 || coarse || lowPower;
-          dpr = Math.min(window.devicePixelRatio || 1, lite ? 1.25 : 1.5);
+          lite = q.has("lite") || W < 721 || coarse; // phone layout: its own lane and smaller fish
+          eco = lite || lowPower || ecoForced || q.has("eco"); // lighter drawing, same route
+          dpr = Math.min(window.devicePixelRatio || 1, lite ? 1.25 : eco ? 1 : 1.5);
           if (SHOT) dpr = Math.min(window.devicePixelRatio || 1, 2);
           cv.width = Math.round(W * dpr);
           cv.height = Math.round(H * dpr);
@@ -3792,7 +3793,7 @@
           }
           seed = 7;
           motes = [];
-          var count = lite ? 14 : 44;
+          var count = eco ? 14 : 44;
           for (var i = 0; i < count; i++)
             motes.push({
               x: rnd() * W,
@@ -3805,7 +3806,7 @@
           fish = new Fish();
           fish.len = lite
             ? Math.min(150, Math.max(116, W * 0.36))
-            : Math.min(320, Math.max(220, W * 0.2));
+            : Math.min(392, Math.max(268, W * 0.245)); // refined: about 22% larger on desktop
           var seg = fish.len / fish.n;
           buildRoute();
           carrot = lite ? W * 0.3 : W * 0.34;
@@ -3828,26 +3829,44 @@
             B0 = st.bottom - hr.top;
           if (lite) {
             // mobile: one calm lane of open water between the status lines and the previews
-            var y = T0 - 62;
+            // Just below the Pause control, clear of it by the fish's full fin height,
+            // so the fish is inside the first screen on a phone.
+            var y = Math.min(
+              T0 - 44,
+              (textRect ? textRect.y + textRect.h - 14 : T0 - 110) + fish.len * 0.31 + 26,
+            );
+            // The lane runs past both screen edges, so the fish turns around out of
+            // sight and glides across the visible lane in a straight, calm pass.
             route = [
-              [W * 0.16, y],
-              [W * 0.84, y - 8],
-              [W * 0.84, y + 8],
-              [W * 0.16, y],
+              [-W * 0.42, y],
+              [W * 1.42, y - 6],
+              [W * 1.42, y + 6],
+              [-W * 0.42, y],
             ];
           } else {
-            var bottom = Math.min(H - 110, B0 + 62),
-              top = Math.max(150, T0 - 30),
-              gap = L0 - 62,
+            // The lane under the buttons is placed from the real text block, so the
+            // fish (fins included) always clears the status lines above it.
+            // reach = how far the fins extend above the spine, plus the bob and a margin
+            var reach = fish.len * 0.31 + 18,
+              head =
+                document.querySelector("header.top .nav").getBoundingClientRect().bottom - hr.top,
+              bottom = Math.min(
+                H - fish.len * 0.22,
+                Math.max(textRect ? textRect.y + textRect.h - 14 + reach : 0, B0 + 40),
+              ),
+              top = Math.max(head + reach, T0 - 6),
+              gap = L0 + 14,
               right = Math.min(W - 40, R0 + 70);
-            // under the buttons → right → up the far side → back across the top → down the gap
+            // under the buttons → right → up the far side → back across the top, half hidden
+            // behind the upper preview → down the gap. Both lanes are placed from the real
+            // positions of the header and the text block, so the fish clears them at any width.
             route = [
               [W * 0.13, bottom],
               [right, bottom],
               [right, top],
               [gap, top],
-              [gap, B0 - 120],
-              [gap - 110, bottom],
+              [gap, bottom - 46], // straight down beside the previews, well right of the status line
+              [gap - 56, bottom],
             ];
           }
           routeLen = 0;
@@ -3873,7 +3892,7 @@
         }
         function target(tt) {
           var g = onRoute(carrot);
-          g.y += Math.sin(tt * 0.5) * (lite ? 5 : 12); // gentle rise and fall
+          g.y += Math.sin(tt * 0.5) * (lite ? 5 : 8); // gentle rise and fall
           if (!lite && P.active > 0.02) {
             // curious, never chasing: lean toward the pointer, capped
             var dx = P.x - g.x,
@@ -3900,9 +3919,13 @@
             d = desired - fish.h;
           while (d > Math.PI) d -= 6.2832;
           while (d < -Math.PI) d += 6.2832;
+          // When it has to reverse, the fish turns downward, away from the text and buttons above the lane.
+          if (Math.abs(d) > 2.3)
+            d = Math.sin(fish.h + 0.4) > Math.sin(fish.h - 0.4) ? Math.abs(d) : -Math.abs(d);
           var maxTurn = 0.75 * dt;
           fish.h += Math.max(-maxTurn, Math.min(maxTurn, d));
           var sp = (lite ? 24 : 36) + Math.min(26, dist * 0.08); // px per second: slow
+          sp *= Math.max(0.3, Math.cos(Math.min(1.45, Math.abs(d) * 0.55))); // ease off through turns: a tight, unhurried pivot
           if (dist < (lite ? 90 : 150)) carrot += sp * dt * 1.6; // lead the fish along its route
           hd.x += Math.cos(fish.h) * sp * dt;
           hd.y += Math.sin(fish.h) * sp * dt;
@@ -4015,17 +4038,17 @@
           ctx.save();
           ctx.globalAlpha = A;
           // soft halo
-          var hg = ctx.createRadialGradient(mid.x, mid.y, 0, mid.x, mid.y, L * 0.75);
+          var hg = ctx.createRadialGradient(mid.x, mid.y, 0, mid.x, mid.y, L * 0.6);
           hg.addColorStop(0, "rgba(170,140,255,0.20)");
           hg.addColorStop(0.5, "rgba(255,124,198,0.06)");
           hg.addColorStop(1, "rgba(120,100,255,0)");
           ctx.fillStyle = hg;
           ctx.beginPath();
-          ctx.arc(mid.x, mid.y, L * 0.75, 0, 6.2832);
+          ctx.arc(mid.x, mid.y, L * 0.6, 0, 6.2832);
           ctx.fill();
           var bEnd = Math.round((n - 1) * 0.5);
           // veil tail: a translucent fan that widens, then tapers, behind the body
-          var layers = lite ? 1 : 2;
+          var layers = eco ? 1 : 2;
           for (var k = 0; k < layers; k++) {
             ctx.beginPath();
             var i, s, v, w;
@@ -4057,7 +4080,7 @@
             ctx.fillStyle = tg;
             ctx.fill();
           }
-          if (!lite) {
+          if (!eco) {
             // fin rays
             ctx.strokeStyle = "rgba(240,225,255,0.22)";
             ctx.lineWidth = 1;
@@ -4106,7 +4129,7 @@
           bg.addColorStop(1, "#c07af0");
           ctx.fillStyle = bg;
           ctx.fill();
-          if (!lite) {
+          if (!eco) {
             // crystal facets and a top highlight
             for (var f = 1; f < bEnd; f++) {
               var p0 = S[f],
@@ -4158,13 +4181,13 @@
         function draw() {
           ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
           ctx.clearRect(0, 0, W, H);
-          if (!lite) {
+          if (!eco) {
             // ambient light that eases toward the pointer
             var lg = ctx.createRadialGradient(P.x, P.y, 0, P.x, P.y, 420);
             lg.addColorStop(0, "rgba(150,125,255," + (0.05 + 0.07 * P.active) + ")");
             lg.addColorStop(1, "rgba(150,125,255,0)");
             ctx.fillStyle = lg;
-            ctx.fillRect(0, 0, W, H);
+            ctx.fillRect(P.x - 420, P.y - 420, 840, 840); // only the lit square, not the whole canvas
           }
           var ox = lite ? 0 : (P.x / W - 0.5) * -14 * P.active,
             oy = lite ? 0 : (P.y / H - 0.5) * -10 * P.active;
@@ -4218,7 +4241,7 @@
           if (!running()) return;
           var dt = Math.min(0.05, (now - last) / 1000 || 0.016);
           last = now;
-          if (lite) {
+          if (eco) {
             acc += dt;
             if (acc < 1 / 30) {
               raf = requestAnimationFrame(frame);
@@ -4230,11 +4253,11 @@
           step(dt);
           draw();
           // adaptive quality: fall back to the lightweight mode if frames run long
-          if (!lite) {
+          if (!eco && !q.has("full")) {
             slow = dt > 0.028 ? slow + 1 : Math.max(0, slow - 1);
             if (slow > 90) {
-              root.dataset.lite = "1";
-              q.set("lite", "1");
+              root.dataset.eco = "1";
+              ecoForced = true;
               layout();
             }
           }
@@ -4261,11 +4284,58 @@
           draw();
         }
 
+        if (q.has("test"))
+          window.__akf = {
+            // average cost of one animation frame (simulate + draw), in milliseconds
+            bench: function (n) {
+              var t0 = performance.now();
+              for (var i = 0; i < n; i++) {
+                step(1 / 60);
+                draw();
+              }
+              return (performance.now() - t0) / n;
+            },
+            // advance the simulation, draw only the fish, and report the strongest
+            // fish pixel found inside each rectangle (hero coordinates)
+            sim: function (sec, zones) {
+              for (var i = 0; i < sec * 30; i++) step(1 / 30);
+              ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+              ctx.clearRect(0, 0, W, H);
+              drawFish();
+              var out = {};
+              for (var k in zones) {
+                var z = zones[k],
+                  x = Math.max(0, Math.floor(z[0] * dpr)),
+                  y = Math.max(0, Math.floor(z[1] * dpr));
+                var w = Math.min(cv.width - x, Math.ceil((z[2] - z[0]) * dpr)),
+                  h = Math.min(cv.height - y, Math.ceil((z[3] - z[1]) * dpr));
+                var m = 0;
+                if (w > 0 && h > 0) {
+                  var d = ctx.getImageData(x, y, w, h).data;
+                  for (var p = 3; p < d.length; p += 4) if (d[p] > m) m = d[p];
+                }
+                out[k] = m;
+              }
+              return { max: out, len: fish.len, head: [fish.pts[0].x, fish.pts[0].y] };
+            },
+          };
+        placeBtn(); // before measuring: the control's position affects the layout
         layout();
         var pose = parseFloat(q.get("t") || "") || (lite ? 5 : 7);
         P.last = -99;
         still(pose); // a composed first frame, also used when motion is off
         sync();
+        function placeBtn() {
+          // desktop and tablet: beside the theme control in the header; phones: under the status lines
+          var right = document.querySelector("header.top .right"),
+            col = hero.querySelector(".hero-grid > div");
+          if (!btn || !right || !col) return;
+          if (innerWidth > 720) {
+            if (btn.parentNode !== right) right.insertBefore(btn, right.firstChild);
+          } else if (btn.parentNode !== col) col.appendChild(btn);
+        }
+        placeBtn();
+        addEventListener("resize", placeBtn);
         if (btn)
           btn.addEventListener("click", function () {
             paused = !paused;
@@ -4294,15 +4364,20 @@
           },
           { passive: true },
         );
+        // Recompute the route whenever the hero's layout changes: window resize,
+        // web fonts arriving, or content reflow. The route is never built from stale positions.
         var rz;
-        addEventListener("resize", function () {
+        function relayout() {
           clearTimeout(rz);
           rz = setTimeout(function () {
             layout();
             still(pose);
             kick();
           }, 150);
-        });
+        }
+        addEventListener("resize", relayout);
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(relayout);
+        if ("ResizeObserver" in window) new ResizeObserver(relayout).observe(hero);
       })();
     </script>
   </body>

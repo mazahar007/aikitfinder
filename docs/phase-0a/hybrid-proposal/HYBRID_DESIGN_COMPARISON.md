@@ -7,6 +7,37 @@ The hybrid keeps the approved Fable visual design and brings back the living, in
 character of the original Nectarline sample: a fish that swims slowly through the hero, ambient
 light and particles, and gentle pointer response.
 
+## Refined final visual (12 Nov 2026)
+
+The owner approved **Option A, the code-drawn crystal betta, for desktop and mobile**, with
+refinements. This is the version shown in the screenshots and the HTML file.
+
+| Refinement requested                                           | What was done                                                                                                                                                         |
+| -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Desktop fish 20–25% larger, same proportions                   | About 22% larger: 353 px long at a 1440 px window (was 288 px). Every part scales together                                                                            |
+| Behind all content, outside text and button zones              | The route is now built from the measured positions of the header, text and previews. Verified by pixel test at eight widths (see `FISH_ANIMATION_SPEC.md` section 12) |
+| Slow, smooth, natural                                          | Same speeds. The fish now eases off through turns and, when it must reverse, turns downward away from the text                                                        |
+| Lightweight mobile version preserved                           | Same small fish and 14 particles. Its lane moved up so the fish is inside the first screen, and it turns around off-screen                                            |
+| Pause/Resume, reduced motion, off-screen stop, static fallback | All retained and re-tested                                                                                                                                            |
+| Approved layout, type, identities, content                     | Unchanged, apart from the three small layout adjustments below                                                                                                        |
+
+Layout adjustments the larger fish required, for your awareness:
+
+1. The hero is 40 px taller (960 px minimum instead of 920) and its content starts 24 px higher,
+   so the larger fish fits under the buttons inside a 1440×900 first screen.
+2. On desktop the Pause control moved from the hero's top-right corner into the header, beside
+   the theme control. This frees the band above the previews for the fish and keeps the control
+   reachable while scrolling.
+3. On mobile there is 84 px of open space above the previews for the fish's lane (as in the
+   first hybrid proposal, where a styling error had left it at 0).
+
+Known limit: on a short laptop screen (for example 1366×768), the fish's lower lane sits partly
+below the first screen. It is still visible on its upper pass and beside the previews.
+
+Defects found and fixed while refining: the route was first calculated before web fonts loaded,
+using stale positions; a mobile spacing rule was being overridden; and the automatic low-power
+fallback switched a slow desktop to the phone's route.
+
 ## Deliverables
 
 | #   | Deliverable                              | File                                                                                     |
@@ -31,7 +62,7 @@ Supporting material:
 | `screenshots/fish-motion-off.png`                                | The page with motion off (reduced-motion setting)                                               |
 | `screenshots/hybrid-tablet-hero.png`                             | 834 px width                                                                                    |
 
-## The one decision this proposal needs from you: which fish
+## The fish decision (now closed: Option A approved)
 
 The original sample's fish is a 3D model rendered with the Three.js library. Measured on the live
 reference site: the model file is **6.2 MB**, loaded from a third-party file host, plus the 3D

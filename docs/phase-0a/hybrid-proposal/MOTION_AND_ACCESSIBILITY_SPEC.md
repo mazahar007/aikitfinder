@@ -45,15 +45,15 @@ Easing throughout: one ease-out curve (`cubic-bezier(0.2, 0.7, 0.2, 1)`).
 
 ## 4. Pause/Resume control
 
-| Property | Specification                                                                                                           |
-| -------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Purpose  | Lets anyone stop all persistent decorative motion (WCAG 2.2.2 Pause, Stop, Hide)                                        |
-| Position | Desktop: top right of the hero, under the header. Mobile: under the status lines, inside the first screen               |
-| Label    | "Pause motion" / "Play motion", with a matching icon. Always visible text, not icon-only                                |
-| Element  | A real button, 44 px high, with `aria-pressed`                                                                          |
-| Effect   | Stops the fish, particles, pointer light, mist, orbit rings and caret. Hover states and one-time reveals are unaffected |
-| Memory   | The choice is stored on the device and applied on the next visit                                                        |
-| Keyboard | In the normal tab order, after the two product buttons; operated with Enter or Space                                    |
+| Property | Specification                                                                                                              |
+| -------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Purpose  | Lets anyone stop all persistent decorative motion (WCAG 2.2.2 Pause, Stop, Hide)                                           |
+| Position | Desktop and tablet: in the header, beside the theme control. Phone: under the status lines, inside the first screen        |
+| Label    | "Pause motion" / "Play motion", with a matching icon. Always visible text, not icon-only                                   |
+| Element  | A real button, 44 px high, with `aria-pressed`                                                                             |
+| Effect   | Stops the fish, particles, pointer light, mist, orbit rings and caret. Hover states and one-time reveals are unaffected    |
+| Memory   | The choice is stored on the device and applied on the next visit                                                           |
+| Keyboard | In the normal tab order (in the header on desktop; after the two product buttons on a phone); operated with Enter or Space |
 
 ## 5. Reduced motion
 
@@ -77,7 +77,7 @@ When the operating system asks for reduced motion:
 | Text contrast is unaffected                          | The fish never passes behind text at full strength; it fades to 16% inside the text zone. All text pairs measured at 4.83:1 or better on the base background |
 | Focus is always visible                              | 2 px violet focus ring with offset on every control                                                                                                          |
 | Targets                                              | At least 44 px high, including the Pause control                                                                                                             |
-| Keyboard order                                       | Skip link, header, product buttons, Pause control, then sections                                                                                             |
+| Keyboard order                                       | Skip link, header (including the Pause control on desktop), product buttons, then sections                                                                   |
 | Works without JavaScript                             | All content and links render; only the animation and overlays need script                                                                                    |
 | Overlays                                             | Focus is trapped, Escape closes, focus returns to the trigger (behavior specified in Phase 0A wireframes)                                                    |
 
