@@ -47,23 +47,25 @@ export function isPublicGenerationEnabled(): boolean {
 export const MAX_CHARS = 5000;
 export const MIN_CHARS = 1;
 
-export function validateTtsInput(body: unknown): {
-  ok: true;
-  text: string;
-  voice_id: string;
-  model_id: string;
-  stability: number;
-  similarity_boost: number;
-} | { ok: false; error: string } {
+export function validateTtsInput(body: unknown):
+  | {
+      ok: true;
+      text: string;
+      voice_id: string;
+      model_id: string;
+      stability: number;
+      similarity_boost: number;
+    }
+  | { ok: false; error: string } {
   if (!body || typeof body !== "object") return { ok: false, error: "No text was sent." };
   const b = body as Record<string, unknown>;
   const text = typeof b.text === "string" ? b.text.trim() : "";
-  if (text.length < MIN_CHARS) return { ok: false, error: "Text is empty — please write something." };
+  if (text.length < MIN_CHARS)
+    return { ok: false, error: "Text is empty — please write something." };
   if (text.length > MAX_CHARS)
     return { ok: false, error: `Text is over ${MAX_CHARS} characters — please shorten it.` };
   const voice_id = typeof b.voice_id === "string" ? b.voice_id.trim() : "";
-  if (!voice_id || voice_id.length > 128)
-    return { ok: false, error: "No voice selected." };
+  if (!voice_id || voice_id.length > 128) return { ok: false, error: "No voice selected." };
   const model_id = typeof b.model_id === "string" ? b.model_id : "";
   if (!MODEL_IDS.includes(model_id)) return { ok: false, error: "Model is not valid." };
   const num = (v: unknown, fallback: number) => {

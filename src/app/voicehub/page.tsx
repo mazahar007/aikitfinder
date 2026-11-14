@@ -56,6 +56,8 @@ export default function VoiceHubPage() {
       .catch(() => undefined);
     try {
       const raw = localStorage.getItem("voicehub-history");
+      // One-time load from browser storage after mount, so server and client markup match.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (raw) setHistory(JSON.parse(raw) as HistoryEntry[]);
     } catch {
       // History is a convenience only; ignore corrupt storage.
@@ -113,7 +115,9 @@ export default function VoiceHubPage() {
         chars: text.trim().length,
         createdAt: new Date().toISOString(),
       });
-      const h = await fetch("/api/voicehub/health").then((r) => r.json()).catch(() => null);
+      const h = await fetch("/api/voicehub/health")
+        .then((r) => r.json())
+        .catch(() => null);
       if (h) setHealth(h);
     } catch {
       setError("Could not reach the server — please try again shortly.");
@@ -129,9 +133,9 @@ export default function VoiceHubPage() {
     <main className="mx-auto w-full max-w-3xl px-4 py-12">
       <h1 className="text-3xl font-bold">VoiceHub</h1>
       <p className="mt-2 text-slate-600">
-        Write text in Bengali or English, pick a voice, and generate natural-sounding
-        speech. This is a separate VoiceHub section inside AIKitFinder — it does not
-        change the AI tool finder pages.
+        Write text in Bengali or English, pick a voice, and generate natural-sounding speech. This
+        is a separate VoiceHub section inside AIKitFinder — it does not change the AI tool finder
+        pages.
       </p>
 
       {health && health.generation_enabled === false && (
@@ -142,10 +146,9 @@ export default function VoiceHubPage() {
       )}
       {health && !health.elevenlabs_configured && (
         <div className="mt-6 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
-          <strong>Demo mode:</strong> The ElevenLabs API key is not set for this
-          AIKitFinder project yet. Generate will show a clear message — no fake
-          audio is created. Real voice generation needs ELEVENLABS_API_KEY in the
-          aikitfinder Vercel project (Production) plus a redeploy.
+          <strong>Demo mode:</strong> The ElevenLabs API key is not set for this AIKitFinder project
+          yet. Generate will show a clear message — no fake audio is created. Real voice generation
+          needs ELEVENLABS_API_KEY in the aikitfinder Vercel project (Production) plus a redeploy.
         </div>
       )}
       {health?.demo_credits && (
@@ -158,7 +161,9 @@ export default function VoiceHubPage() {
 
       <div className="mt-6 space-y-5 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <div>
-          <label className="mb-1 block text-sm font-semibold" htmlFor="voicehub-text">Text</label>
+          <label className="mb-1 block text-sm font-semibold" htmlFor="voicehub-text">
+            Text
+          </label>
           <textarea
             id="voicehub-text"
             className="w-full rounded-md border border-slate-300 px-3 py-2"
@@ -173,10 +178,18 @@ export default function VoiceHubPage() {
               {chars > 0 && ` · about ${Math.max(1, Math.round(chars / 1000))} minute(s)`}
             </span>
             <span className="flex gap-2">
-              <button type="button" className="rounded-md border border-slate-300 px-3 py-1.5 text-sm" onClick={() => setText(BN_SAMPLE)}>
+              <button
+                type="button"
+                className="rounded-md border border-slate-300 px-3 py-1.5 text-sm"
+                onClick={() => setText(BN_SAMPLE)}
+              >
                 Bengali sample
               </button>
-              <button type="button" className="rounded-md border border-slate-300 px-3 py-1.5 text-sm" onClick={() => setText(EN_SAMPLE)}>
+              <button
+                type="button"
+                className="rounded-md border border-slate-300 px-3 py-1.5 text-sm"
+                onClick={() => setText(EN_SAMPLE)}
+              >
                 English sample
               </button>
             </span>
@@ -188,20 +201,37 @@ export default function VoiceHubPage() {
             <label className="mb-1 block text-sm font-semibold" htmlFor="voicehub-voice">
               Voice {voiceSource === "live" ? "(live list)" : "(verified defaults)"}
             </label>
-            <select id="voicehub-voice" className="w-full rounded-md border border-slate-300 px-3 py-2" value={voiceId} onChange={(e) => setVoiceId(e.target.value)}>
+            <select
+              id="voicehub-voice"
+              className="w-full rounded-md border border-slate-300 px-3 py-2"
+              value={voiceId}
+              onChange={(e) => setVoiceId(e.target.value)}
+            >
               {voices.map((v) => (
-                <option key={v.voice_id} value={v.voice_id}>{v.name}</option>
+                <option key={v.voice_id} value={v.voice_id}>
+                  {v.name}
+                </option>
               ))}
             </select>
             <p className="mt-1 text-sm text-slate-500">
-              With an API key, the live voice list loads; without one, only the 2 verified voices are shown.
+              With an API key, the live voice list loads; without one, only the 2 verified voices
+              are shown.
             </p>
           </div>
           <div>
-            <label className="mb-1 block text-sm font-semibold" htmlFor="voicehub-model">Model</label>
-            <select id="voicehub-model" className="w-full rounded-md border border-slate-300 px-3 py-2" value={modelId} onChange={(e) => setModelId(e.target.value)}>
+            <label className="mb-1 block text-sm font-semibold" htmlFor="voicehub-model">
+              Model
+            </label>
+            <select
+              id="voicehub-model"
+              className="w-full rounded-md border border-slate-300 px-3 py-2"
+              value={modelId}
+              onChange={(e) => setModelId(e.target.value)}
+            >
               {MODELS.map((m) => (
-                <option key={m.id} value={m.id}>{m.label}</option>
+                <option key={m.id} value={m.id}>
+                  {m.label}
+                </option>
               ))}
             </select>
             <p className="mt-1 text-sm text-slate-500">
@@ -212,7 +242,9 @@ export default function VoiceHubPage() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="mb-1 block text-sm font-semibold" htmlFor="voicehub-stability">Stability: {stability.toFixed(2)}</label>
+            <label className="mb-1 block text-sm font-semibold" htmlFor="voicehub-stability">
+              Stability: {stability.toFixed(2)}
+            </label>
             <input
               id="voicehub-stability"
               type="range"
@@ -226,7 +258,9 @@ export default function VoiceHubPage() {
             <p className="text-sm text-slate-500">Higher is steadier, lower is more expressive.</p>
           </div>
           <div>
-            <label className="mb-1 block text-sm font-semibold" htmlFor="voicehub-similarity">Similarity: {similarity.toFixed(2)}</label>
+            <label className="mb-1 block text-sm font-semibold" htmlFor="voicehub-similarity">
+              Similarity: {similarity.toFixed(2)}
+            </label>
             <input
               id="voicehub-similarity"
               type="range"
@@ -241,7 +275,11 @@ export default function VoiceHubPage() {
           </div>
         </div>
 
-        {error && <div className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-800">{error}</div>}
+        {error && (
+          <div className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-800">
+            {error}
+          </div>
+        )}
 
         <button
           type="button"
@@ -256,7 +294,11 @@ export default function VoiceHubPage() {
           <div className="rounded-md border border-green-300 bg-green-50 p-4">
             <p className="font-bold">Voice ready — listen and download</p>
             <audio ref={audioRef} controls src={audioUrl} className="mt-2 w-full" />
-            <a href={audioUrl} download="voicehub.mp3" className="mt-3 inline-block rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white">
+            <a
+              href={audioUrl}
+              download="voicehub.mp3"
+              className="mt-3 inline-block rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
+            >
               Download MP3
             </a>
           </div>
@@ -266,25 +308,30 @@ export default function VoiceHubPage() {
       <div className="mt-6 rounded-xl border border-slate-200 bg-white p-6">
         <h2 className="font-bold">Voice cloning — coming soon</h2>
         <p className="mt-1 text-slate-600">
-          VoiceHub V1 has no cloning. Cloning will be paid-plan only, and only with
-          the voice owner&apos;s written consent. It is never offered on the free tier.
+          VoiceHub V1 has no cloning. Cloning will be paid-plan only, and only with the voice
+          owner&apos;s written consent. It is never offered on the free tier.
         </p>
       </div>
 
       <div className="mt-6 rounded-xl border border-slate-200 bg-white p-6">
         <h2 className="font-bold">Full SaaS</h2>
         <p className="mt-1 text-slate-600">
-          This studio is the VoiceHub section inside AIKitFinder. The standalone
-          full voice SaaS lives separately at{" "}
-          <a className="underline" href="https://voicehubo.vercel.app">voicehubo.vercel.app</a>.
-          This page does not claim to be that full SaaS.
+          This studio is the VoiceHub section inside AIKitFinder. The standalone full voice SaaS
+          lives separately at{" "}
+          <a className="underline" href="https://voicehubo.vercel.app">
+            voicehubo.vercel.app
+          </a>
+          . This page does not claim to be that full SaaS.
         </p>
       </div>
 
       <div className="mt-6 rounded-xl border border-slate-200 bg-white p-6">
         <h2 className="font-bold">History (this browser)</h2>
         {history.length === 0 ? (
-          <p className="mt-1 text-slate-600">No voice generated yet. Download the MP3 to keep it — history stores only the text details, not the audio.</p>
+          <p className="mt-1 text-slate-600">
+            No voice generated yet. Download the MP3 to keep it — history stores only the text
+            details, not the audio.
+          </p>
         ) : (
           <ul className="mt-3 space-y-3">
             {history.map((h, i) => (

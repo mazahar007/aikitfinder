@@ -19,7 +19,8 @@ export async function GET() {
     demo_mode: !configured,
     generation_enabled: isPublicGenerationEnabled(),
     supabase: false,
-    supabase_note: "VoiceHub V1 runs on the in-memory DEMO credit ledger; database wiring is a later step.",
+    supabase_note:
+      "VoiceHub V1 runs on the in-memory DEMO credit ledger; database wiring is a later step.",
     models: MODEL_IDS,
     fallback_voices: FALLBACK_VOICES.length,
     demo_credits: demoCredits(),

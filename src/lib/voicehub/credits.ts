@@ -42,7 +42,9 @@ export function canSpend(chars: number): boolean {
 
 // Call ONLY after ElevenLabs returned a successful audio response,
 // so a failed generation never spends demo credit.
-export function recordGeneration(rec: Omit<GenerationRecord, "id" | "createdAt">): GenerationRecord {
+export function recordGeneration(
+  rec: Omit<GenerationRecord, "id" | "createdAt">,
+): GenerationRecord {
   const s = store();
   const entry: GenerationRecord = {
     ...rec,

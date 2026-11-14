@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { FALLBACK_VOICES, elevenLabsApiKey, isElevenLabsConfigured } from "@/lib/voicehub/elevenlabs";
+import {
+  FALLBACK_VOICES,
+  elevenLabsApiKey,
+  isElevenLabsConfigured,
+} from "@/lib/voicehub/elevenlabs";
 import type { VoiceOption } from "@/lib/voicehub/elevenlabs";
 
 // GET /api/voicehub/voices — live list when a key is configured,
