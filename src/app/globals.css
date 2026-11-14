@@ -124,6 +124,192 @@
   --story-4: #052e16;
 }
 
+/*
+ * Product identities
+ * ------------------
+ * The tokens above are the AI Tools Directory's (navy, blue, teal). The parent
+ * site and AutoFlow AI reuse the same token names with their own values, so
+ * every shared component (buttons, badges, inputs, sheets) takes on the right
+ * identity without product-specific code.
+ *
+ * `data-product` is set on <html> by the head script and by <ProductScope>.
+ * The wrapper classes repeat the dark values so the right identity still
+ * shows if scripts are unavailable. Both products are dark by default; their
+ * light themes apply only when the visitor chooses them.
+ */
+:root[data-product="parent"],
+.akf-parent {
+  color-scheme: dark;
+
+  --brand: #05050e;
+  --heading: #ffffff;
+  --on-brand: #b3b0d3;
+  --on-brand-accent: #b8adff;
+  --logo-tile: #6a52f0;
+  --logo-spark: #ffb3df;
+  --zone: #151143;
+
+  --background: #07071a;
+  --card: #0f0e2a;
+  --surface-subtle: #151143;
+  --border: #2a2752;
+  --input: #6e6a9c;
+  --overlay: rgb(4 4 14 / 62%);
+
+  --foreground: #f4f2ff;
+  --muted-foreground: #b3b0d3;
+
+  --primary: #a99bff;
+  --primary-hover: #c4baff;
+  --primary-foreground: #0b0a22;
+  --primary-tint: #1d1848;
+  --ring: #b8adff;
+
+  --learn: #5fe3ef;
+  --learn-foreground: #03262d;
+  --learn-tint: #0b2533;
+
+  --success: #4ade80;
+  --success-tint: #0b2a17;
+  --warning: #fbbf24;
+  --warning-tint: #2b1d07;
+  --destructive: #f87171;
+  --destructive-foreground: #0b0a22;
+  --destructive-tint: #2e1215;
+
+  --shadow-hover-color: rgb(0 0 0 / 45%);
+}
+
+:root[data-product="parent"][data-theme="light"],
+:root[data-product="parent"][data-theme="light"] .akf-parent {
+  color-scheme: light;
+
+  --brand: #0e0b2e;
+  --heading: #0e0b2e;
+  --on-brand: #cfcce6;
+  --on-brand-accent: #b8adff;
+  --logo-tile: #6a52f0;
+  --logo-spark: #ffb3df;
+  --zone: #151143;
+
+  --background: #f6f5ff;
+  --card: #ffffff;
+  --surface-subtle: #eeecfb;
+  --border: #dcd8f3;
+  --input: #8a85ad;
+  --overlay: rgb(14 11 46 / 45%);
+
+  --foreground: #15123a;
+  --muted-foreground: #55517a;
+
+  --primary: #5a3fe0;
+  --primary-hover: #4a31c9;
+  --primary-foreground: #ffffff;
+  --primary-tint: #efecff;
+  --ring: #5a3fe0;
+
+  --learn: #0e7490;
+  --learn-foreground: #ffffff;
+  --learn-tint: #ecfeff;
+
+  --success: #15803d;
+  --success-tint: #f0fdf4;
+  --warning: #b45309;
+  --warning-tint: #fffbeb;
+  --destructive: #b91c1c;
+  --destructive-foreground: #ffffff;
+  --destructive-tint: #fef2f2;
+
+  --shadow-hover-color: rgb(14 11 46 / 10%);
+}
+
+/* AutoFlow AI: the darkest surfaces of the three, violet accents, studio feel. */
+:root[data-product="autoflow"],
+.akf-autoflow {
+  color-scheme: dark;
+
+  --brand: #040308;
+  --heading: #ffffff;
+  --on-brand: #aaa5c8;
+  --on-brand-accent: #a68fff;
+  --logo-tile: #1b1533;
+  --logo-spark: #a68fff;
+  --zone: #1d1745;
+
+  --background: #06050b;
+  --card: #0f0d1a;
+  --surface-subtle: #171427;
+  --border: #2a2545;
+  --input: #6b6590;
+  --overlay: rgb(0 0 0 / 66%);
+
+  --foreground: #f1eefc;
+  --muted-foreground: #aaa5c8;
+
+  --primary: #a68fff;
+  --primary-hover: #c0b0ff;
+  --primary-foreground: #0b0816;
+  --primary-tint: #1d1745;
+  --ring: #a68fff;
+
+  --learn: #5fe3ef;
+  --learn-foreground: #03262d;
+  --learn-tint: #0b2533;
+
+  --success: #4ade80;
+  --success-tint: #0b2a17;
+  --warning: #fbbf24;
+  --warning-tint: #2b1d07;
+  --destructive: #f87171;
+  --destructive-foreground: #0b0816;
+  --destructive-tint: #2e1215;
+
+  --shadow-hover-color: rgb(0 0 0 / 55%);
+}
+
+:root[data-product="autoflow"][data-theme="light"],
+:root[data-product="autoflow"][data-theme="light"] .akf-autoflow {
+  color-scheme: light;
+
+  --brand: #100c22;
+  --heading: #100c22;
+  --on-brand: #cfcbe4;
+  --on-brand-accent: #a68fff;
+  --logo-tile: #1b1533;
+  --logo-spark: #a68fff;
+  --zone: #1d1745;
+
+  --background: #f7f6fb;
+  --card: #ffffff;
+  --surface-subtle: #efedf7;
+  --border: #dedaee;
+  --input: #8a85ad;
+  --overlay: rgb(16 12 34 / 45%);
+
+  --foreground: #17132e;
+  --muted-foreground: #56516f;
+
+  --primary: #5b3fd6;
+  --primary-hover: #4a30bf;
+  --primary-foreground: #ffffff;
+  --primary-tint: #efebff;
+  --ring: #5b3fd6;
+
+  --learn: #0e7490;
+  --learn-foreground: #ffffff;
+  --learn-tint: #ecfeff;
+
+  --success: #15803d;
+  --success-tint: #f0fdf4;
+  --warning: #b45309;
+  --warning-tint: #fffbeb;
+  --destructive: #b91c1c;
+  --destructive-foreground: #ffffff;
+  --destructive-tint: #fef2f2;
+
+  --shadow-hover-color: rgb(16 12 34 / 10%);
+}
+
 @theme inline {
   --color-brand: var(--brand);
   --color-heading: var(--heading);
@@ -159,6 +345,9 @@
   --radius-lg: var(--radius-lg);
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /* Display faces of the parent site and AutoFlow (approved hybrid design) */
+  --font-display: var(--font-inter-tight), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument-serif), Georgia, serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 
   --shadow-card-hover: 0 4px 16px var(--shadow-hover-color);
