@@ -6,7 +6,7 @@
 /*
  * AIKitFinder design tokens
  * -------------------------
- * The single source of truth for colour, radius and motion. Components use
+ * The single source of truth for color, radius and motion. Components use
  * the Tailwind utilities generated from @theme below (e.g. bg-primary,
  * text-muted-foreground, border-border) and never hard-code hex values.
  *

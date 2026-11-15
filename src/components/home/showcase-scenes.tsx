@@ -43,15 +43,15 @@ const CLOUD_FRONT = cloudPath(
 );
 
 /**
- * A band where a cloud-shaped colour rises to cover the screen, handing the
- * page over to the next section's colour. Without motion it is a static
+ * A band where a cloud-shaped color rises to cover the screen, handing the
+ * page over to the next section's color. Without motion it is a static
  * cloud edge.
  *
- * - "to-dark":  current background → the dark zone colour
+ * - "to-dark":  current background → the dark zone color
  * - "to-light": the dark zone → page background
  *
  * `seamless` leaves the band transparent so the cloud rises straight out of
- * whatever colour sits behind it (used at the end of the story).
+ * whatever color sits behind it (used at the end of the story).
  */
 export function CloudWipe({
   direction,
@@ -338,7 +338,7 @@ export function ZoomShowcase() {
                 ))}
               </div>
               <div className="rounded-md border bg-surface-subtle p-3 font-mono text-xs">
-                Summarise this article into a{" "}
+                Summarize this article into a{" "}
                 <mark className="rounded-sm bg-primary-tint px-0.5 text-primary-hover">
                   [length]
                 </mark>

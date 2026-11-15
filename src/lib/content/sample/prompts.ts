@@ -26,7 +26,7 @@ export const samplePrompts: Prompt[] = [
     categorySlugs: ["productivity"],
     tags: ["meetings", "summary", "tasks", "manager", "student"],
     skillLevel: "beginner",
-    text: 'You are an assistant that organises meeting notes.\n\nHere are the notes from [meeting name]:\n[paste notes]\n\nList every action item as a table with three columns: task, owner, deadline. If an owner or deadline is not stated, write "not stated" instead of guessing. After the table, list any open questions that were not answered.',
+    text: 'You are an assistant that organizes meeting notes.\n\nHere are the notes from [meeting name]:\n[paste notes]\n\nList every action item as a table with three columns: task, owner, deadline. If an owner or deadline is not stated, write "not stated" instead of guessing. After the table, list any open questions that were not answered.',
     variables: [
       {
         name: "meeting name",
@@ -157,7 +157,7 @@ export const samplePrompts: Prompt[] = [
     text: "A professional product photo of [product] on a [background] background, soft studio lighting, shot from [angle], sharp focus, plenty of empty space for text. Style: [style]. Avoid: text, logos, hands, clutter.",
     variables: [
       { name: "product", description: "What the picture shows.", example: "a ceramic coffee mug" },
-      { name: "background", description: "A simple backdrop.", example: "pale grey" },
+      { name: "background", description: "A simple backdrop.", example: "pale gray" },
       { name: "angle", description: "The camera angle.", example: "a slightly raised angle" },
       { name: "style", description: "The overall look.", example: "minimal and modern" },
     ],
@@ -174,13 +174,13 @@ export const samplePrompts: Prompt[] = [
     updatedAt: "2026-10-07",
   }),
   sample({
-    slug: "summarise-article-with-sources",
-    title: "Summarise an article and flag unsupported claims",
+    slug: "summarize-article-with-sources",
+    title: "Summarize an article and flag unsupported claims",
     useCase: "Get a short summary and a list of statements that need checking.",
     categorySlugs: ["writing-research"],
     tags: ["summary", "research", "fact-checking", "student", "researcher"],
     skillLevel: "intermediate",
-    text: 'Summarise the text below in [number] bullet points for [reader].\n\nText:\n[text]\n\nThen add a section called "Check before you trust this" listing any claims that give no source, use vague numbers or sound too certain. Do not add facts that are not in the text.',
+    text: 'Summarize the text below in [number] bullet points for [reader].\n\nText:\n[text]\n\nThen add a section called "Check before you trust this" listing any claims that give no source, use vague numbers or sound too certain. Do not add facts that are not in the text.',
     variables: [
       { name: "number", description: "How many bullet points.", example: "5" },
       { name: "reader", description: "Who the summary is for.", example: "a first-year student" },
@@ -209,7 +209,7 @@ export const samplePrompts: Prompt[] = [
     categorySlugs: ["productivity", "business"],
     tags: ["career", "interview", "practice", "student", "job seeker"],
     skillLevel: "beginner",
-    text: "Act as an interviewer for a [role] position at a [company type]. Ask me one question at a time, wait for my answer, and then give short feedback: one thing I did well and one thing to improve. Start with an easy question and make them harder. Stop after [number] questions and summarise my strengths.",
+    text: "Act as an interviewer for a [role] position at a [company type]. Ask me one question at a time, wait for my answer, and then give short feedback: one thing I did well and one thing to improve. Start with an easy question and make them harder. Stop after [number] questions and summarize my strengths.",
     variables: [
       { name: "role", description: "The job title.", example: "junior data analyst" },
       {

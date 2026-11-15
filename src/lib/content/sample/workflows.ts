@@ -14,7 +14,7 @@ export const sampleWorkflows: Workflow[] = [
     steps: [
       {
         title: "Write the script",
-        instructions: "Summarise the article into a 6-scene script.",
+        instructions: "Summarize the article into a 6-scene script.",
         input: "Blog post text",
         output: "Video script",
         mode: "manual",
@@ -188,7 +188,7 @@ export const sampleWorkflows: Workflow[] = [
     prerequisites: ["Everyone’s consent to record", "A team chat you can post to"],
     steps: [
       {
-        title: "Record and summarise",
+        title: "Record and summarize",
         instructions: "Record the meeting (with consent) and generate notes with action items.",
         input: "Meeting audio",
         output: "Summary and action items",

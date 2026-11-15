@@ -37,7 +37,7 @@ export const sampleGuides: Guide[] = [
         title: "Write the prompt in four parts",
         body: "Describe the subject first, then the style, the lighting and the mood. Put the most important thing first, because later words get less attention.",
         example:
-          "A golden retriever reading a book in a library, watercolour style, soft morning light, calm and cosy",
+          "A golden retriever reading a book in a library, watercolor style, soft morning light, calm and cosy",
       },
       {
         title: "Generate and compare",
@@ -76,17 +76,17 @@ export const sampleGuides: Guide[] = [
     slug: "blog-post-to-video",
     title: "Turn a blog post into a short video",
     summary:
-      "Summarise an article into a script, generate scenes and export a vertical video ready for social media.",
+      "Summarize an article into a script, generate scenes and export a vertical video ready for social media.",
     skillLevel: "beginner",
     estimatedMinutes: 20,
     prerequisites: ["A published or drafted blog post", "Accounts for Draftwise and Storyreel"],
     toolSlugs: ["draftwise", "storyreel"],
     steps: [
       {
-        title: "Summarise the article into a script",
+        title: "Summarize the article into a script",
         body: "Ask Draftwise for a script with one idea per scene. Keep it under 120 words for a 45-second video.",
         example:
-          "Summarise this article into a 45-second video script for beginners. Use 6 scenes, one idea per scene, and end with a call to action: [article]",
+          "Summarize this article into a 45-second video script for beginners. Use 6 scenes, one idea per scene, and end with a call to action: [article]",
       },
       {
         title: "Create a new video in Storyreel",
@@ -116,12 +116,12 @@ export const sampleGuides: Guide[] = [
     updatedAt: "2026-10-08",
   }),
   sample({
-    slug: "summarise-long-documents",
-    title: "Summarise long documents without losing key facts",
+    slug: "summarize-long-documents",
+    title: "Summarize long documents without losing key facts",
     summary: "Get accurate bullet-point summaries and check them against the original.",
     skillLevel: "beginner",
     estimatedMinutes: 8,
-    prerequisites: ["A document to summarise", "A Draftwise account"],
+    prerequisites: ["A document to summarize", "A Draftwise account"],
     toolSlugs: ["draftwise"],
     steps: [
       {
@@ -132,7 +132,7 @@ export const sampleGuides: Guide[] = [
         title: "Ask it to keep numbers and names exact",
         body: "This reduces made-up details.",
         example:
-          "Summarise the text below in 7 bullet points for a busy manager. Keep numbers and names exact. Text: [text]",
+          "Summarize the text below in 7 bullet points for a busy manager. Keep numbers and names exact. Text: [text]",
       },
       {
         title: "Spot-check three facts",
@@ -150,7 +150,7 @@ export const sampleGuides: Guide[] = [
     slug: "automate-email-summaries",
     title: "Get a daily summary of important emails",
     summary:
-      "Build an automation that summarises new emails and sends you one digest each morning.",
+      "Build an automation that summarizes new emails and sends you one digest each morning.",
     skillLevel: "intermediate",
     estimatedMinutes: 25,
     prerequisites: ["A Flowpilot account", "Access to your email account"],
@@ -165,7 +165,7 @@ export const sampleGuides: Guide[] = [
         body: "Filter to your inbox and skip newsletters to keep the digest focused.",
       },
       {
-        title: "Add an AI summarise step",
+        title: "Add an AI summarize step",
         body: "Ask for one line per email and a short list of anything that needs a reply.",
         example:
           "For each email, write one line: sender – topic – what they need. Then list emails that need a reply today.",

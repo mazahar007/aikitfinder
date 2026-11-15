@@ -212,8 +212,8 @@ type StoryProps = {
 /**
  * Four chapters (Discover → Learn → Create → Automate), each pairing a short
  * promise with a live preview of the feature that keeps it. Without motion
- * each chapter shows its own colour; with motion the section cross-fades
- * between the colours and ends in a cloud that carries the page into the
+ * each chapter shows its own color; with motion the section cross-fades
+ * between the colors and ends in a cloud that carries the page into the
  * dark "featured" zone.
  */
 export function Story(props: StoryProps) {
@@ -290,7 +290,7 @@ export function Story(props: StoryProps) {
           </div>
         </article>
       ))}
-      {/* The cloud rises out of the last chapter's colour, so there is no seam. */}
+      {/* The cloud rises out of the last chapter's color, so there is no seam. */}
       <div
         className="group-data-[scenes=on]/story:bg-transparent!"
         style={{ backgroundColor: "var(--story-4)" }}

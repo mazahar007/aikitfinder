@@ -131,7 +131,7 @@
 
 /* ------------------------------------------------------------- hero effects */
 
-/* Soft, slowly drifting colour light behind the hero (no blur filter: the
+/* Soft, slowly drifting color light behind the hero (no blur filter: the
    gradients are already soft, which keeps it cheap on phones). */
 .aurora {
   position: absolute;
@@ -279,7 +279,7 @@
   clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
 }
 
-/* Story chapters fade between colours (the colour token is set by GSAP). */
+/* Story chapters fade between colors (the color token is set by GSAP). */
 [data-story] {
   transition: background-color 700ms var(--ease-out);
 }

@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 /**
- * Badges always carry a word (and, for status, an icon) so colour is never
+ * Badges always carry a word (and, for status, an icon) so color is never
  * the only signal.
  */
 const badgeVariants = cva(

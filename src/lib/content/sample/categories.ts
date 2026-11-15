@@ -43,7 +43,7 @@ export const sampleCategories: Category[] = [
   {
     slug: "writing-research",
     name: "AI Writing and Research",
-    description: "Draft, rewrite, summarise and research with source checking.",
+    description: "Draft, rewrite, summarize and research with source checking.",
     icon: "pen",
   },
   {

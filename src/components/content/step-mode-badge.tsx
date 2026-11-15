@@ -11,7 +11,7 @@ export const stepModeText: Record<StepMode, { label: string; meaning: string }> 
   },
 };
 
-/** Icon and words, so the difference never depends on colour. */
+/** Icon and words, so the difference never depends on color. */
 export function StepModeBadge({ mode }: { mode: StepMode }) {
   return (
     <Badge variant={mode === "manual" ? "neutral" : "info"}>

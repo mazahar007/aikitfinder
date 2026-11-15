@@ -24,7 +24,7 @@ const statusStyle = {
   expired: { variant: "neutral", icon: HourglassIcon },
 } as const;
 
-/** Status always has an icon and a word; colour is never the only signal. */
+/** Status always has an icon and a word; color is never the only signal. */
 export function DealStatusBadge({ state }: { state: DealStatus }) {
   const { variant, icon: Icon } = statusStyle[state];
   return (

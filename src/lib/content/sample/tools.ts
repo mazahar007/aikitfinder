@@ -172,7 +172,7 @@ export const sampleTools: Tool[] = [
         slug: "blog-to-short",
         title: "Blog post to short video",
         task: "Turn a long article into a short social video",
-        text: "Summarise this article into a [length]-second video script for [audience]. Use [number] scenes, one idea per scene, and end with a clear call to action: [article text]",
+        text: "Summarize this article into a [length]-second video script for [audience]. Use [number] scenes, one idea per scene, and end with a clear call to action: [article text]",
         placeholders: ["length", "audience", "number", "article text"],
         expectedOutput: "A scene-by-scene script ready to paste into the editor.",
         caveats: "Check facts in the summary; shortening can drop important context.",
@@ -217,7 +217,7 @@ export const sampleTools: Tool[] = [
         checkedAt: "2026-10-01",
       },
       {
-        title: "Help centre: scenes and voices (sample link)",
+        title: "Help center: scenes and voices (sample link)",
         url: "https://example.com/storyreel/docs",
         checkedAt: "2026-10-01",
       },
@@ -272,14 +272,14 @@ export const sampleTools: Tool[] = [
     outputs: ["PNG or JPG images"],
     features: [
       "Several variations per prompt",
-      "Style presets (photo, illustration, 3D, watercolour)",
+      "Style presets (photo, illustration, 3D, watercolor)",
       "Upscaling",
       "Edit part of an image by selecting it",
     ],
     limitations: [
       "Text inside images is often misspelled.",
       "Hands and small details can look wrong.",
-      "Check the licence terms before commercial use.",
+      "Check the license terms before commercial use.",
     ],
     setupRequirements: ["An account", "Credits for generation"],
     quickStart: [
@@ -290,7 +290,7 @@ export const sampleTools: Tool[] = [
     ],
     firstExample: {
       prompt:
-        "A cosy study desk by a window at sunrise, warm light, plants, flat illustration style, soft colours",
+        "A cosy study desk by a window at sunrise, warm light, plants, flat illustration style, soft colors",
       expectedResult: "Four illustrated variations of a desk scene in a consistent flat style.",
     },
     settings: [
@@ -325,7 +325,7 @@ export const sampleTools: Tool[] = [
         slug: "youtube-thumbnail",
         title: "Video thumbnail background",
         task: "Create an eye-catching thumbnail background",
-        text: "[subject], dramatic lighting, high contrast, bold colours, empty space on the [left/right] for text, 16:9",
+        text: "[subject], dramatic lighting, high contrast, bold colors, empty space on the [left/right] for text, 16:9",
         placeholders: ["subject", "left/right"],
         expectedOutput: "A thumbnail background with room for your own title text.",
         caveats: "Add the title text in a design tool; generated text is unreliable.",
@@ -360,11 +360,11 @@ export const sampleTools: Tool[] = [
     slug: "draftwise",
     name: "Draftwise",
     officialUrl: "https://example.com/draftwise",
-    shortDescription: "A writing assistant for drafting, rewriting and summarising text.",
+    shortDescription: "A writing assistant for drafting, rewriting and summarizing text.",
     overview:
-      "Draftwise helps you go from a blank page to a clear draft. It can outline, expand bullet points, adjust tone, shorten text and summarise long documents. It works best when you give it context about your audience and goal.",
+      "Draftwise helps you go from a blank page to a clear draft. It can outline, expand bullet points, adjust tone, shorten text and summarize long documents. It works best when you give it context about your audience and goal.",
     categorySlugs: ["writing-research", "productivity"],
-    tags: ["writing", "blog post", "email", "summarise", "rewrite"],
+    tags: ["writing", "blog post", "email", "summarize", "rewrite"],
     useCases: [
       "Blog posts and articles",
       "Emails and cover letters",
@@ -392,7 +392,7 @@ export const sampleTools: Tool[] = [
     features: ["Outline generator", "Tone adjustment", "Summaries", "Rewrite and shorten"],
     limitations: [
       "Can state incorrect facts confidently; verify anything important.",
-      "Long documents may be summarised unevenly.",
+      "Long documents may be summarized unevenly.",
     ],
     setupRequirements: ["An account"],
     quickStart: [
@@ -427,10 +427,10 @@ export const sampleTools: Tool[] = [
         tested: false,
       },
       {
-        slug: "summarise-document",
-        title: "Summarise a document",
+        slug: "summarize-document",
+        title: "Summarize a document",
         task: "Get the key points of a long text",
-        text: "Summarise the text below in [number] bullet points for someone who has [time] to read it. Keep numbers and names exact. Text: [text]",
+        text: "Summarize the text below in [number] bullet points for someone who has [time] to read it. Keep numbers and names exact. Text: [text]",
         placeholders: ["number", "time", "text"],
         expectedOutput: "A short bulleted summary.",
         caveats: "Check numbers against the original.",
@@ -485,7 +485,7 @@ export const sampleTools: Tool[] = [
     officialUrl: "https://example.com/canvasmint",
     shortDescription: "Designs social posts, slides and simple brand assets from a short brief.",
     overview:
-      "Canvasmint generates editable layouts from a short description and your brand colours. Everything stays editable, so you can adjust text and images by hand.",
+      "Canvasmint generates editable layouts from a short description and your brand colors. Everything stays editable, so you can adjust text and images by hand.",
     categorySlugs: ["design", "marketing-seo"],
     tags: ["social graphics", "presentation", "brand kit"],
     useCases: ["Instagram posts", "Presentation slides", "Event posters"],
@@ -526,7 +526,7 @@ export const sampleTools: Tool[] = [
     officialUrl: "https://example.com/citebird",
     shortDescription: "Research assistant that answers questions with links to its sources.",
     overview:
-      "Citebird searches papers and web pages, summarises what it finds and shows where each claim came from, so you can check it.",
+      "Citebird searches papers and web pages, summarizes what it finds and shows where each claim came from, so you can check it.",
     categorySlugs: ["writing-research"],
     tags: ["research", "citations", "literature review", "study"],
     useCases: ["Literature reviews", "Fact-checking", "Study notes"],
@@ -633,10 +633,10 @@ export const sampleTools: Tool[] = [
     officialUrl: "https://example.com/flowpilot",
     shortDescription: "Connects your apps and runs AI steps automatically when something happens.",
     overview:
-      "Flowpilot lets you build automations like “when a form is submitted, summarise it and post to chat” without code. AI steps can summarise, classify or draft replies.",
+      "Flowpilot lets you build automations like “when a form is submitted, summarize it and post to chat” without code. AI steps can summarize, classify or draft replies.",
     categorySlugs: ["automation", "productivity"],
     tags: ["no-code", "integrations", "automation", "integrations hub"],
-    useCases: ["Summarise new emails", "Route support requests", "Post content on a schedule"],
+    useCases: ["Summarize new emails", "Route support requests", "Post content on a schedule"],
     audience: ["Freelancers", "Small businesses", "Operations teams"],
     skillLevel: "intermediate",
     pricing: {

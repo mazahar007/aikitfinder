@@ -4,7 +4,7 @@
  * These types mirror the planned database tables in the master brief
  * (tools, categories, guides, guide_steps, tool_settings, prompts,
  * workflows, workflow_steps, resources). In Phase 2 they are filled from
- * clearly labelled sample data; in Phase 3 the same shapes come from
+ * clearly labeled sample data; in Phase 3 the same shapes come from
  * Supabase, so pages and components do not need to change.
  *
  * Category model: a tool can belong to several categories (a join table in

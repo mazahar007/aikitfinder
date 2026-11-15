@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-/** Centres page content: 16px gutters on phones, capped at 1200px on desktop. */
+/** Centers page content: 16px gutters on phones, capped at 1200px on desktop. */
 export function Container({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div

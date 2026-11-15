@@ -57,7 +57,7 @@ export function Faq() {
             </summary>
             <p className="ans">
               Each fact is checked against the tool’s official source and dated. Anything not yet
-              checked is labelled. Records marked “Sample” are fictional.
+              checked is labeled. Records marked “Sample” are fictional.
             </p>
           </details>
           <details>

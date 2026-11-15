@@ -238,7 +238,7 @@ export default function DealsPage({ searchParams }: PageProps<"/deals">) {
         <InfoIcon className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
         <span>
           Offers change and not everyone qualifies. Always read the provider’s own terms before you
-          claim anything. If a claim link earns us a commission, the offer is labelled “Affiliate
+          claim anything. If a claim link earns us a commission, the offer is labeled “Affiliate
           link”. We never mark an offer active unless we have checked it recently.
         </span>
       </p>

@@ -14,7 +14,7 @@ import { useEffect, useRef, type ReactNode } from "react";
  *                           (value = direction: "left" | "right")
  *   [data-draw]             an SVG whose [pathLength] strokes draw on scroll
  *   [data-chapter]          a story chapter; its value is the background
- *                           colour token the [data-story] section fades to
+ *                           color token the [data-story] section fades to
  *   [data-story]            the section whose background changes per chapter
  *
  * GSAP is imported dynamically, so it is downloaded only on pages that use
@@ -42,7 +42,7 @@ export function ScrollScenes({ children }: { children: ReactNode }) {
 
       const story = el.querySelector<HTMLElement>("[data-story]");
       if (story) {
-        // Hand chapter colours over to the section so they can cross-fade.
+        // Hand chapter colors over to the section so they can cross-fade.
         story.dataset.scenes = "on";
         const first = el.querySelector<HTMLElement>("[data-chapter]")?.dataset.chapter;
         if (first) story.style.backgroundColor = `var(${first})`;
@@ -96,19 +96,19 @@ export function ScrollScenes({ children }: { children: ReactNode }) {
           );
         });
 
-        // Story: the section background shifts colour chapter by chapter, and
+        // Story: the section background shifts color chapter by chapter, and
         // each chapter's text rises in.
         el.querySelectorAll<HTMLElement>("[data-chapter]").forEach((chapter) => {
-          const colour = chapter.dataset.chapter;
-          if (story && colour) {
+          const color = chapter.dataset.chapter;
+          if (story && color) {
             ScrollTrigger.create({
               trigger: chapter,
               start: "top 55%",
               end: "bottom 55%",
-              // Set the token itself (not a resolved colour) so a theme
+              // Set the token itself (not a resolved color) so a theme
               // switch updates it; CSS transitions the change.
               onToggle: (self) => {
-                if (self.isActive) story.style.backgroundColor = `var(${colour})`;
+                if (self.isActive) story.style.backgroundColor = `var(${color})`;
               },
             });
           }

@@ -54,13 +54,13 @@ export const sampleDeals: Deal[] = [
     claimUrl: "https://example.com/pictora/students",
     claimSteps: [
       "Sign in to your Pictora account, or create one.",
-      "Open the student programme page and start verification.",
+      "Open the student program page and start verification.",
       "Use your school email or upload proof of enrolment.",
       "Credits appear in your account after approval.",
     ],
     sources: [
       {
-        title: "Pictora student programme (sample)",
+        title: "Pictora student program (sample)",
         url: "https://example.com/pictora/students",
         checkedAt: "2026-10-03",
       },
@@ -98,7 +98,7 @@ export const sampleDeals: Deal[] = [
   }),
   sample({
     slug: "flowpilot-startup-credits",
-    title: "Startup programme credits",
+    title: "Startup program credits",
     provider: "Flowpilot",
     toolSlug: "flowpilot",
     type: "credits",
@@ -107,18 +107,18 @@ export const sampleDeals: Deal[] = [
     eligibility: ["startups"],
     eligibilityNotes:
       "Applications are reviewed by the provider; being listed here does not guarantee approval (sample data).",
-    regions: "Selected countries only; see the programme terms.",
+    regions: "Selected countries only; see the program terms.",
     endsOn: "2026-12-31",
     termsUrl: "https://example.com/flowpilot/startups/terms",
     claimUrl: "https://example.com/flowpilot/startups",
     claimSteps: [
-      "Read the programme terms and check that your company qualifies.",
+      "Read the program terms and check that your company qualifies.",
       "Submit the application form on the official page.",
       "Wait for the provider’s decision by email.",
     ],
     sources: [
       {
-        title: "Flowpilot startup programme (sample)",
+        title: "Flowpilot startup program (sample)",
         url: "https://example.com/flowpilot/startups",
         checkedAt: "2026-09-12",
       },
@@ -222,7 +222,7 @@ export const sampleDeals: Deal[] = [
     ],
     sources: [
       {
-        title: "Notewell educator programme (sample)",
+        title: "Notewell educator program (sample)",
         url: "https://example.com/notewell/educators",
         checkedAt: "2026-06-15",
       },
