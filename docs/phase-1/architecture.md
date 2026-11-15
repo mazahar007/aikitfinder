@@ -107,28 +107,62 @@ Directory's `repository.ts`); `access.ts` is the one access check used by the wo
 
 ```
 auth.users (Supabase Auth)            one shared identity
-   └─ profiles                        1:1
-        └─ workspaces                 one per product: 'directory', 'autoflow'
+   └─ profiles                        1:1, created by trigger
+        └─ workspaces                 one per product: 'directory', 'autoflow', created by trigger
              └─ autoflow_projects     AutoFlow workspace only
-                  └─ autoflow_project_stages   six rows per project
+                  └─ autoflow_project_stages   six rows per project, created by trigger
 ```
 
 Defined in `supabase/migrations/0006_accounts_workspaces.sql` with owner-only row level security.
-In the app: `src/lib/auth/config.ts` (`authStatus`), `src/lib/auth/session.ts`
-(`getCurrentUser()`, `safeReturnPath()`), and one shared dialog in `src/components/auth/`.
 
-**Sign-in is not live.** No Supabase project is connected, `authStatus.enabled` is `false`,
-`getCurrentUser()` returns `null`, and the dialog's form is disabled with an explanation.
+### Supabase integration
+
+| Item             | Value                                                                     |
+| ---------------- | ------------------------------------------------------------------------- |
+| Project          | `aikitfinder`, reference `lethjnizehfshztmsiah`                           |
+| Region           | **ap-southeast-2 (Sydney)**, read from the Supabase API, not assumed      |
+| Database         | PostgreSQL 17.11                                                          |
+| Keys used by app | Project URL and publishable key only. No secret or service-role key       |
+| Token signing    | Asymmetric (ES256); tokens are verified against the project's public keys |
+| Migrations       | 0001–0007 applied and recorded in `supabase_migrations.schema_migrations` |
+
+How a request is authenticated:
+
+```
+Browser ── form post ──► Server Action (src/lib/auth/actions.ts)
+                              │  signUp / signInWithPassword / signOut on Supabase Auth
+                              ▼
+                 session in HttpOnly, Secure, SameSite=Lax cookies
+                              │
+every request ─► src/proxy.ts renews an expired token
+                              │
+page render ──► getCurrentUser() (src/lib/auth/session.ts)
+                   verifies the token signature, returns { id, email, displayName } or null
+                              │
+data ─────────► Supabase client acting as that user (src/lib/supabase/server.ts)
+                   row level security returns only the user's own rows
+```
+
+- There is no Supabase client in the browser. Pages learn who is signed in from `/auth/session`,
+  which returns the email and display name only.
+- `/auth/confirm` is where the confirmation email link lands.
+- Without `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` the site builds and
+  runs with accounts switched off and the dialog disabled.
+- Session reads call `connection()`, so they run only for real requests, never in a prerendered or
+  prefetched shell.
 
 ### Access rule for the workspace
 
-| State                             | What `/autoflow/app/*` shows                           |
-| --------------------------------- | ------------------------------------------------------ |
-| Accounts closed (now)             | Read-only layout preview, a notice, one labeled sample |
-| Accounts open, visitor signed out | Sign-in prompt only; the workspace is not rendered     |
-| Signed in                         | The user's own workspace                               |
+| State                            | What `/autoflow/app/*` shows                           |
+| -------------------------------- | ------------------------------------------------------ |
+| Signed out                       | Sign-in prompt only; workspace pages are not rendered  |
+| Signed in                        | The user's own workspace and projects                  |
+| Accounts not configured (no env) | Read-only layout preview, a notice, one labeled sample |
+
+`/account` shows the signed-in user's email, display name and two workspaces.
 
 ## 4. Not part of this architecture yet
 
-Python FastAPI backend, worker, queue, storage, AI provider integrations, publishing. See
+Python FastAPI backend, worker, queue, storage, AI provider integrations, publishing, email
+delivery (SMTP). See
 `remaining-work.md`.

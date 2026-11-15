@@ -1,72 +1,95 @@
 # Phase 1 Testing Report
 
-Run on 15 Nov 2026 against the production build (`pnpm build`, `pnpm start`) of the branch,
-in headless Chromium. Nothing was deployed.
+Final run on 15 Nov 2026 against the production build (`pnpm build`, `pnpm start`) of the branch
+at `cd1069b`, in headless Chromium, connected to the real Supabase project. Nothing was deployed.
 
 ## Results
 
-| Check               | Command                             | Result                                                  |
-| ------------------- | ----------------------------------- | ------------------------------------------------------- |
-| Lint                | `pnpm lint`                         | Pass, 0 errors, 0 warnings                              |
-| Type check          | `pnpm typecheck`                    | Pass                                                    |
-| Formatting          | `pnpm format:check`                 | Pass                                                    |
-| Production build    | `pnpm build`                        | Pass, 95 static pages generated                         |
-| Browser checks      | `node scripts/qa/site-check.cjs`    | **135 passed, 0 failed**                                |
-| Database migrations | `scripts/qa/validate-migrations.sh` | Pass: 0001–0006 apply; 5 groups of security checks pass |
+| Check                            | Command                             | Result                                      |
+| -------------------------------- | ----------------------------------- | ------------------------------------------- |
+| Lint                             | `pnpm lint`                         | Pass, 0 errors, 0 warnings                  |
+| Type check                       | `pnpm typecheck`                    | Pass                                        |
+| Formatting                       | `pnpm format:check`                 | Pass                                        |
+| Production build                 | `pnpm build`                        | Pass, 98 pages                              |
+| Build with accounts switched off | `pnpm build` without `.env.local`   | Pass                                        |
+| Browser and responsive checks    | `node scripts/qa/site-check.cjs`    | **353 passed, 0 failed**                    |
+| Authentication and isolation     | `node scripts/qa/auth-check.cjs`    | **54 passed, 0 failed**                     |
+| Migration validation (local)     | `scripts/qa/validate-migrations.sh` | Pass: 0001–0007 apply; security checks pass |
+| Supabase security advisor        | Management API                      | 0 findings (2 warnings fixed by 0007)       |
+| Server log during test runs      | —                                   | 0 errors                                    |
 
-## Browser checks in detail
+## Responsive checks
 
-| Group                 | Checks | What is verified                                                                                                                                                                                                                           |
-| --------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Routes                | 71     | 23 routes × desktop 1440, tablet 834, phone 390: HTTP 200, correct product, one `<main>`, one `<h1>`, a title, `lang="en"`, no horizontal overflow, no console errors. Plus not-found handling                                             |
-| Hero animation        | 36     | Per viewport: fish drawn; animation runs; one visible Pause control, 44 px or taller; Pause stops drawing and keeps the fish visible; state survives reload; Resume restarts; stops off screen; protected zones; reduced motion            |
-| Navigation, desktop   | 14     | Skip link first; Products menu and Escape; theme switch; AutoFlow theme independent; parent theme remembered; account dialog opens, is disabled with a notice, closes on Escape; both hero buttons; workspace journey; six stages in order |
-| Navigation, Directory | 9      | Six section links; Deals and VoiceHub absent from navigation; tool card opens a tool page                                                                                                                                                  |
-| Navigation, phone     | 5      | Menu opens; all targets 44 px or taller; Escape closes; both hero buttons on the first screen                                                                                                                                              |
+24 routes × 11 widths = 264 page loads: **320, 360, 375, 390, 414, 430, 768, 1024, 1280, 1440,
+1920 px**. Each load checks: HTTP 200, correct product, one visible `<main>`, one visible `<h1>`,
+a title, `lang="en"`, no horizontal overflow, no text under 11 px, no console errors, and on touch
+widths (320–768) no button, field, navigation link or footer link under 44 px tall.
 
-### Protected zones
+All 264 pass. The legacy `/voicehub` page is exempt from the tap-target audit only (unlinked, due
+to be replaced).
 
-Strongest fish pixel found over each element during 120 simulated seconds, as a percentage of
-full opacity. The fish body is far above 10%; values here are the outer glow only.
+## Hero animation
 
-| Viewport | Directory button | AutoFlow button | Pause | Kicker | Headline | Status line |
-| -------- | ---------------- | --------------- | ----- | ------ | -------- | ----------- |
-| Desktop  | 2%               | 3%              | 3%    | 0%     | 0%       | 7%          |
-| Tablet   | 2%               | 2%              | 0%    | 0%     | 0%       | 5%          |
-| Phone    | 0%               | 0%              | 2%    | 0%     | 0%       | 0%          |
+At 320, 390, 834, 1440 and 1920 px (12 checks each): fish drawn; animation runs; one visible Pause
+control of 44 px or more; Pause stops drawing and keeps the fish visible; state survives reload;
+Resume restarts; stops off screen; reduced motion gives a still frame with no looping CSS
+animation.
 
-### Database security checks
+Strongest fish pixel over protected elements in 120 simulated seconds (percent of full opacity;
+the fish body is far above 10%, these are the outer glow):
 
-On a throwaway local PostgreSQL 16 with a stand-in for Supabase's `auth` schema:
+| Width   | Directory button | AutoFlow button | Pause | Kicker | Headline | Status line |
+| ------- | ---------------- | --------------- | ----- | ------ | -------- | ----------- |
+| 320 px  | 0%               | 0%              | 4%    | 0%     | 0%       | 0%          |
+| 390 px  | 0%               | 0%              | 2%    | 0%     | 0%       | 0%          |
+| 834 px  | 2%               | 2%              | 0%    | 0%     | 0%       | 5%          |
+| 1440 px | 2%               | 3%              | 3%    | 0%     | 0%       | 7%          |
+| 1920 px | 2%               | 4%              | 4%    | 0%     | 0%       | 7%          |
 
-1. A new account gets one profile and two workspaces.
-2. A user sees only their own profile and workspaces; a new project gets six stage rows; a user
-   cannot create a project in another user's workspace, in a Directory workspace, or create or
-   rename workspaces they do not own.
-3. Another user cannot see, update or delete those projects or stages.
-4. A visitor sees nothing.
-5. Deleting the account removes its workspaces and projects.
+## Authentication and security (real project)
 
-## Defects found by testing and fixed
+Two throwaway accounts are created for the run and deleted afterwards. No real user data is used.
 
-| Defect                                                              | Fix                |
-| ------------------------------------------------------------------- | ------------------ |
-| Phone layout used the desktop gutter (wrong selector under nesting) | `7edd12c` (in CSS) |
-| Directory header 5 px too wide at 1280 px                           | `f11faa6`          |
-| VoiceHub lost its header and nested two `<main>` elements           | `f11faa6`          |
-| Unknown project showed the Directory's not-found page               | `5f6189e`          |
-| Workspace check hidden by row level security in a trigger           | `853647b`          |
-| Directory header 1 px too wide at 390 px                            | `4879384`          |
-| Logo link in the phone menu was 32 px tall                          | `4879384`          |
+| Group                  | Checks | What is verified                                                                                                                                       |
+| ---------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Visitors               | 6      | Cannot read profiles, workspaces, projects or stages; can read the public catalog; cannot write to it                                                  |
+| Own data               | 5      | Sign-up created one profile and two workspaces; a project can be created in the user's own AutoFlow workspace and gets six stages                      |
+| Limits on a user       | 6      | Cannot write to the catalog, create a project in another user's or a Directory workspace, create extra workspaces, reassign an owner or move a project |
+| Cross-user isolation   | 9      | User B cannot read, edit or delete A's project, stages, workspace or profile; A's data is unchanged; a tampered token is rejected                      |
+| Signed out, in the app | 4      | Workspace and project addresses show only the sign-in prompt; nothing about the project is in the page; `/account` asks to log in                      |
+| Log in                 | 5      | Wrong password gives a clear error, keeps the email, clears the password, sets no session; correct password returns to the requested page              |
+| Session                | 7      | Cookies are HttpOnly, Secure, SameSite=Lax; scripts cannot read them; no token in browser storage; survives reload; shared across tabs and products    |
+| Log out                | 2      | Session ends, cookies cleared, workspace closed again                                                                                                  |
+| Redirect safety        | 1      | An off-site return address is ignored                                                                                                                  |
+| Isolation in the app   | 3      | On a phone, user B logs in and gets "not found" for A's project; B's list is empty; no overflow                                                        |
+| Sign-up form           | 2      | Short password refused before anything is sent; dialog fits a phone                                                                                    |
+| Cleanup                | 1      | Deleting the accounts removed their workspaces and projects                                                                                            |
+
+After the run the project holds 0 users, 0 profiles, 0 workspaces, 0 projects.
+
+## Defects found by testing and fixed in this round
+
+| Defect                                                                                   | Fix                  |
+| ---------------------------------------------------------------------------------------- | -------------------- |
+| Email field cleared after a failed log-in                                                | `906f350`            |
+| Session check ran during prefetch and logged server errors                               | `a861b5c`            |
+| Workspace check in a trigger was hidden by row level security                            | `853647b`            |
+| Two functions with a changeable search path (Supabase advisor)                           | `d02f269`            |
+| Directory header 103 px too wide at 1024 px and 22 px at 1280 px with the account button | `e9cc541`, `cd1069b` |
+| Tap targets under 44 px: footer links, breadcrumbs, chips, small buttons, logos          | `e9cc541`            |
+| Parent footer links 36 px tall on tablets                                                | `e9cc541`            |
+| British spellings in Directory and sample copy                                           | `d6b75e9`            |
+
+Earlier defects are listed in `implementation-progress.md`.
 
 ## Not tested
 
-| Not tested                                                                                   | Why                                                     |
-| -------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| Real devices, Safari, Firefox                                                                | Only headless Chromium is available here                |
-| Screen readers                                                                               | Needs a person                                          |
-| Automated accessibility audit (axe) and contrast of the new AutoFlow and light parent themes | No audit tool installed; not measured                   |
-| Lighthouse or field performance                                                              | Not run. Frame cost was measured for the proposal only  |
-| Sign-up, log-in, sessions                                                                    | Not built                                               |
-| Migrations on Supabase itself                                                                | No project; validated on plain PostgreSQL only          |
-| Each commit building on its own                                                              | Only the final state of the branch was built and tested |
+| Not tested                                                                                  | Why                                                                                                                                                                                        |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Sign-up end to end with a confirmation email                                                | Needs a real inbox. The project has no SMTP; Supabase's built-in sender is limited. A test address at `example.com` was refused by Supabase as invalid, and the form showed that correctly |
+| Password reset                                                                              | Not built                                                                                                                                                                                  |
+| Real devices, Safari, Firefox, screen readers                                               | Only headless Chromium is available here                                                                                                                                                   |
+| Automated accessibility audit (axe), color contrast of the AutoFlow and light parent themes | No audit tool installed                                                                                                                                                                    |
+| Lighthouse or field performance                                                             | Not run                                                                                                                                                                                    |
+| Behavior on the production host (cookies on the real domain)                                | Nothing is deployed                                                                                                                                                                        |
+| Each commit building on its own                                                             | Only the final state was built and tested                                                                                                                                                  |
