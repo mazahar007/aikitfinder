@@ -130,7 +130,7 @@ export default function VoiceHubPage() {
   const overLimit = chars > MAX_CHARS;
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-12">
+    <div className="mx-auto w-full max-w-3xl px-4 py-12">
       <h1 className="text-3xl font-bold">VoiceHub</h1>
       <p className="mt-2 text-slate-600">
         Write text in Bengali or English, pick a voice, and generate natural-sounding speech. This
@@ -357,6 +357,6 @@ export default function VoiceHubPage() {
           </ul>
         )}
       </div>
-    </main>
+    </div>
   );
 }
