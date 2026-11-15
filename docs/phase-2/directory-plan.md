@@ -56,26 +56,11 @@ pass for the home, list and detail screens should be approved before implementat
 - No tool counts in marketing copy until they are real.
 - AI providers set their own prices; the Directory shows the price, its source and the date.
 
-## 4. Login requirement
+## 4. Access (revised 15 Nov 2026)
 
-Under the new requirement every Directory route needs a signed-in account. Design:
-
-| Layer     | Mechanism                                                                                                                                  |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Routing   | `proxy.ts` redirects a visitor without a session cookie from Directory paths to `/` with the sign-in dialog and the destination preserved  |
-| Rendering | The Directory layout verifies the session on the server, the same way the AutoFlow workspace does today; pages render only after it passes |
-| Data      | Catalog policies change from public read to signed-in read                                                                                 |
-| API       | Every Directory endpoint requires a valid token                                                                                            |
-
-Consequences to confirm before this is built:
-
-1. It reverses the earlier decision that the Directory is browsable without an account.
-2. The approved FAQ answer ("…is free and does not require an account") and the hero status line
-   "Browsing the directory needs no account" become false and must be reworded.
-3. Search engines cannot index a login-only Directory.
-4. Directory pages stop being prerendered; each view becomes a server render.
-
-Not implemented in this step.
+The login-for-everything rule was withdrawn. The Directory is hybrid: public, indexable
+discovery pages and a private signed-in workspace. Routes, protection, SEO and open questions
+are in `access-and-seo-strategy.md`.
 
 ## 5. Build order
 
@@ -85,4 +70,5 @@ Not implemented in this step.
 4. Admin: categories, tools, pricing, sources, publish and verify.
 5. Search and suggestions.
 6. Favorites, collections, recently viewed.
-7. Login requirement (once confirmed), FAQ and status-line wording.
+7. Public and private route groups, redirects and SEO plumbing, per `access-and-seo-strategy.md`.
+8. Indexing switched on only when real content exists.

@@ -45,7 +45,8 @@ is shown to customers. AutoFlow pricing has not been announced.
 
 ## 4. Decisions needed before building
 
-1. Is the login-for-everything rule confirmed, given that it reverses public Directory browsing?
+1. The open questions in `access-and-seo-strategy.md` (route changes, AutoFlow landing, homepage
+   buttons, first real content).
 2. Backend hosting provider and region.
 3. Storage provider.
 4. Text and research AI providers.

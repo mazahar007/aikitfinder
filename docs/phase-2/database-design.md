@@ -22,15 +22,18 @@ tables, policies and data are unchanged.
 
 ### Directory catalog (extends existing)
 
-| Table / change                                               | Purpose                                                                      | Reader                | Writer    |
-| ------------------------------------------------------------ | ---------------------------------------------------------------------------- | --------------------- | --------- |
-| `guides`, `guide_steps`, `guide_tools`, `guide_categories`   | Guides exist only as sample code today                                       | Signed-in (published) | Admin API |
-| `tool_features`                                              | Feature list per tool                                                        | Signed-in (published) | Admin API |
-| `tools.search_vector` (+ same on guides, prompts, workflows) | Full-text search column and index                                            | —                     | Trigger   |
-| `tools.verified_by`, `tools.featured_rank`                   | Who verified; featured order                                                 | Admin                 | Admin API |
-| Catalog policies                                             | Public read → signed-in read, **only if** the login requirement is confirmed | —                     | Migration |
+| Table / change                                               | Purpose                                                                   | Reader             | Writer    |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------- | ------------------ | --------- |
+| `guides`, `guide_steps`, `guide_tools`, `guide_categories`   | Guides exist only as sample code today                                    | Public (published) | Admin API |
+| `tool_features`                                              | Feature list per tool                                                     | Public (published) | Admin API |
+| `tools.search_vector` (+ same on guides, prompts, workflows) | Full-text search column and index                                         | —                  | Trigger   |
+| `tools.verified_by`, `tools.featured_rank`                   | Who verified; featured order                                              | Admin              | Admin API |
+| Catalog policies                                             | Unchanged: public read of published rows (access strategy of 15 Nov 2026) | —                  | —         |
 
 ### Library
+
+Private by definition: favorites, collections, saved comparisons and preferences are owner-only and
+never appear in public pages, metadata, structured data or the sitemap.
 
 | Table              | Columns (main)                                                        | Access |
 | ------------------ | --------------------------------------------------------------------- | ------ |
