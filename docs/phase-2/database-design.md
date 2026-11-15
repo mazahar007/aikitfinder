@@ -102,20 +102,19 @@ grants today.
 
 ## 5. Migration sequence (each additive, each validated locally first)
 
-| No.   | Contents                                                   | Needed for                      |
-| ----- | ---------------------------------------------------------- | ------------------------------- |
-| 0008  | Roles, permissions, audit log, `profiles.status`, settings | Admin foundation                |
-| 0009  | Guides, tool features, search columns and indexes          | Directory on real data          |
-| 0010  | Favorites, collections, recent views                       | Library                         |
-| 0011  | Jobs, job errors, media assets                             | Any background work             |
-| 0012  | Providers, secrets, usage, credit ledger, price table      | First paid AI call              |
-| 0013  | Research, scripts, approvals; project columns              | Research and Script             |
-| 0014  | Voice generations                                          | Voice Studio                    |
-| 0015  | Scenes, video jobs; `scenes` enum value                    | Assembly and render             |
-| 0016  | Thumbnails, metadata                                       | Thumbnail and metadata          |
-| 0017  | Notifications, email events                                | Messaging                       |
-| 0018  | Catalog policies to signed-in read                         | Login requirement, if confirmed |
-| later | Plans, subscriptions, payments                             | Billing                         |
+| No.   | Contents                                                   | Needed for             |
+| ----- | ---------------------------------------------------------- | ---------------------- |
+| 0008  | Roles, permissions, audit log, `profiles.status`, settings | Admin foundation       |
+| 0009  | Guides, tool features, search columns and indexes          | Directory on real data |
+| 0010  | Favorites, collections, recent views                       | Library                |
+| 0011  | Jobs, job errors, media assets                             | Any background work    |
+| 0012  | Providers, secrets, usage, credit ledger, price table      | First paid AI call     |
+| 0013  | Research, scripts, approvals; project columns              | Research and Script    |
+| 0014  | Voice generations                                          | Voice Studio           |
+| 0015  | Scenes, video jobs; `scenes` enum value                    | Assembly and render    |
+| 0016  | Thumbnails, metadata                                       | Thumbnail and metadata |
+| 0017  | Notifications, email events                                | Messaging              |
+| later | Plans, subscriptions, payments                             | Billing                |
 
 ## 6. Indexes
 
