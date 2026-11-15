@@ -48,6 +48,16 @@ begin
   update workspaces set name = 'taken' where id = ws_b;
   get diagnostics n = row_count; if n <> 0 then raise exception 'A renamed B workspace'; end if;
 
+  -- A cannot reassign a workspace or a project, or edit protected columns.
+  begin
+    update workspaces set product = 'autoflow' where id = ws_a_dir;
+    raise exception 'A changed a workspace product';
+  exception when insufficient_privilege then null; end;
+  begin
+    update autoflow_projects set workspace_id = ws_b where id = proj;
+    raise exception 'A moved a project';
+  exception when insufficient_privilege then null; end;
+
   -- 3. User B sees none of A's data and cannot change it.
   perform set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-00000000000b', true);
   select count(*) into n from autoflow_projects;       if n <> 0 then raise exception 'B sees % projects', n; end if;
@@ -62,9 +72,20 @@ begin
   -- 4. A visitor sees nothing.
   set local role anon;
   perform set_config('request.jwt.claim.sub', '', true);
-  select count(*) into n from profiles;          if n <> 0 then raise exception 'anon sees profiles'; end if;
-  select count(*) into n from workspaces;        if n <> 0 then raise exception 'anon sees workspaces'; end if;
-  select count(*) into n from autoflow_projects; if n <> 0 then raise exception 'anon sees projects'; end if;
+  begin
+    select count(*) into n from profiles;
+    raise exception 'anon can read profiles';
+  exception when insufficient_privilege then null; end;
+  begin
+    select count(*) into n from autoflow_projects;
+    raise exception 'anon can read projects';
+  exception when insufficient_privilege then null; end;
+  begin
+    perform handle_new_user();
+    raise exception 'anon can call a trigger function';
+  exception when insufficient_privilege or feature_not_supported or others then
+    if sqlerrm = 'anon can call a trigger function' then raise; end if;
+  end;
 
   -- 5. Back as A: update a stage, then deleting the account removes everything.
   set local role authenticated;

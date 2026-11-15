@@ -1,8 +1,7 @@
 -- Accounts, product workspaces and AutoFlow projects (Phase 1 foundation).
 --
--- NOT applied anywhere yet: no Supabase project is connected. Validated on a
--- local PostgreSQL 16 with a stand-in `auth` schema (see
--- docs/phase-1/testing-report.md).
+-- Validated on a local PostgreSQL with a stand-in `auth` schema before being
+-- applied to the Supabase project (see docs/phase-1/testing-report.md).
 --
 -- Model: one shared identity (Supabase Auth, `auth.users`), one profile per
 -- user, and one personal workspace per product. Directory and AutoFlow data
@@ -144,23 +143,23 @@ alter table autoflow_project_stages enable row level security;
 
 -- Profiles: read and edit your own. Created and deleted with the account.
 create policy "own profile is readable" on profiles
-  for select to authenticated using (id = auth.uid());
+  for select to authenticated using (id = (select auth.uid()));
 create policy "own profile is editable" on profiles
-  for update to authenticated using (id = auth.uid()) with check (id = auth.uid());
+  for update to authenticated using (id = (select auth.uid())) with check (id = (select auth.uid()));
 
 -- Workspaces: read and rename your own. Created by the account trigger.
 create policy "own workspaces are readable" on workspaces
-  for select to authenticated using (owner_id = auth.uid());
+  for select to authenticated using (owner_id = (select auth.uid()));
 create policy "own workspaces are editable" on workspaces
-  for update to authenticated using (owner_id = auth.uid()) with check (owner_id = auth.uid());
+  for update to authenticated using (owner_id = (select auth.uid())) with check (owner_id = (select auth.uid()));
 
 -- Projects: full control inside your own workspace only.
 create policy "own projects" on autoflow_projects
   for all to authenticated
   using (exists (
-    select 1 from workspaces w where w.id = workspace_id and w.owner_id = auth.uid()))
+    select 1 from workspaces w where w.id = workspace_id and w.owner_id = (select auth.uid())))
   with check (exists (
-    select 1 from workspaces w where w.id = workspace_id and w.owner_id = auth.uid()));
+    select 1 from workspaces w where w.id = workspace_id and w.owner_id = (select auth.uid())));
 
 -- Stages: read and update for your own projects. Rows are created by the
 -- project trigger and removed with the project.
@@ -168,12 +167,38 @@ create policy "stages of own projects are readable" on autoflow_project_stages
   for select to authenticated
   using (exists (
     select 1 from autoflow_projects p join workspaces w on w.id = p.workspace_id
-    where p.id = project_id and w.owner_id = auth.uid()));
+    where p.id = project_id and w.owner_id = (select auth.uid())));
 create policy "stages of own projects are editable" on autoflow_project_stages
   for update to authenticated
   using (exists (
     select 1 from autoflow_projects p join workspaces w on w.id = p.workspace_id
-    where p.id = project_id and w.owner_id = auth.uid()))
+    where p.id = project_id and w.owner_id = (select auth.uid())))
   with check (exists (
     select 1 from autoflow_projects p join workspaces w on w.id = p.workspace_id
-    where p.id = project_id and w.owner_id = auth.uid()));
+    where p.id = project_id and w.owner_id = (select auth.uid())));
+
+-- Privileges ----------------------------------------------------------------------
+--
+-- Supabase grants every privilege on new public tables to `anon` and
+-- `authenticated` and relies on row level security. These tables are narrowed
+-- further, so a mistake in a policy cannot expose or alter more than intended.
+
+-- Visitors have no business with account data at all.
+revoke all on profiles, workspaces, autoflow_projects, autoflow_project_stages from anon;
+
+-- Signed-in users: only the operations and columns the app needs.
+revoke all on profiles, workspaces, autoflow_project_stages from authenticated;
+grant select on profiles, workspaces, autoflow_project_stages to authenticated;
+grant update (display_name) on profiles to authenticated;
+grant update (name) on workspaces to authenticated;
+grant update (status) on autoflow_project_stages to authenticated;
+
+revoke all on autoflow_projects from authenticated;
+grant select, delete on autoflow_projects to authenticated;
+grant insert (workspace_id, title, aspect_ratio) on autoflow_projects to authenticated;
+grant update (title, status, current_stage) on autoflow_projects to authenticated;
+
+-- Trigger functions are never meant to be called directly.
+revoke execute on function handle_new_user() from public, anon, authenticated;
+revoke execute on function autoflow_projects_workspace_check() from public, anon, authenticated;
+revoke execute on function autoflow_projects_seed_stages() from public, anon, authenticated;

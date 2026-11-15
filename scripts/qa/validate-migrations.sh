@@ -30,18 +30,16 @@ create table auth.users (id uuid primary key default gen_random_uuid(), email te
 create function auth.uid() returns uuid language sql stable as
   $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
 grant usage on schema auth to anon, authenticated;
+-- Supabase's defaults: both roles get every privilege on new public objects.
+grant usage on schema public to anon, authenticated;
+alter default privileges in schema public grant all on tables to anon, authenticated;
+alter default privileges in schema public grant execute on functions to anon, authenticated;
 SQL
 
 for f in "$ROOT"/supabase/migrations/*.sql; do
   $PSQL -d postgres -f "$f" >/dev/null
   echo "applied $(basename "$f")"
 done
-
-$PSQL -d postgres <<'SQL'
-grant usage on schema public to anon, authenticated;
-grant select, insert, update, delete on all tables in schema public to authenticated;
-grant select on all tables in schema public to anon;
-SQL
 
 $PSQL -d postgres -f "$ROOT/scripts/qa/accounts-rls-test.sql"
 echo "ALL MIGRATION CHECKS PASSED"
