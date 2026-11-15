@@ -25,15 +25,16 @@ PSQL="$RUNAS $PGBIN/psql -X -q -v ON_ERROR_STOP=1 -h $DIR -p $PORT -U postgres"
 $PSQL -d postgres <<'SQL'
 create role anon nologin;
 create role authenticated nologin;
+create role service_role nologin bypassrls;
 create schema auth;
 create table auth.users (id uuid primary key default gen_random_uuid(), email text);
 create function auth.uid() returns uuid language sql stable as
   $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
-grant usage on schema auth to anon, authenticated;
+grant usage on schema auth to anon, authenticated, service_role;
 -- Supabase's defaults: both roles get every privilege on new public objects.
-grant usage on schema public to anon, authenticated;
-alter default privileges in schema public grant all on tables to anon, authenticated;
-alter default privileges in schema public grant execute on functions to anon, authenticated;
+grant usage on schema public to anon, authenticated, service_role;
+alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
+alter default privileges in schema public grant execute on functions to anon, authenticated, service_role;
 SQL
 
 for f in "$ROOT"/supabase/migrations/*.sql; do
@@ -42,4 +43,5 @@ for f in "$ROOT"/supabase/migrations/*.sql; do
 done
 
 $PSQL -d postgres -f "$ROOT/scripts/qa/accounts-rls-test.sql"
+$PSQL -d postgres -f "$ROOT/scripts/qa/guest-search-test.sql"
 echo "ALL MIGRATION CHECKS PASSED"
