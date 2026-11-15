@@ -50,11 +50,13 @@ State on 15 Nov 2026 (final). Nothing below is started unless it says so.
 
 ## External dependencies (owner actions)
 
+Exact steps for items 1 and 2 are in `account-system-final-report.md`.
+
 1. **Email delivery.** Add an SMTP provider in Supabase (Authentication → Emails). Until then
    public sign-up cannot be relied on: the built-in sender is limited to a few messages per hour.
 2. **Site URL and redirect URLs** in Supabase (Authentication → URL Configuration). Site URL is
    still `http://localhost:3000`; set the real domain and add `<domain>/auth/confirm`.
-3. **Password policy.** The project minimum is 6; the app requires 8. Raise the project setting.
+3. **Password policy.** Done: the project minimum is now 8, matching the app.
 4. **Hosting environment variables.** `NEXT_PUBLIC_SUPABASE_URL` and
    `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` must be set where the site is deployed. No secret key.
 5. **Access token.** The Supabase access token saved for this work can be revoked once no further
