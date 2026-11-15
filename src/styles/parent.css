@@ -251,6 +251,7 @@
 
   /* ───────────── Logo (existing AIKitFinder mark, recolored) ───────────── */
   .logo {
+    min-height: 44px;
     display: inline-flex;
     align-items: center;
     gap: 10px;

@@ -65,7 +65,8 @@ export function Logo({
         {descriptor ? (
           <span
             className={cn(
-              "ml-1.5 font-medium",
+              // Hidden on the narrowest phones so the header fits; the link label still names it.
+              "ml-1.5 hidden font-medium min-[420px]:inline",
               inverted ? "text-on-brand" : "text-muted-foreground",
             )}
           >
