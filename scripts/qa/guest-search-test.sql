@@ -111,5 +111,51 @@ begin
      and (column_name ~ 'query|term|text|keyword' or column_name = 'q');
   if n <> 0 then raise exception 'a guest_search table has a text column'; end if;
 
-  raise notice 'guest search limit: 11 groups of checks passed';
+  -- 12. Definer-rights functions have a fixed search path that ends with pg_temp,
+  --     and a temporary table of the same name cannot stand in for the real one.
+  select count(*) into n from pg_proc p join pg_namespace ns on ns.oid = p.pronamespace
+   where ns.nspname = 'public' and p.proname in ('consume_guest_search', 'guest_search_status')
+     and p.prosecdef and p.proconfig @> array['search_path=public, pg_temp'];
+  if n <> 2 then raise exception 'search path is not fixed on % of 2 functions', 2 - n; end if;
+  create temporary table guest_search_usage (guest_hash text, usage_date date, search_count smallint) on commit drop;
+  r := consume_guest_search(repeat('7', 64), gen_random_uuid(), null);
+  select count(*) into n from pg_temp.guest_search_usage;
+  if n <> 0 or not (r->>'allowed')::boolean then raise exception 'a temporary table shadowed the real one'; end if;
+  select count(*) into n from public.guest_search_usage where guest_hash = repeat('7', 64);
+  if n <> 1 then raise exception 'the real table was not used'; end if;
+  drop table pg_temp.guest_search_usage;
+
+  -- 13. Cleanup keeps everything from today and removes only what has aged out.
+  insert into public.guest_search_usage (guest_hash, usage_date, search_count)
+    values (repeat('5', 64), (now() at time zone 'utc')::date - 8, 3), (repeat('6', 64), (now() at time zone 'utc')::date - 7, 3);
+  insert into guest_search_requests (guest_hash, request_id, usage_date, allowed, used)
+    values (repeat('5', 64), gen_random_uuid(), (now() at time zone 'utc')::date - 2, true, 1),
+           (repeat('6', 64), gen_random_uuid(), (now() at time zone 'utc')::date - 1, true, 1);
+  select count(*) into i from public.guest_search_usage where usage_date = (now() at time zone 'utc')::date;
+  perform consume_guest_search(repeat('8', 64), gen_random_uuid(), null);
+  select count(*) into n from public.guest_search_usage where guest_hash = repeat('5', 64);
+  if n <> 0 then raise exception 'an 8-day-old counter was kept'; end if;
+  select count(*) into n from public.guest_search_usage where guest_hash = repeat('6', 64);
+  if n <> 1 then raise exception 'a 7-day-old counter was removed early'; end if;
+  select count(*) into n from guest_search_requests where guest_hash = repeat('5', 64);
+  if n <> 0 then raise exception 'a 2-day-old request ID was kept'; end if;
+  select count(*) into n from guest_search_requests where guest_hash = repeat('6', 64);
+  if n <> 1 then raise exception 'yesterday''s request ID was removed early'; end if;
+  select count(*) into n from public.guest_search_usage where usage_date = (now() at time zone 'utc')::date;
+  if n <> i + 1 then raise exception 'cleanup touched today''s counters'; end if;
+
+  -- 14. Every object from this migration is new; nothing existing was altered.
+  select count(*) into n from pg_tables where schemaname = 'public' and tablename like 'guest_search%' and rowsecurity;
+  if n <> 3 then raise exception 'row level security is on for % of 3 tables', n; end if;
+  select count(*) into n from pg_policies where schemaname = 'public' and tablename like 'guest_search%';
+  if n <> 0 then raise exception 'a guest_search table has a policy'; end if;
+  select count(*) into n from information_schema.role_table_grants
+   where table_schema = 'public' and table_name like 'guest_search%' and grantee in ('anon', 'authenticated', 'PUBLIC');
+  if n <> 0 then raise exception 'a browser role holds % table privileges', n; end if;
+  select count(*) into n from information_schema.routine_privileges
+   where routine_schema = 'public' and routine_name in ('consume_guest_search', 'guest_search_status')
+     and grantee in ('anon', 'authenticated', 'PUBLIC');
+  if n <> 0 then raise exception 'a browser role may execute a quota function'; end if;
+
+  raise notice 'guest search limit: 14 groups of checks passed';
 end $$;

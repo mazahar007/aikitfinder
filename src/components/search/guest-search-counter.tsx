@@ -26,7 +26,15 @@ export function GuestSearchCounter({ className }: { className?: string }) {
     let cancelled = false;
     const apply = (value: SearchAccess | undefined) => {
       if (cancelled) return;
-      setAccess(value?.type === "guest" && value.enforced ? value : null);
+      const next = value?.type === "guest" && value.enforced ? value : null;
+      // Two answers can arrive out of order (the status request and a search
+      // response). Within one day usage only goes up, so an answer with a
+      // lower count than the one already shown is the older one: ignore it.
+      setAccess((current) =>
+        current && next && next.reset_at === current.reset_at && next.used < current.used
+          ? current
+          : next,
+      );
     };
     fetch("/api/directory/search", { credentials: "same-origin", cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))

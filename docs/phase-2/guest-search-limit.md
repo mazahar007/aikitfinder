@@ -258,3 +258,157 @@ throwaway accounts in the real Supabase Auth project. The automated permission c
 that as a production write, in line with the rule that production tests be read-only. One run
 with sign-in had completed before that. To run them again, a separate test Supabase project or
 explicit approval for throwaway accounts is needed.
+
+## 14. Pre-deployment review (15 Nov 2026)
+
+A strict review before any production step. Nothing was applied, deployed or changed in
+production, and no production Auth user was created or deleted.
+
+### Changes made by the review
+
+| Change                                                                       | Why                                                                                                                                                                              |
+| ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Both functions now use `search_path = public, pg_temp` (was `public`)        | With `public` alone, a temporary table of the same name is found first. Listing `pg_temp` last closes that. A test now proves a temporary table cannot stand in for the real one |
+| `SUPABASE_SERVICE_URL` is honored only for `http://127.0.0.1` or `localhost` | The override exists for the local test gateway. Any other value is ignored, so a wrong setting can never send the secret key to another host                                     |
+| The counter ignores an answer with a lower "used" than the one shown         | Found by the new tests: the status request could arrive after a search response and show an older number                                                                         |
+| Database checks: 11 → 14 groups                                              | Search path, cleanup boundaries, grants and policies                                                                                                                             |
+| Browser checks: 80 → 90                                                      | Every search entry point, back and forward, and unmetered list filters                                                                                                           |
+
+Migration 0008 had not been applied anywhere, so it was edited in place.
+
+### A. Migration 0008
+
+| #   | Check                                      | Result                                                                                                                                  |
+| --- | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Additive only                              | Pass. Three new tables, two new functions, three indexes, one trigger on a new table. No `alter`, `drop` or change to anything existing |
+| 2   | Row level security on all three tables     | Pass (tested)                                                                                                                           |
+| 3   | No browser role can reach the tables       | Pass. No policies; privileges revoked from `anon` and `authenticated`; tested as both roles                                             |
+| 4   | Definer functions have a fixed search path | Pass after the fix above                                                                                                                |
+| 5   | Execute restricted                         | Pass. Revoked from `public`, `anon`, `authenticated`; granted to `service_role` only                                                    |
+| 6   | Lock and atomic upsert enforce the limit   | Pass. 12 simultaneous requests: 2 accepted, 10 refused; check constraint as a second guard                                              |
+| 7   | Idempotent request IDs                     | Pass, including 8 simultaneous copies of one request                                                                                    |
+| 8   | Cleanup cannot remove active usage         | Pass. Only rows older than 1 day (request IDs) or 7 days (counters) are removed; today's are never touched                              |
+| 9   | UTC reset                                  | Pass. Date and `reset_at` come from the database clock                                                                                  |
+| 10  | No query text or raw identifier stored     | Pass. Only 64-character keyed hashes, dates and counts                                                                                  |
+
+Remaining notes, none blocking:
+
+- The per-address cap is read and then written without a shared lock, so simultaneous guests on
+  one address can pass 60 by a few. It is a soft abuse control, not a quota.
+- The cap trusts the address header set by the host. Vercel overwrites it; behind a different
+  proxy it would need review.
+- Cleanup runs inside every accepted search. It is three indexed deletes and is cheap at this
+  scale; a scheduled job would be the better home if volume grows.
+- A hashed address kept for up to 7 days is pseudonymous personal data. The privacy policy
+  should mention it when that page is written.
+- The functions from migration 0006 (already applied) use `search_path = public` without
+  `pg_temp`. They are trigger functions and cannot be reached with a temporary table through the
+  API, so the risk is low, but a small follow-up migration would align them.
+
+### B. Service key isolation
+
+| Check                                   | Result                                                                                                                                               |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Module is server-only                   | Pass: `import "server-only"`; a client import fails the build                                                                                        |
+| Imported by                             | `src/lib/guest-search/quota.ts` only                                                                                                                 |
+| Used for                                | Two calls: `rpc("consume_guest_search")` and `rpc("guest_search_status")`. No table access                                                           |
+| User data reached with it               | None                                                                                                                                                 |
+| Key or related names in browser files   | None (scan of `.next/static` for the key names, function names and test values)                                                                      |
+| Errors                                  | The database error is discarded; the caller gets a generic exception and the visitor a generic 503. Nothing is logged with details                   |
+| Cross-site use of a visitor's allowance | Not possible: the endpoint requires `Content-Type: application/json`, which another site cannot send without a CORS permission the API does not give |
+
+### C. Authentication regression — blocked
+
+No separate Supabase test project exists: `.env.local` holds only the production project, and
+the saved Supabase token sees one project. None was created.
+
+Not run, because they need accounts in a real Auth project:
+
+- `scripts/qa/auth-check.cjs` (83 checks)
+- The 7 sign-in checks of the guest search suite (pending search resumes once, counter hidden,
+  signed-in users unlimited)
+
+What was run without production writes:
+
+| Check                                                                                                | Result |
+| ---------------------------------------------------------------------------------------------------- | ------ |
+| A visitor cannot claim to be signed in (body `user_id`, made-up bearer token, forged session cookie) | Pass   |
+| Account dialog opens, form live, closes on Escape (site checks)                                      | Pass   |
+| AutoFlow workspace shows the sign-in prompt to visitors (site checks)                                | Pass   |
+| `/account` and the reset page load for visitors (site checks)                                        | Pass   |
+
+Evidence that exists for the blocked items: the one earlier full run, in which all 7 sign-in
+checks passed. The account suite last passed (83 of 83) before this feature; the feature changed
+the shared dialog (an optional heading), so it should be re-run before relying on it.
+
+To unblock, the owner supplies one of:
+
+1. **A test Supabase project** (recommended). Needed: its URL, publishable key and secret key as
+   `QA_SUPABASE_URL`, `QA_SUPABASE_PUBLISHABLE_KEY`, `QA_SUPABASE_ADMIN_KEY` in the test
+   environment; migrations 0001–0008 applied to it; email confirmation left on. The scripts need
+   a small change to read these instead of `.env.local`.
+2. **Approval to use throwaway accounts in production Auth**, as the earlier runs did. They are
+   `akf-qa-…@example.com` addresses, created and deleted by the script.
+
+### D. Search behavior
+
+| Behavior                                                  | Result                                                       |
+| --------------------------------------------------------- | ------------------------------------------------------------ |
+| Header search                                             | Pass: one search                                             |
+| Directory home search                                     | Pass: one search                                             |
+| Search results page                                       | Pass                                                         |
+| Not-found page search                                     | Pass: one search                                             |
+| Phone menu search                                         | Pass: one search                                             |
+| Suggested search                                          | Pass: counts as one search                                   |
+| Reload of results                                         | Pass: uses nothing                                           |
+| Browser back and forward                                  | Pass: earlier results shown, nothing used                    |
+| Result-type tabs                                          | Pass: no request sent                                        |
+| List keyword filters (`/tools`, `/prompts`, `/workflows`) | Pass: unmetered, no search API call, still work at the limit |
+| Category filters, sorting, paging                         | Pass: unmetered                                              |
+| Fourth-search dialog                                      | Pass                                                         |
+| Signed-in unlimited search                                | **Not re-verified** (see C)                                  |
+
+"Search pagination": the search results page has no paging; list pages do, and paging there is
+unmetered.
+
+### E. Rate limiting
+
+Today: 3 per guest per day, and 60 accepted guest searches per hashed address per day.
+
+What the daily cap does not cover: a flood of requests. Every request, including refused ones,
+makes one database call, and nothing limits how fast they arrive. Signed-in users have no cap at
+all. Search is cheap today (in memory over sample data) but will become a database query.
+
+A short-window throttle is **recommended before real traffic, not required to switch the limit
+on**. Without Redis or a paid service, in order of preference:
+
+1. **Vercel Firewall rate-limit rule** on `POST /api/directory/search` (for example 20 per
+   minute per address). No code; it stops requests before they reach the app or the database.
+   Whether the current Vercel plan includes it needs checking.
+2. **In-process limiter** in the route, in front of the database call: a small in-memory window
+   per hashed address. Free and immediate, but per server instance, so on serverless hosting it
+   is best-effort only.
+3. **Database window**: a per-address, per-minute counter inside `consume_guest_search`.
+   Accurate across instances, but every refused request still costs a database call.
+
+Recommendation: option 1 if the plan allows it, otherwise option 2 now and option 3 only if
+abuse is seen. A per-user daily ceiling for signed-in accounts should come with the credits
+system.
+
+### F. Readiness
+
+| Check                               | Result                                                             |
+| ----------------------------------- | ------------------------------------------------------------------ |
+| Migration validation                | Pass: 0001–0008; 14 guest-search groups, 5 account groups          |
+| Lint, typecheck, formatting         | Pass                                                               |
+| Build                               | Pass, 100 pages                                                    |
+| Site checks                         | 364 passed, 0 failed                                               |
+| Guest search checks (local)         | 90 passed, 0 failed, three runs in a row; 4 sign-in checks skipped |
+| Secrets in commits or tracked files | None; `.env.local` untracked                                       |
+| Branch and remote                   | `feature/phase-1-platform-foundation`; remote at `0db4580`         |
+| Production database                 | Unchanged: migrations 0001–0007, no guest tables, 1 user           |
+| Production configuration            | Unchanged                                                          |
+
+Note on deployment: the live site builds from this branch, so the three earlier commits are
+already live. The live API reports `"enforced": false`: the new search page is in production with
+the limit off. For the same reason the review's own commit was **not pushed**: pushing deploys.

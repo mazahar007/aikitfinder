@@ -17,8 +17,24 @@ import { supabaseUrl } from "@/lib/supabase/env";
  * makes the build fail if this file is ever imported from a client component.
  */
 const secretKey = process.env.SUPABASE_SECRET_KEY ?? "";
-/** Normally the project URL. The override is for running against a local database gateway in tests. */
-const serviceUrl = process.env.SUPABASE_SERVICE_URL || supabaseUrl;
+/**
+ * Normally the project URL. Tests may point it at a gateway on this machine;
+ * any other address is ignored, so a mistaken or hostile setting can never
+ * send the secret key to another host.
+ */
+function localOverride(): string | null {
+  const value = process.env.SUPABASE_SERVICE_URL;
+  if (!value) return null;
+  try {
+    const { protocol, hostname } = new URL(value);
+    return protocol === "http:" && (hostname === "127.0.0.1" || hostname === "localhost")
+      ? value
+      : null;
+  } catch {
+    return null;
+  }
+}
+const serviceUrl = localOverride() ?? supabaseUrl;
 
 export const serviceClientConfigured = Boolean(serviceUrl && secretKey);
 

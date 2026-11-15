@@ -835,10 +835,192 @@ async function browserChecks(browser) {
   await phone.close();
 }
 
+/** Every place a main Directory search can start, and everything that must not count as one. */
+async function entryPointChecks(browser) {
+  const g = "D entry points";
+  const fresh = async (options = {}) => {
+    const context = await browser.newContext({
+      viewport: { width: 1280, height: 900 },
+      ...options,
+      extraHTTPHeaders: { "x-real-ip": newAddress() },
+    });
+    const page = await context.newPage();
+    const posts = [];
+    page.on(
+      "request",
+      (r) => r.method() === "POST" && r.url().endsWith("/api/directory/search") && posts.push(1),
+    );
+    return { context, page, posts };
+  };
+  const resultsFor = (page, q) =>
+    page
+      .getByText(new RegExp(`for “${q}”`))
+      .first()
+      .waitFor();
+  const cards = async (page) => {
+    const list = page.locator("main:visible article:visible");
+    await list.first().waitFor();
+    await page.waitForTimeout(400);
+    return list.count();
+  };
+  const remaining = (page, n) => page.locator(`p[data-remaining="${n}"]`).first().waitFor();
+
+  // Header search, Directory home search, suggested search.
+  {
+    const { context, page } = await fresh();
+    await page.goto(BASE + "/tools");
+    await page.locator("header #site-search").fill("video");
+    await page.locator("header #site-search").press("Enter");
+    await resultsFor(page, "video");
+    await remaining(page, 2);
+    check(
+      g,
+      "header search runs one search and lands on results (2/3 left)",
+      /[?&]rid=[0-9a-f-]{36}/.test(page.url()),
+    );
+
+    await page.goto(BASE + "/directory");
+    await remaining(page, 2);
+    await page.locator("#hero-search").fill("summarize");
+    await page.locator("#hero-search").press("Enter");
+    await resultsFor(page, "summarize");
+    await remaining(page, 1);
+    check(g, "Directory home search runs one search (1/3 left)", true);
+
+    await page.goto(BASE + "/directory");
+    await remaining(page, 1);
+    const suggestion = page.locator('ul[aria-label="Example searches"] button').first();
+    const label = (await suggestion.innerText()).trim();
+    await suggestion.click();
+    await page.waitForURL(/\/search\?q=.*&rid=/);
+    await remaining(page, 0);
+    check(
+      g,
+      "choosing a suggested search counts as one search (0/3 left)",
+      new URL(page.url()).searchParams.get("q") === label,
+      label,
+    );
+
+    // Back and forward replay the same request IDs.
+    const before = await test("/__test/totals");
+    await page.goBack({ waitUntil: "load" });
+    await page.goBack({ waitUntil: "load" });
+    await resultsFor(page, "summarize");
+    await page.goForward({ waitUntil: "load" });
+    await page.goForward({ waitUntil: "load" });
+    await page.waitForURL(/\/search\?q=.*&rid=/);
+    await page.locator("main:visible article:visible").first().waitFor();
+    const after = await test("/__test/totals");
+    check(
+      g,
+      "browser back and forward show earlier results without using a search",
+      after.accepted_today === before.accepted_today &&
+        (await page.getByRole("dialog").count()) === 0,
+      `${after.accepted_today - before.accepted_today} used`,
+    );
+    await context.close();
+  }
+
+  // Not-found page search and the phone menu search.
+  {
+    const { context, page } = await fresh();
+    const r = await page.goto(BASE + "/no-such-page-here");
+    await page.locator("#notfound-search").fill("code");
+    await page.locator("#notfound-search").press("Enter");
+    await resultsFor(page, "code");
+    await remaining(page, 2);
+    check(g, "search from the not-found page runs one search", r.status() === 404);
+    await context.close();
+
+    const phone = await fresh({
+      viewport: { width: 390, height: 844 },
+      hasTouch: true,
+      isMobile: true,
+    });
+    await phone.page.goto(BASE + "/tools");
+    await phone.page.getByRole("button", { name: /menu/i }).click();
+    await phone.page.locator("#mobile-search").fill("thumbnail");
+    await phone.page.locator("#mobile-search").press("Enter");
+    await resultsFor(phone.page, "thumbnail");
+    await remaining(phone.page, 2);
+    check(g, "search from the phone menu runs one search", true);
+    await phone.context.close();
+  }
+
+  // List pages: keyword filter, category filter, sorting and paging are not searches.
+  {
+    const { context, page, posts } = await fresh();
+    await page.goto(BASE + "/search");
+    await typeAndSearch(page, "video");
+    await remaining(page, 2);
+    const before = await test("/__test/totals");
+    posts.length = 0;
+
+    await page.goto(BASE + "/tools");
+    const total = await cards(page);
+    await page.locator("#tools-q:visible").fill("write");
+    await page.locator("#tools-q:visible").press("Enter");
+    await page.waitForURL(/\/tools\?.*q=write/);
+    const filtered = await cards(page);
+    check(
+      g,
+      "the tool list's keyword box filters the list",
+      filtered > 0 && filtered < total,
+      `${filtered} of ${total}`,
+    );
+    await page.goto(BASE + "/tools?sort=name");
+    const sortedOk = (await cards(page)) === total;
+    await page.goto(BASE + "/tools?pricing=free&level=beginner");
+    await page.goto(BASE + "/tools?page=2");
+    const pager = page.getByRole("navigation", { name: "Pagination" });
+    if (await pager.count())
+      await pager
+        .getByRole("link")
+        .first()
+        .click()
+        .catch(() => {});
+    await page.goto(BASE + "/prompts?q=email");
+    await page.goto(BASE + "/workflows?q=video");
+    await page.goto(BASE + "/categories");
+    await page.locator('main a[href^="/categories/"]').first().click();
+    await page.waitForURL(/\/categories\/.+/);
+    const after = await test("/__test/totals");
+    check(
+      g,
+      "list keyword filters, category filters, sorting and paging use no search and call no search API",
+      sortedOk &&
+        posts.length === 0 &&
+        after.accepted_today === before.accepted_today &&
+        after.requests === before.requests,
+      `${posts.length} API calls, ${after.accepted_today - before.accepted_today} used`,
+    );
+    await page.goto(BASE + "/search");
+    await remaining(page, 2);
+    check(g, "the counter is unchanged after all of that (2/3)", true);
+
+    // Use the rest, then confirm the list keyword filter still works at the limit.
+    await typeAndSearch(page, "code");
+    await remaining(page, 1);
+    await typeAndSearch(page, "summarize");
+    await remaining(page, 0);
+    await typeAndSearch(page, "thumbnail");
+    await page.getByRole("dialog").waitFor();
+    await page.keyboard.press("Escape");
+    await page.goto(BASE + "/tools?q=write");
+    check(
+      g,
+      "at the limit, the list keyword filter still works (unmetered by the current decision)",
+      (await cards(page)) === filtered && (await page.getByRole("dialog").count()) === 0,
+    );
+    await context.close();
+  }
+}
+
 (async () => {
   const browser = await chromium.launch();
   try {
     await apiChecks();
+    await entryPointChecks(browser);
     await browserChecks(browser);
   } catch (e) {
     check("run", "script completed", false, String(e).slice(0, 400));

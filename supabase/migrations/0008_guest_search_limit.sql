@@ -63,6 +63,9 @@ create index guest_search_ip_usage_date_idx on guest_search_ip_usage (usage_date
 --   reset_at   timestamptz  the next UTC midnight
 --   replayed   boolean   true when this request ID was already processed today
 --
+-- The search path is fixed and lists pg_temp last, so no temporary object can
+-- stand in for a table these definer-rights functions use.
+--
 -- The date comes from the database clock. The increment is a single
 -- conditional upsert, so concurrent calls can never take the count past 3; a
 -- per-guest transaction lock additionally makes the request-ID check and the
@@ -73,7 +76,7 @@ create or replace function consume_guest_search(
   p_request_id uuid,
   p_ip_hash    text default null
 ) returns jsonb
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = public, pg_temp as $$
 declare
   c_limit        constant smallint := 3;
   -- 20 full guest allowances per address per day. Generous for shared
@@ -161,7 +164,7 @@ $$;
 -- Read today's usage without using a search (for the counter) -------------------------
 
 create or replace function guest_search_status(p_guest_hash text) returns jsonb
-language plpgsql stable security definer set search_path = public as $$
+language plpgsql stable security definer set search_path = public, pg_temp as $$
 declare
   c_limit constant smallint := 3;
   v_today date := (now() at time zone 'utc')::date;
