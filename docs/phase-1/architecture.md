@@ -48,10 +48,87 @@ src/app/
                                                    /workflows  /compare  /search  (/deals, unlinked)
   (autoflow)/autoflow/       AutoFlow AI:          /autoflow  (public landing)
                                                    /autoflow/app/…  (workspace shell)
-  voicehub/, api/voicehub/   legacy, unchanged, unlinked
+                                                   (/voicehub, legacy, unlinked)
+  api/voicehub/              legacy route handlers, unchanged
 ```
 
 One root layout is kept so that moving between products is a client-side navigation, not a full
 page reload. Each route group adds its own header, footer and identity.
 
-Sections 3 onward are filled in as the work lands.
+## 3. What was built
+
+### Products and theming
+
+`src/config/products.ts` is the single registry of the three products: home path, status label,
+default theme and the storage key of its theme preference. `productForPath()` decides which
+product a URL belongs to.
+
+The root layout's inline head script and the `<ProductScope>` component set `data-product` and
+`data-theme` on `<html>`. Product identity is a set of token overrides in `src/app/globals.css`
+keyed on `data-product`, so the shared primitives (`Button`, `Badge`, `Input`) restyle themselves
+in each product without product-specific variants.
+
+| Product   | Default theme                | Saved under      |
+| --------- | ---------------------------- | ---------------- |
+| Parent    | Dark                         | `theme-parent`   |
+| Directory | Saved choice, then OS choice | `theme`          |
+| AutoFlow  | Dark                         | `theme-autoflow` |
+
+### Parent homepage
+
+`src/app/(parent)/page.tsx` assembles `src/components/parent/*`. Styles live in
+`src/styles/parent.css`, every rule nested under `.akf-parent` with `--p-*` variables, so nothing
+leaks into the other products.
+
+The fish is `src/components/parent/hero-life/engine.js`: the approved canvas engine, ported
+without visual changes, wrapped by `hero-life.tsx`, which loads it on idle after first paint.
+`motion-store.ts` connects the engine to the Pause control in the header (desktop and tablet) or
+under the hero buttons (phone). State is mirrored on `<html data-motion>` and saved in
+`localStorage` under `akf-motion`.
+
+### Directory
+
+All existing pages moved into `(directory)` with unchanged URLs. The former homepage is
+`/directory`. The header logo leads to `/directory`; "All products" leads back to `/#products`.
+
+### AutoFlow AI
+
+| Path                                 | What it is                         |
+| ------------------------------------ | ---------------------------------- |
+| `/autoflow`                          | Public landing page                |
+| `/autoflow/app`                      | Workspace overview                 |
+| `/autoflow/app/projects`             | Project list                       |
+| `/autoflow/app/projects/[projectId]` | Project detail with the six stages |
+
+`src/lib/autoflow/stages.ts` defines the stages; `projects.ts` is the data seam (same idea as the
+Directory's `repository.ts`); `access.ts` is the one access check used by the workspace layout.
+
+### Accounts
+
+```
+auth.users (Supabase Auth)            one shared identity
+   └─ profiles                        1:1
+        └─ workspaces                 one per product: 'directory', 'autoflow'
+             └─ autoflow_projects     AutoFlow workspace only
+                  └─ autoflow_project_stages   six rows per project
+```
+
+Defined in `supabase/migrations/0006_accounts_workspaces.sql` with owner-only row level security.
+In the app: `src/lib/auth/config.ts` (`authStatus`), `src/lib/auth/session.ts`
+(`getCurrentUser()`, `safeReturnPath()`), and one shared dialog in `src/components/auth/`.
+
+**Sign-in is not live.** No Supabase project is connected, `authStatus.enabled` is `false`,
+`getCurrentUser()` returns `null`, and the dialog's form is disabled with an explanation.
+
+### Access rule for the workspace
+
+| State                             | What `/autoflow/app/*` shows                           |
+| --------------------------------- | ------------------------------------------------------ |
+| Accounts closed (now)             | Read-only layout preview, a notice, one labeled sample |
+| Accounts open, visitor signed out | Sign-in prompt only; the workspace is not rendered     |
+| Signed in                         | The user's own workspace                               |
+
+## 4. Not part of this architecture yet
+
+Python FastAPI backend, worker, queue, storage, AI provider integrations, publishing. See
+`remaining-work.md`.
