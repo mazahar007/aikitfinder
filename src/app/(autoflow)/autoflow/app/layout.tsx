@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 
 import { SignInGate } from "@/components/autoflow/sign-in-gate";
@@ -11,17 +12,19 @@ export const metadata: Metadata = {
 };
 
 /**
- * Every workspace route passes through this check. Signed-out visitors never
- * get the workspace; while accounts are closed it renders as a read-only
- * layout preview (see src/lib/autoflow/access.ts).
+ * Every workspace route passes through this check. A signed-out visitor never
+ * gets the workspace or its pages: the pages are only rendered inside the
+ * shell, after the session has been verified. Where accounts are not
+ * configured it renders as a read-only layout preview (see
+ * src/lib/autoflow/access.ts).
  */
-export default async function WorkspaceLayout({ children }: LayoutProps<"/autoflow/app">) {
+async function WorkspaceGate({ children }: { children: React.ReactNode }) {
   const access = await getWorkspaceAccess();
 
   if (access.mode === "signed-out") {
     return (
       <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
-        <SignInGate returnTo="/autoflow/app" />
+        <SignInGate />
       </main>
     );
   }
@@ -33,5 +36,23 @@ export default async function WorkspaceLayout({ children }: LayoutProps<"/autofl
     >
       {children}
     </WorkspaceShell>
+  );
+}
+
+function WorkspaceLoading() {
+  return (
+    <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
+      <p role="status" className="px-4 py-24 text-center text-muted-foreground">
+        Opening your workspace…
+      </p>
+    </main>
+  );
+}
+
+export default function WorkspaceLayout({ children }: LayoutProps<"/autoflow/app">) {
+  return (
+    <Suspense fallback={<WorkspaceLoading />}>
+      <WorkspaceGate>{children}</WorkspaceGate>
+    </Suspense>
   );
 }

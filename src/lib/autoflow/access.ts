@@ -1,3 +1,5 @@
+import "server-only";
+
 import { authStatus, type SessionUser } from "@/lib/auth/config";
 import { getCurrentUser } from "@/lib/auth/session";
 
@@ -7,9 +9,9 @@ import { getCurrentUser } from "@/lib/auth/session";
  * - "member": signed in. Sees their own workspace.
  * - "signed-out": accounts are open but the visitor is not signed in. The
  *   workspace is not rendered; they are asked to sign in.
- * - "preview": accounts are not open at all (the current state). The layout is
- *   shown read-only with a labeled sample, because there is no user data that
- *   could be exposed and nothing can be created.
+ * - "preview": accounts are not configured on this machine or build. The
+ *   layout is shown read-only with a labeled sample, because there is no user
+ *   data that could be exposed and nothing can be created.
  */
 export type WorkspaceAccess =
   { mode: "member"; user: SessionUser } | { mode: "signed-out" } | { mode: "preview" };

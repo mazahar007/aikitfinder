@@ -4,7 +4,9 @@ import Link from "next/link";
 import { AutoflowLogo } from "@/components/autoflow/autoflow-logo";
 import { WorkspaceNav, WorkspaceNavLinks } from "@/components/autoflow/workspace-nav";
 import { PreviewNotice } from "@/components/autoflow/workspace-notice";
+import { LogoutButton } from "@/components/auth/logout-button";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { buttonVariants } from "@/components/ui/button";
 import { products } from "@/config/products";
 
 /**
@@ -43,9 +45,22 @@ export function WorkspaceShell({
               All products
             </Link>
             <ThemeToggle />
-            <span className="ml-1 hidden rounded-md border px-3 py-1.5 text-xs text-muted-foreground md:inline">
-              {accountLabel ?? "Not signed in"}
-            </span>
+            {accountLabel ? (
+              <>
+                <Link
+                  href="/account"
+                  title={accountLabel}
+                  className="ml-1 hidden h-11 max-w-56 items-center truncate rounded-md border px-3 text-sm text-foreground hover:bg-surface-subtle md:inline-flex"
+                >
+                  <span className="truncate">{accountLabel}</span>
+                </Link>
+                <LogoutButton className={buttonVariants({ variant: "ghost", size: "sm" })} />
+              </>
+            ) : (
+              <span className="ml-1 hidden rounded-md border px-3 py-1.5 text-xs text-muted-foreground md:inline">
+                Not signed in
+              </span>
+            )}
           </div>
         </div>
       </header>

@@ -3,7 +3,8 @@ import { buttonVariants } from "@/components/ui/button";
 import { products } from "@/config/products";
 
 /** Shown instead of the workspace to a visitor who is not signed in. */
-export function SignInGate({ returnTo }: { returnTo: string }) {
+export function SignInGate() {
+  // The dialog returns the visitor to the workspace page they asked for.
   return (
     <div className="mx-auto max-w-md px-4 py-24 text-center">
       <h1 className="font-display text-3xl font-light tracking-tight text-heading">
@@ -13,17 +14,11 @@ export function SignInGate({ returnTo }: { returnTo: string }) {
         Your AutoFlow AI projects are private to your account.
       </p>
       <div className="mt-8 flex justify-center gap-3">
-        <AuthButton
-          mode="login"
-          returnTo={returnTo}
-          returnLabel={products.autoflow.name}
-          className={buttonVariants()}
-        >
+        <AuthButton mode="login" returnLabel={products.autoflow.name} className={buttonVariants()}>
           Log in
         </AuthButton>
         <AuthButton
           mode="signup"
-          returnTo={returnTo}
           returnLabel={products.autoflow.name}
           className={buttonVariants({ variant: "secondary" })}
         >

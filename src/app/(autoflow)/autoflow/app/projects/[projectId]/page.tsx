@@ -9,18 +9,12 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { getProject, projectStatusLabel, SAMPLE_PROJECT_ID } from "@/lib/autoflow/projects";
 import { stageIndex, stages } from "@/lib/autoflow/stages";
 
-/** Only the labeled sample exists until the database is connected. */
+/** The labeled sample is prerendered; real projects are looked up per request. */
 export function generateStaticParams() {
   return [{ projectId: SAMPLE_PROJECT_ID }];
 }
 
-export async function generateMetadata({
-  params,
-}: PageProps<"/autoflow/app/projects/[projectId]">): Promise<Metadata> {
-  const { projectId } = await params;
-  const project = await getProject(await getCurrentUser(), projectId);
-  return { title: project?.title ?? "Project not found" };
-}
+export const metadata: Metadata = { title: "Project" };
 
 export default async function ProjectPage({
   params,
@@ -67,7 +61,13 @@ export default async function ProjectPage({
           <dt className="font-mono text-[11px] tracking-widest text-muted-foreground uppercase">
             Last updated
           </dt>
-          <dd className="mt-1 text-foreground">{project.updatedAt ?? "Never"}</dd>
+          <dd className="mt-1 text-foreground">
+            {project.updatedAt
+              ? new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone: "UTC" }).format(
+                  new Date(project.updatedAt),
+                )
+              : "Never"}
+          </dd>
         </div>
       </dl>
 
