@@ -54,11 +54,12 @@ Exact steps for items 1 and 2 are in `account-system-final-report.md`.
 
 1. **Email delivery.** Add an SMTP provider in Supabase (Authentication → Emails). Until then
    public sign-up cannot be relied on: the built-in sender is limited to a few messages per hour.
-2. **Site URL and redirect URLs** in Supabase (Authentication → URL Configuration). Site URL is
-   still `http://localhost:3000`; set the real domain and add `<domain>/auth/confirm`.
+2. **Site URL and redirect URLs.** Done: Site URL is `https://aikitfinder.vercel.app`; redirect
+   URLs cover the live domain and localhost.
 3. **Password policy.** Done: the project minimum is now 8, matching the app.
-4. **Hosting environment variables.** `NEXT_PUBLIC_SUPABASE_URL` and
-   `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` must be set where the site is deployed. No secret key.
+4. **Hosting environment variables. Not set on the live site**, so accounts are off there. Add
+   `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in Vercel and redeploy.
+   No secret key.
 5. **Access token.** The Supabase access token saved for this work can be revoked once no further
    database changes are needed from here.
 6. **Backend hosting decision** and **verified company details** for the legal pages.

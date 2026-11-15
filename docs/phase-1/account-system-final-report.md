@@ -8,12 +8,16 @@ work. No secrets appear in this document.
 Sign-up (with confirm password), log-in, log-out, sessions, email-confirmation callback and the
 full password-reset flow are built and pass automated tests against the real Supabase project.
 
-Two things are **not** done and cannot be done from the code:
+Updated 15 Nov 2026 after the production domain was confirmed as
+**`https://aikitfinder.vercel.app`**:
 
-1. **Email delivery.** No SMTP provider is configured, so no confirmation or reset email has been
-   sent or received. Nothing in this report claims email delivery.
-2. **Production configuration and testing.** The live domain is not recorded in the repository
-   and was not supplied, so the Supabase Site URL is unchanged and the live site was not tested.
+1. **Supabase URL settings are applied and verified** (section 6).
+2. **Accounts are switched off on the live site.** The live site runs the current code, but the
+   Vercel project does not have the two Supabase environment variables, so the live dialog shows
+   "Accounts are not open yet" with a disabled form. Nobody can sign up or log in on the live site
+   until they are added and the site is redeployed (section 6a).
+3. **Email delivery is still pending.** No SMTP provider is configured; no email has been sent or
+   received.
 
 ## 1. Audit of what existed
 
@@ -137,25 +141,83 @@ Both rely on the Site URL being the live domain (next section).
 
 ## 6. Production URLs
 
+Production domain: **`https://aikitfinder.vercel.app`** (confirmed by the owner).
 The callback path, from the code: **`/auth/confirm`** (one route for confirmation and reset).
 
-| Setting (Authentication → URL Configuration) | Current                                | Required                                   |
-| -------------------------------------------- | -------------------------------------- | ------------------------------------------ |
-| Site URL                                     | `http://localhost:3000`                | `https://<live domain>`                    |
-| Redirect URLs                                | `http://localhost:3000/auth/confirm**` | add `https://<live domain>/auth/confirm**` |
+Supabase settings, applied through the Management API on 15 Nov 2026 and read back afterwards:
 
-| Flow               | Address the email leads to                                                                  |
-| ------------------ | ------------------------------------------------------------------------------------------- |
-| Email confirmation | `https://<live domain>/auth/confirm?token_hash=…&type=email` → `/account`                   |
-| Password reset     | `https://<live domain>/auth/confirm?token_hash=…&type=recovery` → `/account/reset-password` |
-| Local development  | `http://localhost:3000/auth/confirm…`                                                       |
+| Setting (Authentication → URL Configuration) | Before                                 | Saved value now                                                                         |
+| -------------------------------------------- | -------------------------------------- | --------------------------------------------------------------------------------------- |
+| Site URL                                     | `http://localhost:3000`                | `https://aikitfinder.vercel.app`                                                        |
+| Redirect URLs                                | `http://localhost:3000/auth/confirm**` | `https://aikitfinder.vercel.app/auth/confirm**`, `http://localhost:3000/auth/confirm**` |
 
-The live domain could not be determined: it is not in the repository, and Vercel is not reachable
-from the build environment. Site URL was therefore left unchanged rather than guessed. With the
-domain, both settings can be applied in one step.
+No other redirect URLs existed, so nothing was removed. Other settings were not touched:
+password minimum 8, email confirmation required, sign-ups allowed, SMTP not set.
 
-On Vercel the project needs `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-for Production and Preview. No secret key. Whether they are set there was not verified.
+| Flow               | Address the email leads to                                                  |
+| ------------------ | --------------------------------------------------------------------------- |
+| Email confirmation | `https://aikitfinder.vercel.app/auth/confirm?…` → `/account`                |
+| Password reset     | `https://aikitfinder.vercel.app/auth/confirm?…` → `/account/reset-password` |
+| Local development  | `http://localhost:3000/auth/confirm…`                                       |
+
+### Callback review
+
+`src/app/auth/confirm/route.ts` was re-read and not changed.
+
+| Case                                          | Behavior                                                                                                   |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `?token_hash=…&type=email` or `signup`, valid | Verifies the token, starts the session, goes to `/account?notice=confirmed` (or `next`)                    |
+| `?token_hash=…&type=recovery`, valid          | Verifies the token, starts the session, sets the 15-minute reset cookie, goes to `/account/reset-password` |
+| `?code=…` (default Supabase templates)        | Exchanges the code; `flow=recovery` marks a reset                                                          |
+| Confirmation link invalid, expired or reused  | `/account?notice=link-invalid`                                                                             |
+| Reset link invalid, expired or reused         | `/account/reset-password?link=invalid`                                                                     |
+| Every response                                | `Referrer-Policy: no-referrer`; `next` limited to same-site paths                                          |
+
+## 6a. Live site: read-only checks (15 Nov 2026)
+
+No account was created, no email was triggered, and no form that reaches Supabase was submitted.
+
+**Verified on `https://aikitfinder.vercel.app`**
+
+| Check                                                                                            | Result                                                                                                          |
+| ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| `/`, `/directory`, `/tools`, `/autoflow`, `/autoflow/app`, `/account`, `/account/reset-password` | HTTP 200                                                                                                        |
+| Homepage on desktop (1440) and phone (390)                                                       | Loads, one heading, hero canvas present, no horizontal overflow                                                 |
+| HTTPS                                                                                            | HSTS header present                                                                                             |
+| The live site runs the current branch code                                                       | Yes: the confirm-password field and the reset page are present                                                  |
+| `/auth/session`                                                                                  | `{"user":null}`                                                                                                 |
+| `/auth/confirm` with no token                                                                    | 307 to `/account?notice=link-invalid`, `Referrer-Policy: no-referrer`                                           |
+| `/auth/confirm` with an invalid recovery token                                                   | 307 to `/account/reset-password?link=invalid`                                                                   |
+| `/auth/confirm` with an invalid confirmation token                                               | 307 to `/account?notice=link-invalid`                                                                           |
+| Sign-up dialog                                                                                   | Opens with email, password and confirm password, **all disabled**, with the notice "Accounts are not open yet…" |
+| `/account`                                                                                       | Shows "Accounts are not open yet…"                                                                              |
+| `/autoflow/app`                                                                                  | Shows the read-only layout preview, not the sign-in prompt                                                      |
+
+**Finding: the Supabase environment variables are not set in Vercel.** The three results above
+are exactly what the code does when `NEXT_PUBLIC_SUPABASE_URL` and
+`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` are missing at build time. The callback redirects are also
+the "not configured" path, so they do not yet prove the callback works on the live site.
+
+To switch accounts on (Vercel → Project → Settings → Environment Variables), for Production and
+Preview:
+
+| Name                                   | Value                                                                          |
+| -------------------------------------- | ------------------------------------------------------------------------------ |
+| `NEXT_PUBLIC_SUPABASE_URL`             | `https://lethjnizehfshztmsiah.supabase.co`                                     |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | The key starting `sb_publishable_` from Supabase → Project Settings → API Keys |
+
+Then **redeploy**: these values are built into the site, so adding them does not change the
+running deployment. Do not add a secret or service-role key.
+
+**Cannot be verified on the live site yet**
+
+| Item                                                  | Blocked by                      |
+| ----------------------------------------------------- | ------------------------------- |
+| Sign-up, log-in, log-out, sessions on the live domain | Environment variables in Vercel |
+| Workspace sign-in gate on the live domain             | Environment variables in Vercel |
+| Session cookies on the real domain                    | Environment variables in Vercel |
+| Confirmation email and its link                       | SMTP                            |
+| Reset email and its link                              | SMTP                            |
 
 ## 7. Password reset
 
@@ -237,19 +299,23 @@ each run. Confirmation and reset links come from the admin API, so no email is s
 | Workspace ownership           | Passed                                                                         |
 | Cross-user access             | Passed                                                                         |
 
-**Production (live site):** not tested. No domain, and no production accounts were created.
+**Production (live site):** read-only checks done (section 6a). Routes, callback redirects and the
+account UI were verified; accounts are switched off there, so no sign-in behavior could be tested.
+No production account was created and no email was triggered.
 
 ## 11. Pending manual configuration
 
-1. Configure SMTP (section 5).
-2. Paste the two email templates (section 5).
-3. Set Site URL and add the production redirect URL (section 6).
-4. Confirm the two public environment variables exist in Vercel for Production and Preview.
-5. Raise the email rate limit after SMTP is on.
+1. **Vercel:** add the two public environment variables and redeploy (section 6a). Without this
+   the live site has no accounts.
+2. **SMTP:** configure a provider (section 5).
+3. Paste the two email templates (section 5); possible only after SMTP is on.
+4. Raise the email rate limit after SMTP is on.
+
+Done: Supabase Site URL and redirect URLs; password minimum 8.
 
 ## 12. External dependencies
 
-An SMTP provider and a sending domain with DNS access; the live domain; Vercel project settings.
+An SMTP provider and a sending domain with DNS access; Vercel project settings.
 
 ## 13. Known limitations
 
@@ -259,4 +325,7 @@ An SMTP provider and a sending domain with DNS access; the live domain; Vercel p
 - Changing password or email from the account page, and editing the profile, are not built.
 - No CAPTCHA; Supabase's own rate limits apply.
 - Tested in headless Chromium only.
-- Vercel deployment of this branch was not verified.
+- Accounts are off on the live site until the Vercel variables are set; everything account-related
+  was verified on a local production build only.
+- Vercel build logs and settings are not accessible from here; the deployed commit was inferred
+  from the live pages, not read from Vercel.
