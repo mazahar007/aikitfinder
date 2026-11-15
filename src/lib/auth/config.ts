@@ -23,3 +23,10 @@ export type SessionUser = {
 };
 
 export const PASSWORD_MIN_LENGTH = 8;
+
+/**
+ * Set by the reset-link callback for a few minutes and bound to the user it
+ * was issued for. Required to set a new password. HttpOnly.
+ */
+export const RECOVERY_COOKIE = "akf-recovery";
+export const RECOVERY_WINDOW_SECONDS = 15 * 60;

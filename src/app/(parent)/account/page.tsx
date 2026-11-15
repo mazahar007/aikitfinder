@@ -20,12 +20,48 @@ export const metadata: Metadata = {
 const productHome = { directory: products.directory, autoflow: products.autoflow } as const;
 const workspaceHref = { directory: products.directory.home, autoflow: "/autoflow/app" } as const;
 
-async function AccountDetails() {
+const notices: Record<string, { tone: "success" | "error"; text: string }> = {
+  confirmed: { tone: "success", text: "Your email is confirmed and you are signed in." },
+  "password-updated": {
+    tone: "success",
+    text: "Your password has been updated. Other devices were signed out.",
+  },
+  "link-invalid": {
+    tone: "error",
+    text: "That confirmation link has expired or was already used. Log in, or sign up again to get a new link.",
+  },
+};
+
+function Notice({ code }: { code: string | undefined }) {
+  const notice = code ? notices[code] : undefined;
+  if (!notice) return null;
+  return (
+    <p
+      role={notice.tone === "error" ? "alert" : "status"}
+      className={
+        notice.tone === "error"
+          ? "mb-8 rounded-xl border border-destructive/40 bg-destructive-tint px-4 py-3 text-sm"
+          : "mb-8 rounded-xl border border-success/40 bg-success-tint px-4 py-3 text-sm"
+      }
+    >
+      {notice.text}
+    </p>
+  );
+}
+
+async function AccountDetails({
+  searchParams,
+}: {
+  searchParams: PageProps<"/account">["searchParams"];
+}) {
   const user = await getCurrentUser();
+  const code = (await searchParams).notice;
+  const notice = <Notice code={typeof code === "string" ? code : undefined} />;
 
   if (!user) {
     return (
       <>
+        {notice}
         <h1 className="font-display text-4xl font-light tracking-tight text-heading">
           Your account
         </h1>
@@ -55,6 +91,7 @@ async function AccountDetails() {
 
   return (
     <>
+      {notice}
       <h1 className="font-display text-4xl font-light tracking-tight text-heading">Your account</h1>
       <p className="mt-3 text-muted-foreground">
         One account for the {products.directory.name} and {products.autoflow.name}.
@@ -102,7 +139,7 @@ async function AccountDetails() {
   );
 }
 
-export default function AccountPage() {
+export default function AccountPage({ searchParams }: PageProps<"/account">) {
   return (
     <>
       <ParentHeader />
@@ -115,7 +152,7 @@ export default function AccountPage() {
               </p>
             }
           >
-            <AccountDetails />
+            <AccountDetails searchParams={searchParams} />
           </Suspense>
         </Container>
       </main>

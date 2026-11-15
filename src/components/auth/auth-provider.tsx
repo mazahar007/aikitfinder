@@ -6,7 +6,7 @@ import { AuthDialog } from "@/components/auth/auth-dialog";
 import { logOut } from "@/lib/auth/actions";
 import { authStatus } from "@/lib/auth/config";
 
-export type AuthMode = "signup" | "login";
+export type AuthMode = "signup" | "login" | "forgot";
 
 /** What a header may show about the signed-in visitor. */
 export type AccountSummary = { email: string; displayName: string | null };
