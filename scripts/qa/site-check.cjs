@@ -48,6 +48,7 @@ const ROUTES = [
   ["/terms", "parent"],
   ["/editorial-policy", "parent"],
   ["/account", "parent"],
+  ["/account/reset-password", "parent"],
   ["/directory", "directory"],
   ["/tools", "directory"],
   ["/tools/storyreel", "directory"],
