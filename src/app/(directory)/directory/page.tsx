@@ -36,7 +36,7 @@ import {
 const typingExamples = [
   "make a video from a blog post",
   "remove an image background",
-  "summarise a long PDF",
+  "summarize a long PDF",
   "explain this code",
   "write a cover letter",
 ];
@@ -44,7 +44,7 @@ const typingExamples = [
 const suggestions = [
   "Write a blog post",
   "Make a video from text",
-  "Summarise a document",
+  "Summarize a document",
   "Fix my code",
 ];
 
@@ -122,7 +122,7 @@ export default async function DirectoryHomePage() {
               <li key={q} className="enter-fade" style={enterDelay(6 + i)}>
                 <Link
                   href={`/search?q=${encodeURIComponent(q)}`}
-                  className="inline-flex min-h-9 items-center rounded-full border bg-card/80 px-3.5 text-sm text-foreground backdrop-blur transition-[color,background-color,border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-primary hover:bg-primary-tint hover:text-primary-hover"
+                  className="inline-flex min-h-9 items-center rounded-full border bg-card/80 px-3.5 text-sm text-foreground backdrop-blur transition-[color,background-color,border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-primary hover:bg-primary-tint hover:text-primary-hover pointer-coarse:min-h-11"
                 >
                   {q}
                 </Link>

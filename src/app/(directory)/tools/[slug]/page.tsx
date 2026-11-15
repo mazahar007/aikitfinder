@@ -165,7 +165,11 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
             </p>
             <div className="mt-3 flex flex-wrap gap-1.5">
               {tool.categorySlugs.map((c) => (
-                <Link key={c} href={`/categories/${c}`}>
+                <Link
+                  key={c}
+                  href={`/categories/${c}`}
+                  className="inline-flex items-center pointer-coarse:min-h-11"
+                >
                   <Badge variant="info" className="hover:underline">
                     {categoryName(c)}
                   </Badge>

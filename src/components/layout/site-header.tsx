@@ -29,8 +29,16 @@ export function SiteHeader() {
           </Suspense>
         </nav>
         <div className="ml-auto flex items-center gap-1">
-          <SearchForm shortcut className="hidden w-56 md:block lg:w-44 xl:w-56 2xl:w-72" />
-          <Button asChild variant="ghost" size="icon" className="text-foreground md:hidden">
+          <SearchForm
+            shortcut
+            className="hidden w-56 md:block lg:hidden xl:block xl:w-44 2xl:w-72"
+          />
+          <Button
+            asChild
+            variant="ghost"
+            size="icon"
+            className="text-foreground md:hidden lg:inline-flex xl:hidden"
+          >
             <Link href="/search">
               <SearchIcon className="size-5!" aria-hidden="true" />
               <span className="sr-only">Search</span>

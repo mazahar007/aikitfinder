@@ -50,7 +50,7 @@ export function ActiveFilters({ query, categories }: { query: ToolQuery; categor
           key={chip.href + chip.label}
           href={chip.href}
           scroll={false}
-          className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-primary-tint px-3 text-sm font-medium text-primary-hover hover:bg-primary hover:text-primary-foreground"
+          className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-primary-tint px-3 text-sm font-medium text-primary-hover hover:bg-primary hover:text-primary-foreground pointer-coarse:min-h-11"
         >
           {chip.label}
           <XIcon className="size-3.5" aria-hidden="true" />
@@ -60,7 +60,7 @@ export function ActiveFilters({ query, categories }: { query: ToolQuery; categor
       <Link
         href={query.sort !== "featured" ? `/tools?sort=${query.sort}` : "/tools"}
         scroll={false}
-        className="inline-flex min-h-9 items-center px-2 text-sm font-semibold text-primary hover:underline"
+        className="inline-flex min-h-9 items-center px-2 text-sm font-semibold text-primary hover:underline pointer-coarse:min-h-11"
       >
         Clear all
       </Link>

@@ -16,7 +16,8 @@ const buttonVariants = cva(
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
       },
       size: {
-        sm: "h-9 px-3 text-sm",
+        // 36px with a mouse, 44px on touch screens.
+        sm: "h-9 px-3 text-sm pointer-coarse:h-11",
         md: "h-11 px-4 text-sm",
         lg: "h-12 px-6 text-base",
         icon: "size-11",

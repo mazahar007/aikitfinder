@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
-const suggestions = ["make a video", "summarise", "code", "thumbnail", "automation"];
+const suggestions = ["make a video", "summarize", "code", "thumbnail", "automation"];
 
 function ResultItem({ result }: { result: SearchResult }) {
   return (
@@ -87,7 +87,7 @@ async function SearchResults({
               <Link
                 key={s}
                 href={`/search?q=${encodeURIComponent(s)}`}
-                className="inline-flex min-h-9 items-center rounded-full border bg-card px-3.5 text-sm hover:border-primary hover:bg-primary-tint hover:text-primary-hover"
+                className="inline-flex min-h-9 items-center rounded-full border bg-card px-3.5 text-sm hover:border-primary hover:bg-primary-tint hover:text-primary-hover pointer-coarse:min-h-11"
               >
                 {s}
               </Link>
@@ -127,7 +127,7 @@ async function SearchResults({
                   scroll={false}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium",
+                    "inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium pointer-coarse:min-h-11",
                     active
                       ? "border-primary bg-primary text-primary-foreground"
                       : "bg-card text-foreground hover:border-primary hover:bg-primary-tint",

@@ -14,7 +14,7 @@ export function isActivePath(pathname: string | null, href: string) {
 /** Desktop links. Pass `pathname={null}` to render without an active state. */
 export function NavLinks({ pathname }: { pathname: string | null }) {
   return (
-    <ul className="flex items-center gap-1">
+    <ul className="flex items-center gap-1 whitespace-nowrap">
       {mainNav.map((item) => {
         const active = isActivePath(pathname, item.href);
         return (

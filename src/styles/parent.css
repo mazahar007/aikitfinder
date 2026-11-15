@@ -213,6 +213,12 @@
     font-size: 15px;
     border-radius: 999px;
   }
+  /* Touch screens: every control is at least 44px tall. */
+  @media (pointer: coarse) {
+    .btn-sm {
+      min-height: 44px;
+    }
+  }
   .pill {
     display: inline-flex;
     align-items: center;
@@ -1637,6 +1643,11 @@
     min-height: 36px;
     color: #cfcce6;
     gap: 8px;
+  }
+  @media (pointer: coarse) {
+    .foot ul a {
+      min-height: 44px;
+    }
   }
   .foot ul a:hover {
     color: #fff;

@@ -16,7 +16,7 @@ export function AutoflowLogo({
     <Link
       href={href}
       aria-label="AutoFlow AI home"
-      className={cn("inline-flex items-center gap-2 rounded-md", className)}
+      className={cn("inline-flex min-h-11 items-center gap-2 rounded-md", className)}
     >
       <LogoMark />
       <span className="font-display text-lg font-medium tracking-tight text-heading">

@@ -21,7 +21,7 @@ export function SiteFooter() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="inline-flex min-h-9 items-center rounded-sm hover:text-white hover:underline focus-visible:outline-white"
+                    className="inline-flex min-h-9 items-center rounded-sm hover:text-white hover:underline focus-visible:outline-white pointer-coarse:min-h-11"
                   >
                     {item.title}
                   </Link>

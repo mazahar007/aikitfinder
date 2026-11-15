@@ -55,7 +55,7 @@ export function Logo({
       href={href}
       aria-label={descriptor ? `${siteConfig.name} ${descriptor} home` : `${siteConfig.name} home`}
       className={cn(
-        "inline-flex items-center gap-2 rounded-md font-extrabold tracking-tight",
+        "inline-flex min-h-11 items-center gap-2 rounded-md font-extrabold tracking-tight",
         className,
       )}
     >
