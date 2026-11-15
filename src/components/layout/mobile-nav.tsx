@@ -2,6 +2,8 @@
 
 import * as React from "react";
 import Link from "next/link";
+
+import { useAccount, useAuthDialog } from "@/components/auth/auth-provider";
 import { usePathname } from "next/navigation";
 import { MenuIcon } from "lucide-react";
 
@@ -21,6 +23,8 @@ import { cn } from "@/lib/utils";
 export function MobileNav() {
   const [open, setOpen] = React.useState(false);
   const pathname = usePathname();
+  const openAuth = useAuthDialog();
+  const { account, signOut, signingOut } = useAccount();
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -62,6 +66,40 @@ export function MobileNav() {
             })}
           </ul>
         </nav>
+        <div className="grid grid-cols-2 gap-2 border-t pt-4">
+          {account ? (
+            <>
+              <Button asChild>
+                <Link href="/account" onClick={() => setOpen(false)}>
+                  Account
+                </Link>
+              </Button>
+              <Button variant="secondary" onClick={signOut} disabled={signingOut}>
+                {signingOut ? "Logging out…" : "Log out"}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                onClick={() => {
+                  setOpen(false);
+                  openAuth("signup");
+                }}
+              >
+                Sign up
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setOpen(false);
+                  openAuth("login");
+                }}
+              >
+                Log in
+              </Button>
+            </>
+          )}
+        </div>
         <ul className="mt-auto flex flex-wrap gap-x-4 gap-y-2 border-t pt-4 text-sm">
           {footerNav
             .flatMap((group) => group.items)

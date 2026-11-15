@@ -4,7 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import * as Dialog from "@radix-ui/react-dialog";
 
-import { useAuthDialog } from "@/components/auth/auth-provider";
+import { useAccount, useAuthDialog } from "@/components/auth/auth-provider";
 import { ParentLogo } from "@/components/parent/logo";
 import { useThemeToggle } from "@/components/theme/theme-toggle";
 import { products } from "@/config/products";
@@ -18,6 +18,7 @@ import { products } from "@/config/products";
 export function ParentMobileMenu() {
   const [open, setOpen] = React.useState(false);
   const openAuth = useAuthDialog();
+  const { account, signOut, signingOut } = useAccount();
   const toggleTheme = useThemeToggle();
   const close = () => setOpen(false);
 
@@ -105,28 +106,44 @@ export function ParentMobileMenu() {
               </button>
             </div>
 
-            <div className="acts">
-              <button
-                type="button"
-                className="btn btn-af"
-                onClick={() => {
-                  close();
-                  openAuth("signup");
-                }}
-              >
-                Sign up
-              </button>
-              <button
-                type="button"
-                className="btn btn-ghost"
-                onClick={() => {
-                  close();
-                  openAuth("login");
-                }}
-              >
-                Log in
-              </button>
-            </div>
+            {account ? (
+              <div className="acts">
+                <Link className="btn btn-af" href="/account" onClick={close}>
+                  Account
+                </Link>
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={signOut}
+                  disabled={signingOut}
+                >
+                  {signingOut ? "Logging out…" : "Log out"}
+                </button>
+              </div>
+            ) : (
+              <div className="acts">
+                <button
+                  type="button"
+                  className="btn btn-af"
+                  onClick={() => {
+                    close();
+                    openAuth("signup");
+                  }}
+                >
+                  Sign up
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={() => {
+                    close();
+                    openAuth("login");
+                  }}
+                >
+                  Log in
+                </button>
+              </div>
+            )}
           </Dialog.Content>
         </div>
       </Dialog.Portal>

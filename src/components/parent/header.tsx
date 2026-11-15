@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { AuthButton } from "@/components/auth/auth-provider";
+import { AccountControls } from "@/components/auth/account-controls";
 import { ParentLogo } from "@/components/parent/logo";
 import { ParentMobileMenu } from "@/components/parent/mobile-menu";
 import { MotionToggle } from "@/components/parent/motion-toggle";
@@ -35,12 +35,10 @@ export function ParentHeader({ withMotionToggle = false }: { withMotionToggle?: 
         <div className="right">
           {withMotionToggle ? <MotionToggle className="in-header" /> : null}
           <ParentThemeButton />
-          <AuthButton mode="login" className="btn btn-ghost btn-sm hide-t">
-            Log in
-          </AuthButton>
-          <AuthButton mode="signup" className="btn btn-af btn-sm">
-            Sign up
-          </AuthButton>
+          <AccountControls
+            loginClassName="btn btn-ghost btn-sm hide-t"
+            signupClassName="btn btn-af btn-sm"
+          />
           <ParentMobileMenu />
         </div>
       </div>

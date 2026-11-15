@@ -1,12 +1,13 @@
 import Link from "next/link";
 
 import { Container } from "@/components/layout/container";
+import { authStatus } from "@/lib/auth/config";
 import { products } from "@/config/products";
 
 const links = [
   { href: "/", label: "AIKitFinder home" },
   { href: products.directory.home, label: products.directory.name },
-  { href: "/autoflow/app", label: "Workspace preview" },
+  { href: "/autoflow/app", label: authStatus.enabled ? "Workspace" : "Workspace preview" },
   { href: "/privacy", label: "Privacy" },
   { href: "/terms", label: "Terms" },
 ];

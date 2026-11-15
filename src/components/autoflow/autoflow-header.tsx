@@ -1,10 +1,11 @@
 import Link from "next/link";
 
-import { AuthButton } from "@/components/auth/auth-provider";
+import { AccountControls } from "@/components/auth/account-controls";
 import { AutoflowLogo } from "@/components/autoflow/autoflow-logo";
 import { Container } from "@/components/layout/container";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { buttonVariants } from "@/components/ui/button";
+import { authStatus } from "@/lib/auth/config";
 import { products } from "@/config/products";
 
 const linkClass =
@@ -21,20 +22,19 @@ export function AutoflowHeader() {
             Pipeline
           </Link>
           <Link href="/autoflow/app" className={linkClass}>
-            Workspace preview
+            {authStatus.enabled ? "Workspace" : "Workspace preview"}
           </Link>
           <Link href="/#products" className={linkClass}>
             All products
           </Link>
           <ThemeToggle />
-          <AuthButton
-            mode="signup"
+          <AccountControls
+            showLogin={false}
+            showLogout={false}
             returnTo="/autoflow/app"
             returnLabel={products.autoflow.name}
-            className={buttonVariants({ size: "sm" })}
-          >
-            Sign up
-          </AuthButton>
+            signupClassName={buttonVariants({ size: "sm" })}
+          />
         </nav>
       </Container>
     </header>

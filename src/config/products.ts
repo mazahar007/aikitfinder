@@ -43,7 +43,14 @@ export const products = {
 } as const;
 
 /** Top-level paths that belong to the parent site. Everything else that is not AutoFlow is Directory. */
-export const parentPaths = ["about", "contact", "privacy", "terms", "editorial-policy"] as const;
+export const parentPaths = [
+  "about",
+  "contact",
+  "privacy",
+  "terms",
+  "editorial-policy",
+  "account",
+] as const;
 
 export function productForPath(pathname: string): ProductId {
   if (

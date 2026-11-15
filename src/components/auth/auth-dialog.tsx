@@ -2,11 +2,12 @@
 
 import * as React from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { InfoIcon, XIcon } from "lucide-react";
+import { CircleAlertIcon, CircleCheckIcon, InfoIcon, XIcon } from "lucide-react";
 
 import type { AuthMode } from "@/components/auth/auth-provider";
 import { siteConfig } from "@/config/site";
-import { authStatus } from "@/lib/auth/config";
+import { logIn, signUp, type AuthFormState } from "@/lib/auth/actions";
+import { authStatus, PASSWORD_MIN_LENGTH } from "@/lib/auth/config";
 import { cn } from "@/lib/utils";
 
 const copy = {
@@ -20,18 +21,21 @@ const copy = {
  * its colors from the current product's tokens, so the same dialog fits the
  * parent site, the Directory and AutoFlow. On phones it is a bottom sheet.
  *
- * Accounts are not connected in Phase 1 (see src/lib/auth/config.ts), so the
- * form is shown disabled with a plain explanation. Nothing typed is sent.
+ * The form posts to a Server Action; the password never touches client-side
+ * state. If accounts are not configured (see src/lib/auth/config.ts) the form
+ * is shown disabled with a plain explanation and nothing typed is sent.
  */
 export function AuthDialog({
   open,
   mode,
+  returnTo,
   returnLabel,
   onModeChange,
   onOpenChange,
 }: {
   open: boolean;
   mode: AuthMode;
+  returnTo?: string;
   returnLabel?: string;
   onModeChange: (mode: AuthMode) => void;
   onOpenChange: (open: boolean) => void;
@@ -39,6 +43,25 @@ export function AuthDialog({
   const id = React.useId();
   const disabled = !authStatus.enabled;
   const text = copy[mode];
+
+  // One action state per mode, so an error from "Log in" is not shown under "Sign up".
+  const [signupState, signupAction, signupPending] = React.useActionState<AuthFormState, FormData>(
+    signUp,
+    {},
+  );
+  const [loginState, loginAction, loginPending] = React.useActionState<AuthFormState, FormData>(
+    logIn,
+    {},
+  );
+  const state = mode === "signup" ? signupState : loginState;
+  const pending = signupPending || loginPending;
+
+  // Signed in: load the destination fresh so every header and page reflects it.
+  const redirectTo = state.redirectTo;
+  React.useEffect(() => {
+    if (redirectTo) window.location.assign(redirectTo);
+  }, [redirectTo]);
+  const leaving = Boolean(redirectTo);
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -108,20 +131,50 @@ export function AuthDialog({
             </p>
           ) : null}
 
+          {state.error ? (
+            <p
+              role="alert"
+              className="mt-5 flex items-start gap-2 rounded-xl border border-destructive/40 bg-destructive-tint px-4 py-3 text-sm"
+            >
+              <CircleAlertIcon
+                className="mt-0.5 size-4 shrink-0 text-destructive"
+                aria-hidden="true"
+              />
+              <span>{state.error}</span>
+            </p>
+          ) : null}
+          {state.notice ? (
+            <p
+              role="status"
+              className="mt-5 flex items-start gap-2 rounded-xl border border-success/40 bg-success-tint px-4 py-3 text-sm"
+            >
+              <CircleCheckIcon className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
+              <span>{state.notice}</span>
+            </p>
+          ) : null}
+
           <form
+            key={mode}
             className="mt-5 space-y-4"
-            onSubmit={(event) => event.preventDefault()}
+            action={disabled ? undefined : mode === "signup" ? signupAction : loginAction}
+            onSubmit={disabled ? (event) => event.preventDefault() : undefined}
             aria-label={text.submit}
+            aria-busy={pending || leaving}
           >
+            <input type="hidden" name="returnTo" value={returnTo ?? "/"} />
             <div>
               <label htmlFor={`${id}-email`} className="mb-2 block text-sm font-medium">
                 Email
               </label>
               <input
                 id={`${id}-email`}
+                name="email"
+                required
+                maxLength={254}
                 type="email"
                 inputMode="email"
                 autoComplete="email"
+                defaultValue={state.email}
                 placeholder="you@example.com"
                 disabled={disabled}
                 className="h-13 w-full rounded-xl border border-input bg-background px-4 text-base placeholder:text-muted-foreground disabled:opacity-60"
@@ -133,18 +186,34 @@ export function AuthDialog({
               </label>
               <input
                 id={`${id}-password`}
+                name="password"
+                required
+                minLength={mode === "signup" ? PASSWORD_MIN_LENGTH : undefined}
+                maxLength={72}
+                aria-describedby={mode === "signup" ? `${id}-pw-hint` : undefined}
                 type="password"
                 autoComplete={mode === "signup" ? "new-password" : "current-password"}
                 disabled={disabled}
                 className="h-13 w-full rounded-xl border border-input bg-background px-4 text-base disabled:opacity-60"
               />
+              {mode === "signup" ? (
+                <p id={`${id}-pw-hint`} className="mt-2 text-sm text-muted-foreground">
+                  At least {PASSWORD_MIN_LENGTH} characters.
+                </p>
+              ) : null}
             </div>
             <button
               type="submit"
-              disabled={disabled}
+              disabled={disabled || pending || leaving}
               className="h-13 w-full rounded-xl bg-primary text-base font-semibold text-primary-foreground hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {text.submit}
+              {leaving
+                ? "Signed in. One moment…"
+                : pending
+                  ? mode === "signup"
+                    ? "Creating account…"
+                    : "Logging in…"
+                  : text.submit}
             </button>
           </form>
 

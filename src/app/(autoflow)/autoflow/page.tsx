@@ -8,6 +8,7 @@ import { StageRail } from "@/components/autoflow/stage-rail";
 import { Container } from "@/components/layout/container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { authStatus } from "@/lib/auth/config";
 import { products } from "@/config/products";
 
 export const metadata: Metadata = {
@@ -60,7 +61,7 @@ export default function AutoflowLandingPage() {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg">
                 <Link href="/autoflow/app">
-                  See the workspace preview
+                  {authStatus.enabled ? "Open the workspace" : "See the workspace preview"}
                   <ArrowRightIcon aria-hidden="true" />
                 </Link>
               </Button>
@@ -69,7 +70,9 @@ export default function AutoflowLandingPage() {
               </Button>
             </div>
             <p className="mt-4 text-sm text-muted-foreground">
-              The preview shows the layout only. Nothing is generated and nothing is saved.
+              {authStatus.enabled
+                ? "The workspace needs an account. It shows your projects; no stage can be run yet."
+                : "The preview shows the layout only. Nothing is generated and nothing is saved."}
             </p>
           </Container>
         </section>
