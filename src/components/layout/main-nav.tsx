@@ -23,9 +23,9 @@ export function NavLinks({ pathname }: { pathname: string | null }) {
               href={item.href}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "relative inline-flex h-11 items-center rounded-md px-3 text-sm font-medium transition-colors",
+                "relative inline-flex h-11 items-center rounded-md px-2 text-sm font-medium transition-colors 2xl:px-3",
                 active
-                  ? "text-foreground after:absolute after:inset-x-3 after:bottom-1 after:h-0.5 after:rounded-full after:bg-primary"
+                  ? "text-foreground after:absolute after:inset-x-2 after:bottom-1 after:h-0.5 after:rounded-full after:bg-primary 2xl:after:inset-x-3"
                   : "text-muted-foreground hover:bg-surface-subtle hover:text-foreground",
               )}
             >
