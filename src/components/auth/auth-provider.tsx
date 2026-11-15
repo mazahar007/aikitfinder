@@ -11,7 +11,13 @@ export type AuthMode = "signup" | "login" | "forgot";
 /** What a header may show about the signed-in visitor. */
 export type AccountSummary = { email: string; displayName: string | null };
 
-type OpenAuth = (mode?: AuthMode, options?: { returnTo?: string; returnLabel?: string }) => void;
+/** Replaces the dialog's heading and adds context, e.g. why an account is being asked for. */
+export type AuthPrompt = { title: string; description: string; note?: string };
+
+type OpenAuth = (
+  mode?: AuthMode,
+  options?: { returnTo?: string; returnLabel?: string; prompt?: AuthPrompt },
+) => void;
 
 type AuthContextValue = {
   openAuth: OpenAuth;
@@ -52,6 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     mode: AuthMode;
     returnTo?: string;
     returnLabel?: string;
+    prompt?: AuthPrompt;
   }>({ open: false, mode: "signup" });
   const [account, setAccount] = React.useState<AccountSummary | null | undefined>(
     authStatus.enabled ? undefined : null,
@@ -77,6 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Come back to the page the visitor is on unless a destination was given.
       returnTo: options?.returnTo ?? window.location.pathname + window.location.search,
       returnLabel: options?.returnLabel,
+      prompt: options?.prompt,
     });
   }, []);
 
@@ -101,6 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         mode={state.mode}
         returnTo={state.returnTo}
         returnLabel={state.returnLabel}
+        prompt={state.prompt}
         onModeChange={(mode) => setState((s) => ({ ...s, mode }))}
         onOpenChange={(open) => setState((s) => ({ ...s, open }))}
       />

@@ -2,9 +2,12 @@
 
 import * as React from "react";
 import Form from "next/form";
+import { useRouter } from "next/navigation";
 import { SearchIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { searchHref } from "@/lib/guest-search/client";
+import { SEARCH_QUERY_MAX_LENGTH } from "@/lib/guest-search/config";
 import { cn } from "@/lib/utils";
 
 type SearchFormProps = {
@@ -83,6 +86,8 @@ export function SearchForm({
   typingExamples,
 }: SearchFormProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const router = useRouter();
+  const [pending, startTransition] = React.useTransition();
   useTypingPlaceholder(inputRef, variant === "hero" ? typingExamples : undefined);
 
   React.useEffect(() => {
@@ -104,7 +109,21 @@ export function SearchForm({
   const hero = variant === "hero";
 
   return (
-    <Form action="/search" role="search" className={cn("w-full", className)}>
+    <Form
+      action="/search"
+      role="search"
+      className={cn("w-full", className)}
+      aria-busy={pending}
+      onSubmit={(event) => {
+        // One submission is one search: give it a request ID and go to the
+        // results. An empty field does nothing, and a second submit while the
+        // first is still loading is ignored.
+        event.preventDefault();
+        if (pending) return;
+        const href = searchHref(inputRef.current?.value ?? "");
+        if (href) startTransition(() => router.push(href));
+      }}
+    >
       <label htmlFor={id} className="sr-only">
         Search AI tools, guides and workflows
       </label>
@@ -131,6 +150,7 @@ export function SearchForm({
           name="q"
           type="search"
           defaultValue={defaultValue}
+          maxLength={SEARCH_QUERY_MAX_LENGTH}
           autoComplete="off"
           enterKeyHint="search"
           placeholder={hero ? STATIC_HERO_PLACEHOLDER : "Search tools and guides"}
@@ -140,7 +160,7 @@ export function SearchForm({
           )}
         />
         {hero ? (
-          <Button type="submit" size="lg" className="px-4 sm:px-6">
+          <Button type="submit" size="lg" className="px-4 sm:px-6" disabled={pending}>
             <SearchIcon className="sm:hidden" aria-hidden="true" />
             <span className="sr-only sm:not-sr-only">Search</span>
           </Button>

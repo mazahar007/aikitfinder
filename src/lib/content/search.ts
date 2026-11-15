@@ -11,31 +11,13 @@ import {
   type MatchMode,
   type WeightedField,
 } from "@/lib/content/text-match";
-import type { SkillLevel } from "@/lib/content/types";
+import {
+  searchGroupOrder,
+  type SearchResult,
+  type SearchResultType,
+} from "@/lib/content/search-types";
 
-export type SearchResultType =
-  "tool" | "guide" | "workflow" | "prompt" | "setting" | "troubleshooting";
-
-export type SearchResult = {
-  type: SearchResultType;
-  title: string;
-  description: string;
-  href: string;
-  /** Extra context, e.g. which tool a setting belongs to. */
-  context?: string;
-  skillLevel?: SkillLevel;
-  isSample: boolean;
-  score: number;
-};
-
-export const searchGroupOrder: { type: SearchResultType; label: string }[] = [
-  { type: "tool", label: "Tools" },
-  { type: "guide", label: "Guides" },
-  { type: "workflow", label: "Workflows" },
-  { type: "prompt", label: "Prompts" },
-  { type: "setting", label: "Settings explained" },
-  { type: "troubleshooting", label: "Troubleshooting" },
-];
+export { searchGroupOrder, type SearchResult, type SearchResultType };
 
 /** Searches every public content type. Results are sorted best-first within each type. */
 export async function searchContent(query: string): Promise<SearchResult[]> {

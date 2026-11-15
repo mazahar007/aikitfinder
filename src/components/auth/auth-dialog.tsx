@@ -4,7 +4,7 @@ import * as React from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { InfoIcon, LoaderCircleIcon, XIcon } from "lucide-react";
 
-import type { AuthMode } from "@/components/auth/auth-provider";
+import type { AuthMode, AuthPrompt } from "@/components/auth/auth-provider";
 import { FormMessage, PasswordField } from "@/components/auth/password-field";
 import { siteConfig } from "@/config/site";
 import { logIn, requestPasswordReset, signUp, type AuthFormState } from "@/lib/auth/actions";
@@ -48,6 +48,7 @@ export function AuthDialog({
   mode,
   returnTo,
   returnLabel,
+  prompt,
   onModeChange,
   onOpenChange,
 }: {
@@ -55,6 +56,8 @@ export function AuthDialog({
   mode: AuthMode;
   returnTo?: string;
   returnLabel?: string;
+  /** Why the dialog was opened, when it was not the visitor's own choice. */
+  prompt?: AuthPrompt;
   onModeChange: (mode: AuthMode) => void;
   onOpenChange: (open: boolean) => void;
 }) {
@@ -115,13 +118,13 @@ export function AuthDialog({
           </Dialog.Close>
 
           <Dialog.Title className="pr-12 font-display text-[1.75rem] leading-tight font-normal tracking-tight text-heading">
-            {text.title}
+            {prompt && mode !== "forgot" ? prompt.title : text.title}
           </Dialog.Title>
           <Dialog.Description id={`${id}-desc`} className="mt-2 text-muted-foreground">
-            {text.description}
+            {prompt && mode !== "forgot" ? prompt.description : text.description}
           </Dialog.Description>
 
-          {mode === "forgot" ? null : (
+          {mode === "forgot" || prompt ? null : (
             <div
               role="tablist"
               aria-label="Account"
@@ -233,8 +236,26 @@ export function AuthDialog({
               {busy ? (
                 <LoaderCircleIcon className="size-5 animate-spin" aria-hidden="true" />
               ) : null}
-              {leaving ? "Signed in. One moment…" : pending ? text.pending : text.submit}
+              {leaving
+                ? "Signed in. One moment…"
+                : pending
+                  ? text.pending
+                  : prompt && mode === "signup"
+                    ? "Create Free Account"
+                    : text.submit}
             </button>
+
+            {prompt && mode !== "forgot" ? (
+              <button
+                type="button"
+                onClick={() => onModeChange(mode === "signup" ? "login" : "signup")}
+                className="inline-flex h-11 w-full items-center justify-center rounded-xl text-sm font-medium text-primary hover:underline"
+              >
+                {mode === "signup"
+                  ? "Already have an account? Sign in"
+                  : "New here? Create a free account"}
+              </button>
+            ) : null}
 
             {mode === "forgot" ? (
               <button
@@ -246,6 +267,10 @@ export function AuthDialog({
               </button>
             ) : null}
           </form>
+
+          {prompt?.note && mode !== "forgot" ? (
+            <p className="mt-4 text-sm text-muted-foreground">{prompt.note}</p>
+          ) : null}
 
           {returnLabel && mode !== "forgot" ? (
             <p className="mt-4 text-sm text-muted-foreground">

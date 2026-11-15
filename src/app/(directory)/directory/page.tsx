@@ -13,7 +13,9 @@ import {
 import { Story } from "@/components/home/story";
 import { ScrollScenes } from "@/components/motion/scroll-scenes";
 import { Container } from "@/components/layout/container";
+import { GuestSearchCounter } from "@/components/search/guest-search-counter";
 import { SearchForm } from "@/components/search/search-form";
+import { SearchLink } from "@/components/search/search-link";
 import { Badge } from "@/components/ui/badge";
 import { products } from "@/config/products";
 import { directoryDescription, siteConfig } from "@/config/site";
@@ -116,16 +118,17 @@ export default async function DirectoryHomePage() {
           </p>
           <div className="enter mx-auto mt-8 max-w-2xl" style={enterDelay(5)}>
             <SearchForm variant="hero" id="hero-search" typingExamples={typingExamples} />
+            <GuestSearchCounter className="mt-3 justify-center" />
           </div>
           <ul className="mt-4 flex flex-wrap justify-center gap-2" aria-label="Example searches">
             {suggestions.map((q, i) => (
               <li key={q} className="enter-fade" style={enterDelay(6 + i)}>
-                <Link
-                  href={`/search?q=${encodeURIComponent(q)}`}
+                <SearchLink
+                  query={q}
                   className="inline-flex min-h-9 items-center rounded-full border bg-card/80 px-3.5 text-sm text-foreground backdrop-blur transition-[color,background-color,border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-primary hover:bg-primary-tint hover:text-primary-hover pointer-coarse:min-h-11"
                 >
                   {q}
-                </Link>
+                </SearchLink>
               </li>
             ))}
           </ul>
