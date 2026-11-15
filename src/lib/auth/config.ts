@@ -1,25 +1,25 @@
+import { supabaseConfigured } from "@/lib/supabase/env";
+
 /**
  * Account system status.
  *
  * AIKitFinder uses one shared account for the AI Tools Directory and AutoFlow
- * AI (Supabase Auth, see docs/phase-1/architecture.md). In Phase 1 the schema
- * and this abstraction exist, but no Supabase project has been connected, so
- * sign-up and log-in are switched off. Nothing in the app pretends otherwise:
- * there is no placeholder login and no hard-coded user.
- *
- * To switch accounts on in a later phase: connect the project, implement
- * `getCurrentUser` and the two form actions against Supabase Auth, then set
- * `enabled` from the environment.
+ * AI, on Supabase Auth. Accounts are on when the Supabase project is
+ * configured (see .env.example). On a machine or build without it they are
+ * off, and the app says so: there is no placeholder login and no hard-coded
+ * user.
  */
 export const authStatus = {
-  enabled: false,
+  enabled: supabaseConfigured,
   reason:
     "Accounts are not open yet. Sign-up and log-in will be switched on once the account system is connected.",
 } as const;
 
-/** The signed-in user as the rest of the app sees it. */
+/** The signed-in user as the rest of the app sees it. Deliberately narrow. */
 export type SessionUser = {
   id: string;
   email: string;
   displayName: string | null;
 };
+
+export const PASSWORD_MIN_LENGTH = 8;

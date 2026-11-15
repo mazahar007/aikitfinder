@@ -1,21 +1,38 @@
+import "server-only";
+
+import { cache } from "react";
+
 import { authStatus, type SessionUser } from "@/lib/auth/config";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 /**
  * The current signed-in user, or null.
  *
  * Every protected area asks this one function, so access rules live in one
- * place. Until accounts are connected it always resolves to null; it never
- * returns a made-up user. Protected data must additionally be guarded by row
- * level security in the database (supabase/migrations/0006).
+ * place. The session token's signature is verified (not just read) before the
+ * user is trusted. Data is additionally guarded by row level security in the
+ * database, so a mistake here cannot expose another user's rows.
+ *
+ * Reads the request's cookies, so callers must sit inside a <Suspense>
+ * boundary. Cached for the duration of one request.
  */
-export async function getCurrentUser(): Promise<SessionUser | null> {
+export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
   if (!authStatus.enabled) return null;
-  return null;
-}
 
-/** Only same-site paths may be used as a return destination after sign-in (prevents open redirects). */
-export function safeReturnPath(value: string | null | undefined, fallback = "/"): string {
-  if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\"))
-    return fallback;
-  return value;
-}
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.auth.getClaims();
+  const claims = data?.claims;
+  if (error || !claims?.sub || claims.is_anonymous) return null;
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("display_name")
+    .eq("id", claims.sub)
+    .maybeSingle();
+
+  return {
+    id: claims.sub,
+    email: typeof claims.email === "string" ? claims.email : "",
+    displayName: profile?.display_name ?? null,
+  };
+});
