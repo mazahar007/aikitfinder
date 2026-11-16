@@ -46,4 +46,5 @@ done
 $PSQL -d postgres -f "$ROOT/scripts/qa/accounts-rls-test.sql"
 $PSQL -d postgres -f "$ROOT/scripts/qa/guest-search-test.sql"
 $PSQL -d postgres -f "$ROOT/scripts/qa/admin-rbac-test.sql"
+$PSQL -d postgres -f "$ROOT/scripts/qa/catalog-admin-test.sql"
 echo "ALL MIGRATION CHECKS PASSED"

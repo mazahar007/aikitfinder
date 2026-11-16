@@ -2,7 +2,7 @@
 # Proves the recovery path on a throwaway local PostgreSQL:
 #   1. a logical snapshot restores into a database built from the migrations,
 #      with the same row fingerprints as the source;
-#   2. migrations 0008-0010 apply on top of that data without changing it;
+#   2. migrations 0008-0011 apply on top of that data without changing it;
 #   3. the rollback scripts return the database to its exact earlier shape.
 #
 #   scripts/qa/verify-recovery.sh <snapshot.json>
@@ -57,12 +57,12 @@ echo "1. PASS  snapshot restores with identical profile and workspace rows"
 echo "   shape before: $BASE"
 
 # 2. Apply 0008-0010 on top of the restored data.
-for v in 0008 0009 0010; do
+for v in 0008 0009 0010 0011; do
   $PSQL -f "$ROOT"/supabase/migrations/${v}_*.sql >/dev/null
   $PSQL -c "insert into supabase_migrations.schema_migrations (version) values ('$v')"
 done
 [ "$(fp)" = "$WANT" ] || { echo "DATA CHANGED BY MIGRATIONS"; exit 1; }
-echo "2. PASS  migrations 0008-0010 apply; existing rows are byte-for-byte unchanged"
+echo "2. PASS  migrations 0008-0011 apply; existing rows are byte-for-byte unchanged"
 echo "   shape after : $(shape)"
 OWNER="$($PSQL -c "select id from auth.users limit 1")"
 $PSQL -c "select bootstrap_first_super_admin('$OWNER')" >/dev/null
@@ -70,7 +70,7 @@ $PSQL -c "select bootstrap_first_super_admin('$OWNER')" >/dev/null
 echo "   PASS  owner bootstrap adds a role without changing the profile or workspaces"
 
 # 3. Roll back in reverse order.
-for v in 0010 0009 0008; do $PSQL -f "$ROOT"/supabase/rollback/${v}_*.down.sql >/dev/null; done
+for v in 0011 0010 0009 0008; do $PSQL -f "$ROOT"/supabase/rollback/${v}_*.down.sql >/dev/null; done
 AFTER="$(shape)"
 echo "   shape rolled back: $AFTER"
 [ "$AFTER" = "$BASE" ] || { echo "ROLLBACK DID NOT RESTORE THE SHAPE"; exit 1; }
