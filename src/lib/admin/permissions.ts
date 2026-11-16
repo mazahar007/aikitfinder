@@ -32,6 +32,7 @@ export type Permission =
   | "roles.read"
   | "roles.grant"
   | "catalog.write"
+  | "catalog.publish"
   | "content.write"
   | "projects.status.read"
   | "jobs.read"

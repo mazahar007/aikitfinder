@@ -2,6 +2,8 @@
 
 import * as React from "react";
 
+import { keepValues } from "@/components/admin/use-keep-values";
+
 import { FormMessage } from "@/components/auth/password-field";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,7 +44,7 @@ export function IntegrationConfigForm({
   );
   const id = React.useId();
   return (
-    <form action={action} className="p-4" aria-busy={pending}>
+    <form onSubmit={keepValues(action)} className="p-4" aria-busy={pending}>
       <Message state={state} />
       <input type="hidden" name="key" value={record.key} />
       <fieldset disabled={!canEdit || pending} className="grid gap-4 sm:grid-cols-2">

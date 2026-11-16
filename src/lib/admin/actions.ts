@@ -7,12 +7,12 @@ import { assignableRoles, type Permission, type PlatformRole } from "@/lib/admin
 import { getAdapter } from "@/lib/integrations/adapter";
 import { integrationByKey, type ConfigField } from "@/lib/integrations/registry";
 import { encryptSecret, secretHint, secretStorageConfigured } from "@/lib/integrations/secrets";
+import { DENIED, explain } from "@/lib/admin/errors";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type AdminFormState = { error?: string; notice?: string };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const DENIED = "You do not have permission to do that.";
 
 /**
  * Checks the caller on the server before anything else. This is the first of
@@ -22,17 +22,6 @@ async function allowed(permission: Permission) {
   const context = await getAdminContext();
   return context?.permissions.has(permission) ? context : null;
 }
-
-/** Database messages that are safe and useful to show; anything else becomes a generic sentence. */
-function explain(error: { code?: string; message?: string }): string {
-  if (error.code === "42501")
-    return error.message && error.message !== "not allowed" ? sentence(error.message) : DENIED;
-  if (error.code === "22023" || error.code === "23514")
-    return sentence(error.message ?? "That value was not accepted.");
-  return "The change could not be saved. Try again.";
-}
-const sentence = (text: string) =>
-  (text.charAt(0).toUpperCase() + text.slice(1)).replace(/\.?$/, ".");
 
 function readField(
   field: ConfigField,
