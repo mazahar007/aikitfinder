@@ -1,3 +1,9 @@
+import {
+  HeroDemoClock,
+  HeroGateDemo,
+  HeroSearchDemo,
+  HeroStudioReadouts,
+} from "@/components/parent/hero-demo/hero-demo";
 import Link from "next/link";
 
 import { HeroLife } from "@/components/parent/hero-life/hero-life";
@@ -89,8 +95,7 @@ export function Hero() {
               <span className="crop b"></span>
               <span className="crop c"></span>
               <span className="crop d"></span>
-              <span className="sc">SCENE 03 · 16:9</span>
-              <span className="tc">00:01:12:04</span>
+              <HeroStudioReadouts />
               <span className="cap">
                 <span style={{ width: "150px" }}></span>
                 <span style={{ width: "96px", opacity: "0.7" }}></span>
@@ -173,7 +178,7 @@ export function Hero() {
                   <span className="clip t" style={{ left: "80%", width: "15%" }}></span>
                 </div>
               </div>
-              <span className="playhead" style={{ left: "calc(46px + 8px + 54%)" }}></span>
+              <span className="playhead live" style={{ left: "calc(46px + 8px + 54%)" }}></span>
             </div>
           </div>
 
@@ -186,69 +191,14 @@ export function Hero() {
                 className="pill"
                 style={{ color: "#ffd28a", borderColor: "rgba(255, 210, 138, 0.38)" }}
               >
-                Sample data
+                Demo data
               </span>
             </div>
-            <div className="srch">
-              <svg>
-                <use href="#i-search" />
-              </svg>
-              voiceover for a documentary<span className="caret"></span>
-            </div>
-            <ul className="res">
-              <li>
-                <span
-                  className="ini"
-                  style={{ background: "linear-gradient(135deg, #7aeaf3, #2bb8d0)" }}
-                >
-                  V
-                </span>
-                <span>
-                  <strong>Voxly</strong>
-                  <em>Audio and voice</em>
-                </span>
-                <span className="s">SAMPLE</span>
-              </li>
-              <li>
-                <span
-                  className="ini"
-                  style={{ background: "linear-gradient(135deg, #8cc8ff, #3a8ee6)" }}
-                >
-                  S
-                </span>
-                <span>
-                  <strong>Storyreel</strong>
-                  <em>Video generation</em>
-                </span>
-                <span className="s">SAMPLE</span>
-              </li>
-              <li>
-                <span
-                  className="ini"
-                  style={{ background: "linear-gradient(135deg, #7ff0d4, #22b59a)" }}
-                >
-                  N
-                </span>
-                <span>
-                  <strong>Notewell</strong>
-                  <em>Audio and voice</em>
-                </span>
-                <span className="s">SAMPLE</span>
-              </li>
-            </ul>
+            <HeroSearchDemo />
           </div>
 
-          <div className="gate">
-            <span className="ic">
-              <svg>
-                <use href="#i-shield" />
-              </svg>
-            </span>
-            <span>
-              <b>Your approval comes first</b>
-              <small>Nothing publishes without it</small>
-            </span>
-          </div>
+          <HeroGateDemo />
+          <HeroDemoClock />
         </div>
       </div>
       <Link className="scroll-cue" href="/#products" aria-label="Scroll to products">

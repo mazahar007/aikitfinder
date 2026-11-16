@@ -342,6 +342,141 @@ async function hero(browser) {
   }
 }
 
+/** The hero's illustrative product demo: runs, stops with Pause, off screen and under reduced motion. */
+async function heroDemo(browser) {
+  const g = "hero demo";
+  const read = (page) =>
+    page.evaluate(() => ({
+      query: document.querySelector(".stage .srch").innerText.trim(),
+      rows: [...document.querySelectorAll(".stage .res li")]
+        .map((l) => l.querySelector("strong").innerText)
+        .join(","),
+      labels: [...document.querySelectorAll(".stage .res li .s")]
+        .map((l) => l.textContent)
+        .join(","),
+      gate: document.querySelector(".stage .gate").innerText.replace(/\s+/g, " ").trim(),
+      timecode: document.querySelector(".stage .frame .tc").innerText,
+      demo: document.querySelector(".stage").dataset.demo,
+      playhead: getComputedStyle(document.querySelector(".stage .playhead")).animationName,
+    }));
+  for (const [vpName, vp] of [
+    ["desktop", VIEWPORTS.desktop],
+    ["mobile", VIEWPORTS.mobile],
+  ]) {
+    const { context, page, errors } = await open(browser, "/", vp);
+    await page.evaluate(() => document.querySelector(".stage").scrollIntoView({ block: "center" }));
+    await page.waitForFunction(
+      () => document.querySelector(".stage")?.dataset.demo === "on",
+      null,
+      { timeout: 15000 },
+    );
+    const seen = { queries: new Set(), rows: new Set(), gates: new Set(), timecodes: new Set() };
+    let labelsOk = true;
+    for (let i = 0; i < 34; i++) {
+      const f = await read(page);
+      seen.queries.add(f.query);
+      seen.rows.add(f.rows);
+      seen.gates.add(f.gate.replace(/\d+%/, "N%"));
+      seen.timecodes.add(f.timecode);
+      if (!f.labels.split(",").every((l) => l === "DEMO")) labelsOk = false;
+      await page.waitForTimeout(500);
+    }
+    check(
+      g,
+      `${vpName}: the search is typed and changes`,
+      seen.queries.size > 8 &&
+        [
+          "voiceover for a documentary",
+          "summarize a research paper",
+          "turn a blog post into a video",
+        ].filter((q) => seen.queries.has(q)).length >= 2,
+      `${seen.queries.size} states`,
+    );
+    check(
+      g,
+      `${vpName}: the results change with the search`,
+      seen.rows.size >= 2,
+      [...seen.rows].join(" | "),
+    );
+    check(g, `${vpName}: every result is labeled DEMO at all times`, labelsOk);
+    check(
+      g,
+      `${vpName}: the chip goes through render, review and approval`,
+      [
+        "Rendering preview Demo · N%",
+        "Ready for your review Demo · waiting for approval",
+        "Your approval comes first Nothing publishes without it",
+      ].every((s) => seen.gates.has(s)),
+      [...seen.gates].join(" | "),
+    );
+    check(
+      g,
+      `${vpName}: the preview timecode advances and the playhead moves`,
+      seen.timecodes.size > 10 && (await read(page)).playhead === "akf-playhead",
+    );
+    const panel = await page.locator(".stage .plane.af .pl-head").innerText();
+    check(
+      g,
+      `${vpName}: the studio panel still says it is a preview that is not available`,
+      /Preview — not yet available/i.test(panel),
+    );
+
+    // Pause: everything stops and stays where it is.
+    await page.locator(".motion-btn:visible").first().click();
+    await page.evaluate(() => document.querySelector(".stage").scrollIntoView({ block: "center" }));
+    await page.waitForTimeout(400);
+    const p1 = await read(page);
+    await page.waitForTimeout(1500);
+    const p2 = await read(page);
+    check(
+      g,
+      `${vpName}: Pause stops the demo`,
+      p1.demo === "off" &&
+        p1.query === p2.query &&
+        p1.timecode === p2.timecode &&
+        p1.gate === p2.gate &&
+        p2.playhead === "none",
+    );
+    await page.locator(".motion-btn:visible").first().click();
+    await page.evaluate(() => document.querySelector(".stage").scrollIntoView({ block: "center" }));
+    await page.waitForTimeout(1200);
+    const p3 = await read(page);
+    check(g, `${vpName}: Resume continues it`, p3.demo === "on" && p3.timecode !== p2.timecode);
+
+    // Off screen: nothing ticks.
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    await page.waitForTimeout(600);
+    const o1 = await read(page);
+    await page.waitForTimeout(1200);
+    const o2 = await read(page);
+    check(
+      g,
+      `${vpName}: the demo stops when it is off screen`,
+      o1.demo === "off" && o1.timecode === o2.timecode && o1.query === o2.query,
+    );
+    check(g, `${vpName}: no page errors`, errors.length === 0, errors.join(" | "));
+    await context.close();
+
+    // Reduced motion: the approved still frame, nothing moving.
+    const rm = await open(browser, "/", { ...vp, reducedMotion: "reduce" });
+    await rm.page.waitForTimeout(2500);
+    const r1 = await read(rm.page);
+    await rm.page.waitForTimeout(1500);
+    const r2 = await read(rm.page);
+    check(
+      g,
+      `${vpName}: reduced motion shows the still frame and never starts`,
+      r1.demo !== "on" &&
+        r1.query === "voiceover for a documentary" &&
+        r1.timecode === "00:01:12:04" &&
+        r1.gate === "Your approval comes first Nothing publishes without it" &&
+        r2.timecode === r1.timecode &&
+        r1.rows === "Voxly,Storyreel,Notewell",
+    );
+    await rm.context.close();
+  }
+}
+
 async function interactions(browser) {
   // Desktop: skip link, Products menu, theme, account dialog, CTAs.
   {
@@ -530,6 +665,7 @@ async function interactions(browser) {
   const browser = await chromium.launch();
   await routes(browser);
   await hero(browser);
+  await heroDemo(browser);
   await interactions(browser);
   await browser.close();
   const failed = results.filter((r) => !r.pass);

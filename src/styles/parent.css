@@ -55,6 +55,41 @@
   --p-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
+@keyframes akf-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes akf-playhead {
+  from {
+    left: calc(54px + 1%);
+  }
+  to {
+    left: calc(100% - 6px);
+  }
+}
+@keyframes akf-wave {
+  0%,
+  100% {
+    transform: scaleY(0.5);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+@keyframes akf-pan {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08) translateX(-2.5%);
+  }
+}
 @keyframes akf-blink {
   50% {
     opacity: 0;
@@ -958,6 +993,61 @@
   :root[data-motion="paused"] & .orbit,
   :root[data-motion="paused"] & .caret {
     animation-play-state: paused;
+  }
+
+  /* ── Hero product demo: illustrative motion ──
+     A typed search with arriving results, a moving playhead, a breathing
+     waveform and a slow pan on the preview. It runs only while the stage is
+     marked data-demo="on" (see HeroDemoClock): not when motion is paused, not
+     off screen, not in a hidden tab. Reduced motion removes it entirely. */
+  .res li.row-in {
+    animation: akf-row-in 0.44s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .res li.row-out {
+    opacity: 0.35;
+    transition: opacity 0.18s ease;
+  }
+  .res li.row-pending {
+    visibility: hidden;
+  }
+  .stage[data-demo="on"] .playhead.live {
+    animation: akf-playhead 15s linear infinite;
+    animation-delay: -8s;
+  }
+  .stage[data-demo="on"] .tl .lane svg rect {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: akf-wave 1.15s ease-in-out infinite;
+  }
+  .stage[data-demo="on"] .tl .lane svg rect:nth-child(3n) {
+    animation-delay: -0.38s;
+  }
+  .stage[data-demo="on"] .tl .lane svg rect:nth-child(3n + 1) {
+    animation-delay: -0.76s;
+  }
+  .stage[data-demo="on"] .tl .lane svg rect:nth-child(4n) {
+    animation-duration: 0.9s;
+  }
+  .stage[data-demo="on"] .frame svg.ridge {
+    transform-origin: 50% 100%;
+    animation: akf-pan 18s ease-in-out infinite alternate;
+  }
+  .gate {
+    min-width: 268px;
+  }
+  .gate small .bar {
+    display: block;
+    height: 3px;
+    margin-top: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    overflow: hidden;
+  }
+  .gate small .bar i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--p-pink);
   }
   .stage .plane.af {
     translate: calc(var(--px, 0) * -7px) calc(var(--py, 0) * -5px);
