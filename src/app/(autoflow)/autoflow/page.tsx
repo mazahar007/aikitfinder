@@ -4,6 +4,7 @@ import { ArrowRightIcon, ShieldCheckIcon } from "lucide-react";
 
 import { AutoflowFooter } from "@/components/autoflow/autoflow-footer";
 import { AutoflowHeader } from "@/components/autoflow/autoflow-header";
+import { PipelineDependencies } from "@/components/autoflow/pipeline-dependencies";
 import { StageRail } from "@/components/autoflow/stage-rail";
 import { Container } from "@/components/layout/container";
 import { Badge } from "@/components/ui/badge";
@@ -93,6 +94,16 @@ export default function AutoflowLandingPage() {
               built around; the stages themselves are not built yet.
             </p>
             <StageRail className="mt-8" />
+            <h3 className="mt-12 font-display text-2xl font-light tracking-tight text-heading">
+              What each stage depends on
+            </h3>
+            <p className="mt-2 max-w-2xl text-muted-foreground">
+              Every stage needs an outside service or piece of infrastructure. None is connected
+              yet.
+            </p>
+            <div className="mt-5">
+              <PipelineDependencies statuses={null} />
+            </div>
           </Container>
         </section>
 
