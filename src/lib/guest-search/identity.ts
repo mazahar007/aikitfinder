@@ -76,14 +76,16 @@ export async function ensureGuestHash(): Promise<string> {
 
 /**
  * A keyed hash of the caller's network address, for the daily per-address
- * cap. The address itself is never stored or logged. Null when the platform
- * does not supply one, in which case the cap is not applied.
+ * cap. The address itself is never stored or logged. When the platform does
+ * not supply one, all such requests share a single bucket.
  */
 export async function requestAddressHash(): Promise<string | null> {
   if (!guestIdentityConfigured) return null;
   const h = await headers();
   // Set by the hosting platform; the first entry is the client.
   const address = (h.get("x-real-ip") ?? h.get("x-forwarded-for")?.split(",")[0] ?? "").trim();
-  if (!address || address.length > 64) return null;
-  return hmac("akf-guest-address:v1", address).toString("hex");
+  // Without a usable address every such request shares one bucket, so the
+  // daily cap still applies instead of being skipped.
+  const bucket = address && address.length <= 64 ? address : "unknown";
+  return hmac("akf-guest-address:v1", bucket).toString("hex");
 }
