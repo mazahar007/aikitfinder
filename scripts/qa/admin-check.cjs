@@ -557,12 +557,12 @@ const SECTIONS = [
         .waitFor();
       check(
         g,
-        "the permission matrix lists 16 permissions for 5 roles",
+        "the permission matrix lists 17 permissions for 5 roles",
         (await owner.page
           .locator("main section")
           .filter({ hasText: "Permission matrix" })
           .locator("tbody tr")
-          .count()) === 16,
+          .count()) === 17,
       );
 
       // Editor: limited navigation, blocked pages.
@@ -753,6 +753,274 @@ const SECTIONS = [
         ws.join(","),
       );
       await user.context.close();
+    }
+
+    // ---- Directory content ----
+    {
+      const g = "directory";
+      const pg = owner.page;
+      const m = () => pg.locator("main:visible").first();
+      const field = (name) => m().locator(`[name="${name}"]`).first();
+      const section = (title) =>
+        m()
+          .locator("section")
+          .filter({ has: pg.getByRole("heading", { name: title }) })
+          .first();
+      const note = async (scope) => {
+        const n = (scope ?? m()).locator('[role="status"], [role="alert"]').first();
+        await n.waitFor({ timeout: 20000 });
+        return n.innerText();
+      };
+
+      await pg.goto(BASE + "/admin/directory");
+      await pg.getByRole("heading", { name: "AI Directory", level: 1 }).waitFor();
+      check(
+        g,
+        "the Directory admin page loads with an empty catalog",
+        /No tools yet/.test(await m().innerText()),
+      );
+
+      // Categories.
+      await pg.goto(BASE + "/admin/directory/categories");
+      await pg.getByRole("heading", { name: "Categories", level: 1 }).waitFor();
+      await field("name").fill("Writing");
+      await field("slug").fill("writing");
+      await field("description").fill("Tools that draft and edit text.");
+      await m().getByRole("button", { name: "Add category" }).click();
+      check(g, "a category can be added", /Category saved/.test(await note()));
+      await pg.reload();
+      await field("name").fill("Editing");
+      await field("slug").fill("editing");
+      await field("parent_id").selectOption({ label: "Writing" });
+      await m().getByRole("button", { name: "Add category" }).click();
+      await note();
+      check(
+        g,
+        "a subcategory can be added under it",
+        (await db("select count(*) from categories where parent_id is not null")) === "1",
+      );
+      await pg.reload();
+      await field("name").fill("Dup");
+      await field("slug").fill("writing");
+      await m().getByRole("button", { name: "Add category" }).click();
+      check(
+        g,
+        "a duplicate address name is refused with a clear message",
+        /already uses that address name/i.test(await note()),
+      );
+
+      // A new tool.
+      await pg.goto(BASE + "/admin/directory/tools/new");
+      await pg.getByRole("heading", { name: "Add tool", level: 1 }).waitFor();
+      await field("name").fill("Example Writer");
+      check(
+        g,
+        "the address name is suggested from the name",
+        (await field("slug").inputValue()) === "example-writer",
+      );
+      await field("official_url").fill("https://writer.example.com");
+      await field("short_description").fill("Drafts and edits text with AI.");
+      await field("primary_category").selectOption({ label: "Writing › Editing" });
+      await m().locator('input[name="platforms"][value="web"]').check();
+      await field("features").fill("Drafts articles\nRewrites paragraphs");
+      await m().getByRole("button", { name: "Create draft" }).click();
+      await pg.waitForURL(/\/admin\/directory\/tools\/[0-9a-f-]{36}\?created=1/, {
+        timeout: 20000,
+      });
+      const toolId = pg.url().match(/tools\/([0-9a-f-]{36})/)[1];
+      check(
+        g,
+        "creating a tool opens its editor, as an unpublished, unverified draft",
+        (await db(
+          `select status || ':' || verification || ':' || is_sample from tools where id = '${toolId}'`,
+        )) === "draft:unverified:false",
+      );
+      check(
+        g,
+        "the primary category and features were saved",
+        (await db(
+          `select count(*) from tool_categories where tool_id = '${toolId}' and position = 0`,
+        )) === "1" &&
+          (await db(`select array_length(features, 1) from tools where id = '${toolId}'`)) === "2",
+      );
+
+      // Publishing needs a source.
+      const publish = m()
+        .locator("form")
+        .filter({ has: pg.getByRole("button", { name: "Update status" }) });
+      await publish.locator('[name="status"]').selectOption("published");
+      await publish.getByRole("button", { name: "Update status" }).click();
+      check(
+        g,
+        "a tool without an official source cannot be published",
+        /add at least one official source/i.test(
+          await note(section("Publishing and verification")),
+        ) && (await db(`select status from tools where id = '${toolId}'`)) === "draft",
+      );
+      const verify = section("Publishing and verification")
+        .locator("form")
+        .filter({ has: pg.getByRole("button", { name: "Mark verified" }) });
+      await verify.getByRole("button", { name: "Mark verified" }).click();
+      await pg.waitForTimeout(1200);
+      check(
+        g,
+        "a tool without a dated source cannot be marked verified",
+        (await db(`select verification from tools where id = '${toolId}'`)) === "unverified",
+      );
+
+      // Add a dated source, then publish and verify.
+      await pg.reload();
+      const sources = m()
+        .locator("form")
+        .filter({ has: pg.getByRole("button", { name: "Add source" }) });
+      await sources.locator('[name="title"]').fill("Official site");
+      await sources.locator('[name="url"]').fill("https://writer.example.com");
+      const today = new Date().toISOString().slice(0, 10);
+      await sources.locator('[name="checked_at"]').fill(today);
+      await sources.getByRole("button", { name: "Add source" }).click();
+      await pg.waitForFunction(
+        () => document.querySelector("main")?.innerText.includes("https://writer.example.com"),
+        null,
+        { timeout: 15000 },
+      );
+      check(
+        g,
+        "a dated official source is added",
+        (await db(
+          `select count(*) from tool_sources where tool_id = '${toolId}' and checked_at is not null`,
+        )) === "1",
+      );
+      await pg.reload();
+      const publish2 = m()
+        .locator("form")
+        .filter({ has: pg.getByRole("button", { name: "Update status" }) });
+      await publish2.locator('[name="status"]').selectOption("published");
+      await publish2.locator('[name="featured"]').check();
+      await publish2.getByRole("button", { name: "Update status" }).click();
+      check(
+        g,
+        "with a category and a source, the tool can be published and featured",
+        /Published/.test(await note(section("Publishing and verification"))) &&
+          (await db(`select status || ':' || featured from tools where id = '${toolId}'`)) ===
+            "published:true",
+      );
+      await pg.reload();
+      await m()
+        .locator("form")
+        .filter({ has: pg.getByRole("button", { name: "Mark verified" }) })
+        .getByRole("button", { name: "Mark verified" })
+        .click();
+      check(
+        g,
+        "it can be marked verified, dated today by the database",
+        /verified as of today/i.test(await note(section("Publishing and verification"))) &&
+          (await db(
+            `select verification || ':' || last_verified_at from tools where id = '${toolId}'`,
+          )) === `verified:${today}`,
+      );
+
+      // Pricing.
+      await pg.reload();
+      const pricing = m()
+        .locator("form")
+        .filter({ has: pg.getByRole("button", { name: "Save pricing" }) });
+      await pricing.locator('[name="pricing_url"]').fill("https://writer.example.com/pricing");
+      await pricing.locator('[name="checked_at"]').fill(today);
+      await pricing.locator('[name="plan.0.name"]').fill("Free");
+      await pricing.locator('[name="plan.0.price"]').fill("0");
+      await pricing.locator('[name="plan.1.name"]').fill("Pro");
+      await pricing.locator('[name="plan.1.price"]').fill("12");
+      await pricing.getByRole("button", { name: "Save pricing" }).click();
+      check(
+        g,
+        "a paid plan without currency and billing is refused",
+        /needs a price, a 3-letter currency and a billing interval/i.test(
+          await note(section("Pricing plans")),
+        ),
+      );
+      await pricing.locator('[name="plan.1.currency"]').fill("usd");
+      await pricing.locator('[name="plan.1.interval"]').selectOption("month");
+      await pricing.getByRole("button", { name: "Save pricing" }).click();
+      await pg.waitForTimeout(1500);
+      check(
+        g,
+        "pricing with two plans is saved, and must be verified again before it shows publicly",
+        // detail
+
+        (await db(`select count(*) from pricing_plans where tool_id = '${toolId}'`)) === "2" &&
+          (await db(`select verification from tool_pricing where tool_id = '${toolId}'`)) ===
+            "unverified",
+        `${await db(`select count(*) from pricing_plans where tool_id = '${toolId}'`)} plans; ${await m()
+          .innerText()
+          .then(
+            (t) =>
+              (t.match(
+                /(plan "[^"]*"[^.]*\.|Pricing saved[^.]*\.|The change could not be saved[^.]*\.)/i,
+              ) || [""])[0],
+          )}`,
+      );
+
+      // Validation and the public view.
+      await pg.reload();
+      await field("official_url").fill("javascript:alert(1)");
+      await m().getByRole("button", { name: "Save changes" }).click();
+      await pg.waitForTimeout(800);
+      check(
+        g,
+        "an unsafe official address is refused",
+        (await db(`select official_url from tools where id = '${toolId}'`)) ===
+          "https://writer.example.com",
+      );
+      check(
+        g,
+        "the database lets visitors read the published tool only",
+        (await db("set role anon; select count(*) from tools")) === "1",
+      );
+      check(
+        g,
+        "every step was written to the audit log",
+        (await db(
+          "select count(distinct action) from audit_log where action in ('category.created','tool.created','tool.categories_set','tool.source_added','tool.status_set','tool.verification_set','tool.pricing_saved')",
+        )) === "7",
+        await db(
+          "select string_agg(distinct action, ',') from audit_log where action like 'tool.%' or action like 'category.%'",
+        ),
+      );
+      await pg.goto(BASE + "/admin/directory");
+      await pg.getByText("Example Writer").first().waitFor({ timeout: 15000 });
+      check(
+        g,
+        "the tool list shows the published, verified tool",
+        /Example Writer/.test(await m().innerText()) &&
+          /Published/.test(await m().innerText()) &&
+          /Verified/.test(await m().innerText()),
+      );
+
+      // An Editor can manage content; Finance and ordinary users cannot.
+      const editor = await signedIn(browser, EDITOR);
+      await editor.page.goto(BASE + "/admin/directory/tools/" + toolId);
+      await editor.page
+        .getByRole("heading", { name: "Example Writer", level: 1 })
+        .waitFor({ timeout: 15000 });
+      check(
+        g,
+        "an Editor can open the tool editor and publish controls",
+        (await main(editor.page).getByRole("button", { name: "Update status" }).count()) === 1,
+      );
+      await editor.context.close();
+      await db(
+        `insert into user_roles (user_id, role) values ('${MEMBER.id}', 'finance') on conflict (user_id) do update set role = 'finance'`,
+      );
+      const finance = await signedIn(browser, MEMBER);
+      await finance.page.goto(BASE + "/admin/directory");
+      await finance.page.waitForTimeout(1200);
+      check(
+        g,
+        'a Finance user gets "not found" for Directory management',
+        await isNotFound(finance.page),
+      );
+      await finance.context.close();
+      await db(`delete from user_roles where user_id = '${MEMBER.id}'`);
     }
 
     // ---- Phone layout ----

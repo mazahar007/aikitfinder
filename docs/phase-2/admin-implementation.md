@@ -198,3 +198,40 @@ dependency map, and the phone layout.
 Suspending accounts; user detail pages; Directory content management; job monitoring; storage
 browser; billing; email management; notifications; feature flags; maintenance mode; two-factor
 enforcement for staff; any provider adapter or real connection test; any AutoFlow stage.
+
+## 11. AI Directory content management (added 16 Nov 2026)
+
+Built and tested locally; **needs migration 0011 in production** before it works there. Until
+then `/admin/directory` says that management is not available yet.
+
+| Screen                        | What it does                                                                                          |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `/admin/directory`            | Tool list with search and status filter; counts                                                       |
+| `/admin/directory/tools/new`  | Create a tool as an unpublished, unverified draft                                                     |
+| `/admin/directory/tools/[id]` | Edit details and categories; add and remove sources; pricing plans; publish, feature, archive; verify |
+| `/admin/directory/categories` | Add, edit and delete categories and subcategories (two levels)                                        |
+
+Rules enforced by the database, not only the page:
+
+- Publishing needs a category and at least one official source. Sample records cannot be published.
+- Only published tools can be featured.
+- Verified needs a source with a check date; the verified date is set to today by the database.
+- Removing the last dated source sends a verified tool back to review.
+- Saving pricing marks it unverified; it shows publicly only after the tool is verified again,
+  and only if checked within the last 30 days.
+- Addresses must be full `http(s)` addresses; check dates cannot be in the future.
+- A category in use, or with subcategories, cannot be deleted.
+- Every change is written to the audit log.
+
+New permission `catalog.publish` (Super Admin, Admin, Editor). Editors can manage the Directory;
+Support and Finance cannot.
+
+Not yet done: the public Directory still reads the labeled sample records from code. Switching
+it to read published database records is the next step. Guides, prompts and workflows are not
+editable yet.
+
+Fixed along the way: admin forms no longer clear the person's input when the server refuses a
+value.
+
+Rollback: `supabase/rollback/0011_catalog_admin.down.sql` removes the functions and the
+permission and keeps any content entered.
