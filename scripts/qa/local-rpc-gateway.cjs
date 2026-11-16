@@ -88,6 +88,7 @@ const handlers = {
 const crypto = require("node:crypto");
 const { publicKey, privateKey } = crypto.generateKeyPairSync("ec", { namedCurve: "P-256" });
 const KID = "local-test-key";
+const LOCAL_PASSWORD = "local-test-password";
 const b64 = (v) => Buffer.from(typeof v === "string" ? v : JSON.stringify(v)).toString("base64url");
 const origin = () => `http://127.0.0.1:${port}`;
 
@@ -242,6 +243,47 @@ http
         const last = row.split("\n").filter(Boolean).pop();
         return last ? send(200, last) : send(406, { code: "PGRST116", message: "no rows" });
       }
+      // Password sign-in for local test accounts (all share one test password).
+      if (path === "/auth/v1/token") {
+        const body = raw ? JSON.parse(raw) : {};
+        const email = String(body.email || "");
+        if (!/^[a-z0-9._-]+@local\.test$/.test(email) || body.password !== LOCAL_PASSWORD)
+          return send(400, {
+            code: 400,
+            error_code: "invalid_credentials",
+            msg: "Invalid login credentials",
+          });
+        const id = await sql(
+          `select id from auth.users where email = '${email}' and email_confirmed_at is not null;`,
+          null,
+        );
+        if (!id)
+          return send(400, {
+            code: 400,
+            error_code: "invalid_credentials",
+            msg: "Invalid login credentials",
+          });
+        const now = Math.floor(Date.now() / 1000);
+        const user = {
+          id,
+          aud: "authenticated",
+          role: "authenticated",
+          email,
+          email_confirmed_at: new Date().toISOString(),
+          app_metadata: { provider: "email" },
+          user_metadata: {},
+          created_at: new Date().toISOString(),
+        };
+        return send(200, {
+          access_token: mintToken(id, email),
+          token_type: "bearer",
+          expires_in: 3600,
+          expires_at: now + 3600,
+          refresh_token: "local-refresh",
+          user,
+        });
+      }
+      if (path === "/auth/v1/logout") return send(204, "");
       // The local test accounts have no projects.
       if (path === "/rest/v1/autoflow_projects") return send(200, []);
       const handler = handlers[path];

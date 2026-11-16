@@ -25,6 +25,10 @@ if (fs.existsSync(".env.local"))
   }
 const SUPA = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const ADMIN = process.env.QA_SUPABASE_ADMIN_KEY;
+/** A local test account served by the gateway's stand-in for Supabase Auth. */
+const LOCAL = process.env.QA_LOCAL_EMAIL
+  ? { email: process.env.QA_LOCAL_EMAIL, password: process.env.QA_LOCAL_PASSWORD }
+  : null;
 
 /** Optional: save pictures of the main states here for a visual review. */
 const SHOTS = process.env.SCREENSHOT_DIR;
@@ -692,20 +696,27 @@ async function browserChecks(browser) {
   // ---- Sign in and continue the pending search ----
   // These need one throwaway account in the real sign-in project, so they run only when asked.
   const signInChecks = async () => {
-    const email = `akf-qa-search-${Date.now()}@example.com`;
-    const password = crypto.randomBytes(18).toString("base64url");
+    const email = LOCAL ? LOCAL.email : `akf-qa-search-${Date.now()}@example.com`;
+    const password = LOCAL ? LOCAL.password : crypto.randomBytes(18).toString("base64url");
     const H = {
       apikey: ADMIN,
       Authorization: `Bearer ${ADMIN}`,
       "Content-Type": "application/json",
     };
-    const made = await (
-      await fetch(`${SUPA}/auth/v1/admin/users`, {
-        method: "POST",
-        headers: H,
-        body: JSON.stringify({ email, password, email_confirm: true }),
-      })
-    ).json();
+    const made = LOCAL
+      ? null
+      : await (
+          await fetch(`${SUPA}/auth/v1/admin/users`, {
+            method: "POST",
+            headers: H,
+            body: JSON.stringify({
+              email,
+              password,
+              email_confirmed_at: true,
+              email_confirm: true,
+            }),
+          })
+        ).json();
     try {
       const g2 = "B/E sign-in";
       await page.goto(BASE + "/search");
@@ -781,7 +792,7 @@ async function browserChecks(browser) {
         await fetch(`${SUPA}/auth/v1/admin/users/${made.id}`, { method: "DELETE", headers: H });
     }
   };
-  if (ADMIN && SUPA) await signInChecks();
+  if (LOCAL || (ADMIN && SUPA)) await signInChecks();
   else
     for (const n of [
       "pending search survives sign-in",
@@ -789,7 +800,7 @@ async function browserChecks(browser) {
       "counter hidden when signed in",
       "signed-in users are not limited",
     ])
-      skip("B/E sign-in", n, "QA_SUPABASE_ADMIN_KEY not set");
+      skip("B/E sign-in", n, "no test account available");
   check(g, "no page errors", errors.length === 0, errors.join(" | "));
   await context.close();
 
